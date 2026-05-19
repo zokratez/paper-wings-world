@@ -25,17 +25,18 @@ Full development begins after Huh? Build 44 ships and generates initial revenue.
 /docs/                  ← Additional technical docs
 ```
 
-## Getting Started (Phase 1 - Folding System)
+## HIGH INTENSITY MODE - Getting a Playable Demo (5 minutes)
 
-1. Open the folder `~/paper-wings-world/` in **Unity 6+**.
-2. Let Unity import the packages (UI Toolkit, Addressables, URP, etc.).
-3. Go to menu: **Paper Wings → Create MVP Plane Assets (v1.0 Locked 8)**  
-   → This will generate all 8 ScriptableObjects + the central library.
-4. Create a new scene and add the `FoldingTutorialManager` + UI Documents.
-5. Use the `SimplePaperPlaneGenerator` + `PaperModelOrbitController` for early 3D testing.
-6. The `notes/` folder is the Obsidian vault (highly recommended to open separately).
+1. Open `~/paper-wings-world/` in **Unity 6+**.
+2. Run: **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
+3. Run: **Paper Wings → HIGH INTENSITY - Create Playable Demo Scene**
+4. Open the new scene: `Assets/Scenes/FoldingTutorialDemo.unity`
+5. Press Play.
+6. Click any plane card (Classic Dart has full working steps + animation).
 
-See `Assets/Scripts/Folding/README.md` for detailed status and next steps.
+Touch controls: Drag to rotate the paper, pinch to zoom.
+
+See `Assets/Scripts/Folding/Demo/HOW_TO_TEST.md` for details.
 
 ## Principles (inherited from ooabisabi operating agreement)
 
