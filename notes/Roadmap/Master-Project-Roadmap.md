@@ -65,11 +65,11 @@ The app combines:
 - Monetization foundation: 2 products, purchase buttons on locked content, Premium badges, Settings screen with Restore & Sign Out, success toasts
 
 ### What Is Next (Phase 6)
-- Expanded device-specific test cases in `Phase-6-Testing.md` (iPad Pro, Galaxy Tab S9, mid-range Android, iPhone, low-end)
-- Performance: Mobile-aware particle reduction in FlightEffects (lower maxParticles and emission rates on handheld for fewer draw calls and consistent 60 FPS)
-- Simple splash/loading screen on initial app launch in FoldingDemoBootstrap (dark overlay with title + "Loading..." text, auto-dismiss after 1.5s)
-- Maintain living Known Issues & Testing Checklist
-- Final polish, store readiness, and beta preparation
+- Expanded device-specific test cases in `Phase-6-Testing.md`
+- Performance: Mobile particle optimization + centralized low-end shadow/post-processing reduction (QualitySettings + shadowDistance on low-end devices via SceneTransition)
+- Simple splash/loading screen on initial launch
+- Known Issues expanded with gaps (duplicated perf code, LOD not needed)
+- Maintain checklist and prepare for real device QA
 
 See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issues.
 

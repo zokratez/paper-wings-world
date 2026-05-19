@@ -40,12 +40,15 @@ From Master Project Roadmap:
 **High Priority**
 - Scene load hitch on some devices during cross-scene transitions (Folding ↔ Flight) — mitigated by fade but not eliminated.
 - No real device testing matrix executed yet (all work in Editor + limited simulator).
+- Performance settings (60 FPS, quality) are duplicated in multiple bootstraps and SceneTransition; no single source of truth yet.
 
 **Medium / Polish**
 - Performance on lower-end Android tablets may drop below 60 FPS in dense particle + physics scenes.
 - No explicit battery/thermal throttling awareness.
 - Purchase simulation does not persist across app restarts in a user-visible way beyond the existing prefs (fine for demo).
 - Loading indicator during transitions is basic (fade only).
+- Shadow and post-processing quality lowering is only applied in SceneTransition (may be overridden by per-scene bootstraps).
+- No LOD on paper models (evaluated: not needed — models use < 100 tris via quads/cubes; adding LOD would add complexity with zero visual/perf gain on target devices).
 
 **Low / Nice-to-Have**
 - No haptic feedback on purchases or strong thermals.
