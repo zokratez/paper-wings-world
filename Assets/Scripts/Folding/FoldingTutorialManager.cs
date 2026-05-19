@@ -390,8 +390,15 @@ namespace PaperWings.Folding
                     var (dist, time) = PaperWings.Progression.FlightProgress.GetBest(planeDef.planeId, region.Id);
                     bool unlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked(region.Id);
 
+                    string badge = "";
+                    if (unlocked && (dist > 0 || time > 0))
+                    {
+                        var tier = PaperWings.Progression.FlightProgress.GetMasteryTier(planeDef.planeId, region.Id);
+                        badge = PaperWings.Progression.FlightProgress.GetBadgeEmoji(tier) + " ";
+                    }
+
                     string text = unlocked 
-                        ? (dist > 0 || time > 0 ? $"{region.Name}: {dist:F0}m / {time:F1}s" : $"{region.Name}: No flights yet")
+                        ? (dist > 0 || time > 0 ? $"{badge}{region.Name}: {dist:F0}m / {time:F1}s" : $"{region.Name}: No flights yet")
                         : $"{region.Name}: 🔒 Locked";
 
                     var line = new Label(text);
@@ -529,7 +536,7 @@ namespace PaperWings.Folding
             }
             else
             {
-                // Show best scores if we have a current plane
+                // Show best scores + mastery badge if we have a current plane
                 if (currentPlane != null)
                 {
                     var (bestDist, bestTime) = PaperWings.Progression.FlightProgress.GetBest(currentPlane.planeId, regionId);
@@ -546,6 +553,18 @@ namespace PaperWings.Folding
                         bestLabel.style.fontSize = 10;
                         bestLabel.style.color = new Color(0.6f, 0.6f, 0.6f);
                         card.Add(bestLabel);
+                    }
+
+                    // Mastery badge
+                    var tier = PaperWings.Progression.FlightProgress.GetMasteryTier(currentPlane.planeId, regionId);
+                    string badgeEmoji = PaperWings.Progression.FlightProgress.GetBadgeEmoji(tier);
+                    if (!string.IsNullOrEmpty(badgeEmoji))
+                    {
+                        var badgeLabel = new Label($"{badgeEmoji} {PaperWings.Progression.FlightProgress.GetBadgeLabel(tier)}");
+                        badgeLabel.style.fontSize = 12;
+                        badgeLabel.style.color = new Color(0.85f, 0.65f, 0.1f);
+                        badgeLabel.style.marginTop = 2;
+                        card.Add(badgeLabel);
                     }
                 }
 
