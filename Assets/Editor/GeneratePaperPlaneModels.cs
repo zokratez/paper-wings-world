@@ -40,12 +40,16 @@ namespace PaperWings.Editor
             Debug.Log("Generated all 8 low-poly rigged paper plane prefabs in " + OutputPath);
         }
 
-        [MenuItem("Paper Wings/Assign Real Models to Key PaperPlaneDefinitions")]
-        public static void AssignModelsToDefinitions()
+        [MenuItem("Paper Wings/Assign Real Models to All PaperPlaneDefinitions")]
+        public static void AssignAllModelsToDefinitions()
         {
-            string[] keyPlanes = { "classic_dart", "the_ring", "nakamichi_glider", "the_bird" };
+            string[] allPlanes = { 
+                "classic_dart", "the_ring", "loop_plane", 
+                "nakamichi_glider", "stealth_glider", "light_spinner", 
+                "canard", "the_bird" 
+            };
 
-            foreach (string id in keyPlanes)
+            foreach (string id in allPlanes)
             {
                 string defPath = $"Assets/ScriptableObjects/PaperPlanes/{id}.asset";
                 string prefabPath = $"Assets/Prefabs/Planes/{id}.prefab";
@@ -67,6 +71,7 @@ namespace PaperWings.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            Debug.Log("All 8 PaperPlaneDefinitions now point to real 3D models.");
         }
 
         private enum PlaneStyle
@@ -96,7 +101,10 @@ namespace PaperWings.Editor
 
             var tail = CreateBone(root, "Tail", PrimitiveType.Quad, GetTailScale(style), GetTailPos(style));
 
-            // Apply plane-specific shaping for more realistic folded paper look
+            // === Improved geometry for more realistic folded paper look ===
+            AddPaperCreases(style, leftWing, rightWing, leftTip, rightTip, tail);
+
+            // Apply plane-specific shaping
             ApplyPlaneStyle(style, body, leftWing, rightWing, leftTip, rightTip, tail);
 
             // Add the animator
@@ -114,6 +122,53 @@ namespace PaperWings.Editor
             string path = OutputPath + id + ".prefab";
             PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
+        }
+
+        /// <summary>
+        /// Adds extra geometry to simulate paper creases and subtle folds.
+        /// This makes the low-poly models look more like real folded paper.
+        /// </summary>
+        private static void AddPaperCreases(PlaneStyle style, Transform leftWing, Transform rightWing, 
+                                           Transform leftTip, Transform rightTip, Transform tail)
+        {
+            // Add a subtle crease line on main wings for most planes
+            if (style != PlaneStyle.Ring)
+            {
+                CreateCrease(leftWing, "LeftCrease", new Vector3(0.48f, 0.01f, 1f), new Vector3(0, 0.005f, 0));
+                CreateCrease(rightWing, "RightCrease", new Vector3(0.48f, 0.01f, 1f), new Vector3(0, 0.005f, 0));
+            }
+
+            // Extra layered look for The Bird (accordion style)
+            if (style == PlaneStyle.Bird)
+            {
+                CreateCrease(leftWing, "LeftLayer2", new Vector3(0.45f, 0.01f, 0.95f), new Vector3(0, 0.008f, 0.02f));
+                CreateCrease(rightWing, "RightLayer2", new Vector3(0.45f, 0.01f, 0.95f), new Vector3(0, 0.008f, 0.02f));
+            }
+
+            // Ring gets a more cylindrical feel with an inner ring indicator
+            if (style == PlaneStyle.Ring)
+            {
+                CreateCrease(leftWing, "InnerRing", new Vector3(0.22f, 0.015f, 0.9f), new Vector3(0, 0.01f, 0));
+                CreateCrease(rightWing, "InnerRing", new Vector3(0.22f, 0.015f, 0.9f), new Vector3(0, 0.01f, 0));
+            }
+        }
+
+        private static void CreateCrease(Transform parent, string name, Vector3 scale, Vector3 localPos)
+        {
+            GameObject crease = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            crease.name = name;
+            crease.transform.SetParent(parent);
+            crease.transform.localPosition = localPos;
+            crease.transform.localScale = scale;
+            crease.transform.localRotation = Quaternion.identity;
+
+            var renderer = crease.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                var mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                mat.color = new Color(0.85f, 0.85f, 0.85f); // slightly darker for crease effect
+                renderer.material = mat;
+            }
         }
 
         // --- Improved scales for more paper-like appearance ---
