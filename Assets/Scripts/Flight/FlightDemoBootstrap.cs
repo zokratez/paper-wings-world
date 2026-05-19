@@ -72,10 +72,15 @@ namespace PaperWings.Demo
             flightAudio.planeTransform = planeGO.transform;
             flightAudio.planeRigidbody = physics.GetComponent<Rigidbody>();
 
-            // Add flight visual effects (paper flutter)
+            // Add flight visual effects (paper flutter + region particles)
             var flightEffects = gameObject.AddComponent<FlightEffects>();
             flightEffects.planeTransform = planeGO.transform;
             flightEffects.planeRigidbody = physics.GetComponent<Rigidbody>();
+
+            if (region != null)
+            {
+                flightEffects.SetRegion(region);
+            }
 
             // Apply region-specific flight tuning via manager if available, otherwise direct
             if (region != null && physics != null)
@@ -108,6 +113,13 @@ namespace PaperWings.Demo
             if (flightEffects != null)
             {
                 flightEffects.PlayLaunchBurst();
+            }
+
+            // Subtle screen shake on strong launch (satisfying feedback)
+            var camFollower = flightCamera.GetComponent<FlightCameraFollower>();
+            if (camFollower != null)
+            {
+                camFollower.Shake(0.7f, 0.4f);
             }
 
             // Apply rich region visuals (sky, fog, ambient) — this is what makes each place feel different
@@ -232,12 +244,13 @@ namespace PaperWings.Demo
             panelRect.sizeDelta = new Vector2(520, 380);
 
             var panelImg = panelGO.GetComponent<UnityEngine.UI.Image>();
-            panelImg.color = new Color(0.98f, 0.98f, 0.96f, 0.97f);
+            // Consistent kid-friendly palette (cream with soft blue undertone)
+            panelImg.color = new Color(0.97f, 0.96f, 0.94f, 0.97f);
 
             // Add rounded look via material or just color for demo
 
             // Title
-            var titleGO = CreateText(panelGO.transform, "Flight Complete", new Vector2(0, 140), 32, true, new Color(0.15f, 0.25f, 0.35f));
+            var titleGO = CreateText(panelGO.transform, "Flight Complete", new Vector2(0, 140), 32, true, new Color(0.12f, 0.22f, 0.38f));
 
             // Stats
             string statsText = $"Distance: {dist:F0} m\nFlight Time: {time:F1} s\nMax Altitude: {maxAlt:F0} m";

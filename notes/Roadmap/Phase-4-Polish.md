@@ -133,15 +133,26 @@ This phase focuses on audio feedback, particle/visual effects, and consistent vi
   - Wired into folding launch and flight bootstrap.
 
 - **Visual Effects**:
-  - New `FlightEffects.cs` with runtime-created lightweight paper flutter particles that scale with speed.
-  - Launch burst particles + visual pop on the 3D model when launching from success screen.
-  - Wired into flight scene.
+  - Enhanced `FlightEffects.cs`:
+    - Region-specific particles (warm dust in Grand Canyon, soft pink/green leaves in Fuji, sea spray in Norwegian Coast).
+    - High-speed contrail / wind streak particles behind the plane.
+    - Full integration with `FlightRegion` via `SetRegion()`.
+  - Launch burst + model pop effect now triggers from success screen.
 
-- **Polish**:
-  - Added kid-friendly palette comment block in USS.
-  - Enhanced lighting/environment variation already benefits from previous region data work.
+- **Screen Shake**:
+  - Added `Shake()` method to `FlightCameraFollower`.
+  - Gentle shake on strong launches for satisfying feedback.
+  - Ready for strong thermals.
 
-More work remains on stronger real audio clips and region-specific particle variety, but the foundation is solid and delightful.
+- **Visual Polish**:
+  - Rolled out consistent kid-friendly color palette (primary blue, warm accent, title cream tones) across:
+    - Main Hub
+    - My Progress overlay
+    - Post-Flight Summary
+    - Region Selection cards (via USS + dynamic styling)
+  - Added official palette reference block in `FoldingScreen.uss`.
+
+All changes maintain mobile performance and the existing data-driven region system.
 
 All work will be done with the same high-quality, readable, data-driven standards used in previous phases.
 

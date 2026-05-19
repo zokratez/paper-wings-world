@@ -106,5 +106,35 @@ namespace PaperWings.Flight
                 currentPitch = Mathf.Lerp(currentPitch, 7f, Time.deltaTime * 3.8f);
             }
         }
+
+        /// <summary>
+        /// Triggers a subtle screen shake (used for strong launches or thermals).
+        /// Kid-friendly — short and gentle.
+        /// </summary>
+        public void Shake(float intensity = 0.6f, float duration = 0.35f)
+        {
+            StartCoroutine(DoShake(intensity, duration));
+        }
+
+        private System.Collections.IEnumerator DoShake(float intensity, float duration)
+        {
+            float elapsed = 0f;
+            Vector3 originalPosition = transform.localPosition;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float strength = intensity * (1 - (elapsed / duration));
+
+                float x = Random.Range(-1f, 1f) * strength * 0.08f;
+                float y = Random.Range(-1f, 1f) * strength * 0.08f;
+
+                transform.localPosition = originalPosition + new Vector3(x, y, 0);
+
+                yield return null;
+            }
+
+            transform.localPosition = originalPosition;
+        }
     }
 }

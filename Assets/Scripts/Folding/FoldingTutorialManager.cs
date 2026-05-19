@@ -89,18 +89,24 @@ namespace PaperWings.Folding
             mainMenuContainer.style.paddingTop = 40;
             mainMenuContainer.style.paddingBottom = 40;
 
+            // Kid-friendly consistent palette (Phase 4)
+            Color primaryBlue = new Color(0.23f, 0.51f, 0.82f);
+            Color warmAccent = new Color(0.96f, 0.62f, 0.15f);
+            Color titleColor = new Color(0.12f, 0.28f, 0.48f);
+            Color textMuted = new Color(0.35f, 0.42f, 0.52f);
+
             // Title
             var title = new Label("Paper Wings World");
             title.style.fontSize = 42;
             title.style.unityFontStyleAndWeight = FontStyle.Bold;
-            title.style.color = new Color(0.15f, 0.35f, 0.55f);
+            title.style.color = titleColor;
             title.style.marginBottom = 8;
             mainMenuContainer.Add(title);
 
             // Friendly subtitle
             var subtitle = new Label("Fold amazing planes. Fly them across the world.");
             subtitle.style.fontSize = 18;
-            subtitle.style.color = new Color(0.3f, 0.4f, 0.5f);
+            subtitle.style.color = textMuted;
             subtitle.style.marginBottom = 30;
             mainMenuContainer.Add(subtitle);
 
@@ -108,7 +114,7 @@ namespace PaperWings.Folding
             var iconArea = new VisualElement();
             iconArea.style.width = 120;
             iconArea.style.height = 120;
-            iconArea.style.backgroundColor = new Color(0.3f, 0.65f, 0.85f);
+            iconArea.style.backgroundColor = primaryBlue;
             iconArea.style.borderRadius = 60;
             iconArea.style.alignItems = Align.Center;
             iconArea.style.justifyContent = Justify.Center;
@@ -128,7 +134,7 @@ namespace PaperWings.Folding
 
             // Start New Flight button
             var startBtn = new Button { text = "✈️  Start New Flight" };
-            StyleBigButton(startBtn, new Color(0.2f, 0.55f, 0.85f));
+            StyleBigButton(startBtn, primaryBlue);
             startBtn.clicked += () =>
             {
                 HideMainMenu();
@@ -138,7 +144,7 @@ namespace PaperWings.Folding
 
             // My Progress button
             var progressBtn = new Button { text = "📊  My Progress" };
-            StyleBigButton(progressBtn, new Color(0.85f, 0.55f, 0.2f));
+            StyleBigButton(progressBtn, warmAccent);
             progressBtn.clicked += () =>
             {
                 ShowMyProgressScreen();
@@ -532,7 +538,7 @@ namespace PaperWings.Folding
             progressPanel.style.left = 0;
             progressPanel.style.width = Length.Percent(100);
             progressPanel.style.height = Length.Percent(100);
-            progressPanel.style.backgroundColor = new Color(0, 0, 0, 0.85f);
+            progressPanel.style.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 0.88f);
             progressPanel.style.flexDirection = FlexDirection.Column;
             progressPanel.style.alignItems = Align.Center;
             progressPanel.style.justifyContent = Justify.Center;
@@ -542,7 +548,7 @@ namespace PaperWings.Folding
             var title = new Label("My Flight Progress");
             title.style.fontSize = 28;
             title.style.unityFontStyleAndWeight = FontStyle.Bold;
-            title.style.color = Color.white;
+            title.style.color = new Color(0.95f, 0.97f, 1f);
             title.style.marginBottom = 20;
             progressPanel.Add(title);
 
