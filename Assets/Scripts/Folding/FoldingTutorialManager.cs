@@ -67,6 +67,26 @@ namespace PaperWings.Folding
             }
 
             ShowMainMenu();
+
+            // Phase 5 listeners (auth, purchases, etc.)
+            InitializePhase5Listeners();
+        }
+
+        private void InitializePhase5Listeners()
+        {
+            PurchaseManager.EnsureExists();
+            if (PurchaseManager.Instance != null)
+            {
+                PurchaseManager.Instance.OnPurchaseCompleted += (productId) =>
+                {
+                    ShowToast($"✅ Purchase successful!\n{productId} unlocked.");
+                };
+
+                PurchaseManager.Instance.OnRestoreCompleted += () =>
+                {
+                    ShowToast("✅ Purchases restored successfully.");
+                };
+            }
         }
 
         #region Main Menu / Hub
@@ -165,6 +185,12 @@ namespace PaperWings.Folding
                 ShowMyProgressScreen();
             };
             buttonRow.Add(progressBtn);
+
+            // Settings button (Phase 5)
+            var settingsBtn = new Button { text = "⚙️  Settings" };
+            StyleBigButton(settingsBtn, new Color(0.45f, 0.5f, 0.55f));
+            settingsBtn.clicked += ShowSettingsScreen;
+            buttonRow.Add(settingsBtn);
 
             // ============================================================
             // Phase 5 Email Auth Section (Permanent accounts)
@@ -1123,6 +1149,126 @@ namespace PaperWings.Folding
             foldingRoot.Add(progressPanel);
         }
 
+        private void ShowSettingsScreen()
+        {
+            if (selectionRoot == null) return;
+
+            // Full-screen semi-transparent overlay (works from Hub)
+            var overlay = new VisualElement();
+            overlay.name = "settings-overlay";
+            overlay.style.position = Position.Absolute;
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = Length.Percent(100);
+            overlay.style.height = Length.Percent(100);
+            overlay.style.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 0.88f);
+            overlay.style.flexDirection = FlexDirection.Column;
+            overlay.style.alignItems = Align.Center;
+            overlay.style.justifyContent = Justify.Center;
+            overlay.style.padding = 20;
+
+            // Cream content card
+            var card = new VisualElement();
+            card.style.backgroundColor = CreamBg;
+            card.style.borderRadius = 14;
+            card.style.padding = 22;
+            card.style.width = Length.Percent(88);
+            card.style.maxWidth = 420;
+            card.style.flexDirection = FlexDirection.Column;
+            card.style.alignItems = Align.Center;
+            overlay.Add(card);
+
+            // Title
+            var title = new Label("⚙️  Settings");
+            title.style.fontSize = 26;
+            title.style.unityFontStyleAndWeight = FontStyle.Bold;
+            title.style.color = TitleColor;
+            title.style.marginBottom = 18;
+            card.Add(title);
+
+            // Account info
+            string accountInfo = "Not signed in";
+            if (SupabaseAuth.Instance != null && SupabaseAuth.Instance.IsAuthenticated)
+            {
+                accountInfo = !string.IsNullOrEmpty(SupabaseAuth.Instance.CurrentEmail)
+                    ? SupabaseAuth.Instance.CurrentEmail
+                    : "Anonymous User (cloud sync enabled)";
+            }
+
+            var accountLabel = new Label($"Account:\n{accountInfo}");
+            accountLabel.style.fontSize = 15;
+            accountLabel.style.color = TitleColor;
+            accountLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            accountLabel.style.marginBottom = 22;
+            card.Add(accountLabel);
+
+            // Restore Purchases
+            var restoreBtn = new Button { text = "🔄  Restore Purchases" };
+            restoreBtn.style.width = Length.Percent(100);
+            restoreBtn.style.maxWidth = 300;
+            restoreBtn.style.height = 54;
+            restoreBtn.style.backgroundColor = PrimaryBlue;
+            restoreBtn.style.color = Color.white;
+            restoreBtn.style.fontSize = 16;
+            restoreBtn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            restoreBtn.style.borderRadius = 10;
+            restoreBtn.style.marginBottom = 12;
+
+            restoreBtn.clicked += () =>
+            {
+                PurchaseManager.EnsureExists();
+                if (PurchaseManager.Instance != null)
+                {
+                    PurchaseManager.Instance.RestorePurchases();
+                    // Feedback comes via OnRestoreCompleted → toast
+                }
+            };
+            card.Add(restoreBtn);
+
+            // Sign Out
+            var signOutBtn = new Button { text = "🚪  Sign Out" };
+            signOutBtn.style.width = Length.Percent(100);
+            signOutBtn.style.maxWidth = 300;
+            signOutBtn.style.height = 54;
+            signOutBtn.style.backgroundColor = new Color(0.7f, 0.32f, 0.32f);
+            signOutBtn.style.color = Color.white;
+            signOutBtn.style.fontSize = 16;
+            signOutBtn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            signOutBtn.style.borderRadius = 10;
+            signOutBtn.style.marginBottom = 24;
+
+            signOutBtn.clicked += () =>
+            {
+                if (SupabaseAuth.Instance != null)
+                {
+                    SupabaseAuth.Instance.SignOut();
+                }
+                if (overlay.parent != null) overlay.parent.Remove(overlay);
+                // Refresh Hub to update status bar and sections
+                ShowMainMenu();
+            };
+            card.Add(signOutBtn);
+
+            // Close
+            var closeBtn = new Button { text = "Close" };
+            closeBtn.style.paddingLeft = 36;
+            closeBtn.style.paddingRight = 36;
+            closeBtn.style.paddingTop = 9;
+            closeBtn.style.paddingBottom = 9;
+            closeBtn.style.fontSize = 15;
+            closeBtn.style.backgroundColor = TextMuted;
+            closeBtn.style.color = Color.white;
+            closeBtn.style.borderRadius = 8;
+
+            closeBtn.clicked += () =>
+            {
+                if (overlay.parent != null) overlay.parent.Remove(overlay);
+            };
+            card.Add(closeBtn);
+
+            selectionRoot.Add(overlay);
+        }
+
         private void ShowRegionSelection()
         {
             // Phase 3 Region Selection "screen" - appears after successful fold, before launch.
@@ -1366,6 +1512,50 @@ namespace PaperWings.Folding
             if (toAlpha <= 0.01f)
             {
                 element.style.display = DisplayStyle.None;
+            }
+        }
+
+        // ============================================================
+        // Phase 5 Toast / Confirmation system
+        // ============================================================
+        private void ShowToast(string message, float duration = 2.8f)
+        {
+            VisualElement root = selectionRoot ?? foldingRoot;
+            if (root == null)
+            {
+                Debug.Log("[Toast] " + message);
+                return;
+            }
+
+            var toast = new Label(message);
+            toast.style.position = Position.Absolute;
+            toast.style.bottom = 60;
+            toast.style.left = Length.Percent(8);
+            toast.style.right = Length.Percent(8);
+            toast.style.backgroundColor = new Color(0.15f, 0.55f, 0.25f, 0.95f);
+            toast.style.color = Color.white;
+            toast.style.fontSize = 15;
+            toast.style.paddingLeft = 16;
+            toast.style.paddingRight = 16;
+            toast.style.paddingTop = 10;
+            toast.style.paddingBottom = 10;
+            toast.style.borderRadius = 10;
+            toast.style.unityTextAlign = TextAnchor.MiddleCenter;
+            toast.style.whiteSpace = WhiteSpace.Normal;
+
+            root.Add(toast);
+
+            StartCoroutine(FadeOutAndRemoveToast(toast, duration));
+        }
+
+        private IEnumerator FadeOutAndRemoveToast(VisualElement toast, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            if (toast != null && toast.parent != null)
+            {
+                yield return StartCoroutine(FadeElement(toast, 1f, 0f, 0.35f));
+                if (toast.parent != null) toast.parent.Remove(toast);
             }
         }
     }

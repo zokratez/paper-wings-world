@@ -115,6 +115,9 @@ create policy "Users can update own progress"
 - Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` and show an "Unlock for $4.99" button on locked items (buys the full content pack).
 - Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` and shows purchase buttons on locked regions.
 - New `PurchaseManager` abstraction (simulation mode) + wired into `ContentUnlockManager` for real gating. One foundation product: "full_content_pack".
+- Simple **Settings screen** (⚙️ button on Hub) with Account info, Restore Purchases button, and Sign Out.
+- Purchase success confirmation toast after buying.
+- Restore Purchases wired and functional (with user feedback).
 
 **Not yet production-ready**:
 - Token refresh / session expiration handling
