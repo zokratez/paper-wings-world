@@ -408,4 +408,19 @@ All changes keep the system clean, data-driven, and easy to extend (new region =
 - Fully dynamic, uses the same `FlightProgress` data source.
 - Accessible right after any successful fold (no need for main menu yet).
 
-This completes a very satisfying vertical slice of Phase 3 progression and feedback loops while staying lightweight and demo-friendly.
+### 4. Post-Flight Summary Screen
+- When clicking the original "Return to Folding" button in flight, a polished centered summary card now appears instead of immediate transition.
+- Displays: Distance, Flight Time, Max Altitude.
+- Celebrates new personal bests with 🎉 message + current mastery badge if a new tier was reached.
+- Two clear actions:
+  - "Fly Again in Same Region" — reloads the flight scene (keeps same plane + region).
+  - "Return to Folding" — performs the actual scene transition back to the folding tutorial.
+
+### 5. Mastery / Badge System
+- Bronze (≥400m), Silver (≥650m), Gold (≥950m) tiers computed from best distance per plane + region.
+- Badges (🥉 🥈 🥇) are shown:
+  - On Region Selection cards next to the best score (for the current plane).
+  - On every line in the My Progress screen.
+- Fully driven by the extended `FlightProgress` class (no hard-coded UI logic).
+
+All features maintain the data-driven, clean architecture and professional polish of the project.
