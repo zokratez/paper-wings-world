@@ -40,7 +40,7 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 
 See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
 
-## Current Playable Experience (Phase 3)
+## Current Playable Experience (Phase 4 Complete - Fully Polished)
 
 You can now experience a complete, motivating loop:
 
@@ -54,6 +54,8 @@ You can now experience a complete, motivating loop:
 8. **Progression** — Unlock new regions by achieving distance milestones.
 
 The experience feels cohesive, kid-friendly, and rewarding. Best scores and unlocks persist between sessions.
+
+**Phase 4 Polish Applied**: Region-specific particles, dynamic wind audio, camera shake on thermals/launches, bigger launch effects, unified kid-friendly color palette, and subtle fade transitions between screens. The app now delivers a premium sensory experience.
 
 ### How to Test the Current Build (Recommended Order)
 

@@ -49,6 +49,13 @@ namespace PaperWings.Folding
 
         private FoldingAudio audioPlayer;
 
+        // Unified kid-friendly palette (Phase 4 final)
+        private static readonly Color PrimaryBlue = new Color(0.23f, 0.51f, 0.82f);
+        private static readonly Color WarmAccent = new Color(0.96f, 0.62f, 0.15f);
+        private static readonly Color TitleColor = new Color(0.12f, 0.28f, 0.48f);
+        private static readonly Color TextMuted = new Color(0.35f, 0.42f, 0.52f);
+        private static readonly Color CreamBg = new Color(0.97f, 0.96f, 0.94f, 0.97f);
+
         private void Start()
         {
             if (planeLibrary == null || planeLibrary.allPlanes.Count == 0)
@@ -89,11 +96,11 @@ namespace PaperWings.Folding
             mainMenuContainer.style.paddingTop = 40;
             mainMenuContainer.style.paddingBottom = 40;
 
-            // Kid-friendly consistent palette (Phase 4)
-            Color primaryBlue = new Color(0.23f, 0.51f, 0.82f);
-            Color warmAccent = new Color(0.96f, 0.62f, 0.15f);
-            Color titleColor = new Color(0.12f, 0.28f, 0.48f);
-            Color textMuted = new Color(0.35f, 0.42f, 0.52f);
+            // Use unified palette
+            var primaryBlue = PrimaryBlue;
+            var warmAccent = WarmAccent;
+            var titleColor = TitleColor;
+            var textMuted = TextMuted;
 
             // Title
             var title = new Label("Paper Wings World");
@@ -152,19 +159,28 @@ namespace PaperWings.Folding
             buttonRow.Add(progressBtn);
 
             selectionRoot.Add(mainMenuContainer);
+
+            // Subtle fade in for Hub
+            StartCoroutine(FadeElement(mainMenuContainer, 0f, 1f, 0.3f));
         }
 
         private void HideMainMenu()
         {
             if (mainMenuContainer != null && mainMenuContainer.parent != null)
             {
-                mainMenuContainer.parent.Remove(mainMenuContainer);
-                mainMenuContainer = null;
+                StartCoroutine(FadeOutAndRemove(mainMenuContainer));
             }
 
             // Show the grid again
             var grid = selectionRoot.Q<VisualElement>("plane-grid");
             if (grid != null) grid.style.display = DisplayStyle.Flex;
+        }
+
+        private IEnumerator FadeOutAndRemove(VisualElement element)
+        {
+            yield return StartCoroutine(FadeElement(element, 1f, 0f, 0.25f));
+            if (element.parent != null) element.parent.Remove(element);
+            if (element == mainMenuContainer) mainMenuContainer = null;
         }
 
         private void StyleBigButton(Button btn, Color bgColor)
@@ -483,8 +499,11 @@ namespace PaperWings.Folding
             if (successPanel != null)
             {
                 successPanel.style.display = DisplayStyle.Flex;
+                successPanel.style.opacity = 0f;
                 if (successTitle != null)
                     successTitle.text = $"Great job!\n{currentPlane.displayName} complete!";
+
+                StartCoroutine(FadeElement(successPanel, 0f, 1f, 0.3f));
             }
 
             // Hide launch button until region is chosen
@@ -538,23 +557,26 @@ namespace PaperWings.Folding
             progressPanel.style.left = 0;
             progressPanel.style.width = Length.Percent(100);
             progressPanel.style.height = Length.Percent(100);
-            progressPanel.style.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 0.88f);
+            progressPanel.style.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 0.88f); // Dark overlay, keep for modal feel but use cream content
             progressPanel.style.flexDirection = FlexDirection.Column;
             progressPanel.style.alignItems = Align.Center;
             progressPanel.style.justifyContent = Justify.Center;
             progressPanel.style.padding = 20;
+            progressPanel.style.opacity = 0f;
+
+            StartCoroutine(FadeElement(progressPanel, 0f, 1f, 0.3f));
 
             // Title
             var title = new Label("My Flight Progress");
             title.style.fontSize = 28;
             title.style.unityFontStyleAndWeight = FontStyle.Bold;
-            title.style.color = new Color(0.95f, 0.97f, 1f);
+            title.style.color = TitleColor;
             title.style.marginBottom = 20;
             progressPanel.Add(title);
 
             // Content container (scrollable feel via max height)
             var content = new VisualElement();
-            content.style.backgroundColor = new Color(1, 1, 1, 0.95f);
+            content.style.backgroundColor = CreamBg;
             content.style.borderRadius = 12;
             content.style.padding = 16;
             content.style.maxHeight = 420;
@@ -834,6 +856,30 @@ namespace PaperWings.Folding
             // Small breathing room between steps for better feel
             yield return new WaitForSeconds(0.12f);
             UpdateUI();
+        }
+
+        // Subtle fade transitions for major screens (Phase 4 final polish)
+        private IEnumerator FadeElement(VisualElement element, float fromAlpha, float toAlpha, float duration)
+        {
+            if (element == null) yield break;
+
+            float t = 0f;
+            element.style.opacity = fromAlpha;
+            element.style.display = DisplayStyle.Flex;
+
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                element.style.opacity = Mathf.Lerp(fromAlpha, toAlpha, t / duration);
+                yield return null;
+            }
+
+            element.style.opacity = toAlpha;
+
+            if (toAlpha <= 0.01f)
+            {
+                element.style.display = DisplayStyle.None;
+            }
         }
     }
 }

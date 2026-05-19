@@ -244,17 +244,17 @@ namespace PaperWings.Demo
             panelRect.sizeDelta = new Vector2(520, 380);
 
             var panelImg = panelGO.GetComponent<UnityEngine.UI.Image>();
-            // Consistent kid-friendly palette (cream with soft blue undertone)
-            panelImg.color = new Color(0.97f, 0.96f, 0.94f, 0.97f);
+            // Unified kid-friendly palette
+            panelImg.color = new Color(0.97f, 0.96f, 0.94f, 0.97f); // CreamBg equivalent
 
             // Add rounded look via material or just color for demo
 
             // Title
-            var titleGO = CreateText(panelGO.transform, "Flight Complete", new Vector2(0, 140), 32, true, new Color(0.12f, 0.22f, 0.38f));
+            var titleGO = CreateText(panelGO.transform, "Flight Complete", new Vector2(0, 140), 32, true, new Color(0.12f, 0.28f, 0.48f)); // TitleColor
 
             // Stats
             string statsText = $"Distance: {dist:F0} m\nFlight Time: {time:F1} s\nMax Altitude: {maxAlt:F0} m";
-            CreateText(panelGO.transform, statsText, new Vector2(0, 40), 20, false, new Color(0.2f, 0.25f, 0.3f));
+            CreateText(panelGO.transform, statsText, new Vector2(0, 40), 20, false, new Color(0.35f, 0.42f, 0.52f)); // TextMuted
 
             // Celebration
             if (!string.IsNullOrEmpty(celebration))
@@ -275,16 +275,16 @@ namespace PaperWings.Demo
             hlg.spacing = 20;
             hlg.childAlignment = TextAnchor.MiddleCenter;
 
-            // Fly Again button
-            var flyAgainBtn = CreateButton(btnContainer.transform, "Fly Again in Same Region", new Color(0.2f, 0.5f, 0.8f));
+            // Fly Again button - PrimaryBlue
+            var flyAgainBtn = CreateButton(btnContainer.transform, "Fly Again in Same Region", new Color(0.23f, 0.51f, 0.82f));
             flyAgainBtn.onClick.AddListener(() =>
             {
                 // Simple and reliable for demo: reload the scene (static session data persists)
                 UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
             });
 
-            // Return to Folding button
-            var returnBtn = CreateButton(btnContainer.transform, "Return to Folding", new Color(0.2f, 0.6f, 0.4f));
+            // Return to Folding button - WarmAccent
+            var returnBtn = CreateButton(btnContainer.transform, "Return to Folding", new Color(0.96f, 0.62f, 0.15f));
             returnBtn.onClick.AddListener(() =>
             {
                 // Final return
