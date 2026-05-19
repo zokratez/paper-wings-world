@@ -20,9 +20,8 @@ namespace PaperWings.Demo
 
         private void Start()
         {
-            // Phase 6 basic performance target (tablet-first 60 FPS)
-            Application.targetFrameRate = 60;
-            QualitySettings.vSyncCount = 0;
+            // Centralized Phase 6 performance settings
+            PerformanceManager.EnsurePerformanceSettings();
 
             // Build nice environment first — now region-aware for distinct visual personality
             FlightEnvironment env = null;

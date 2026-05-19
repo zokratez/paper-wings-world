@@ -34,9 +34,8 @@ namespace PaperWings.Demo
                 return;
             }
 
-            // Phase 6 basic performance target (tablet-first 60 FPS)
-            Application.targetFrameRate = 60;
-            QualitySettings.vSyncCount = 0;
+            // Centralized Phase 6 performance settings
+            PerformanceManager.EnsurePerformanceSettings();
 
             // Phase 6 simple splash/loading screen for initial app launch
             StartCoroutine(ShowInitialSplash());

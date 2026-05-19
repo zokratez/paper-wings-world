@@ -48,7 +48,7 @@ From Master Project Roadmap:
 - Purchase simulation does not persist across app restarts in a user-visible way beyond the existing prefs (fine for demo).
 - Loading indicator during transitions is basic (fade only).
 - Shadow and post-processing quality lowering is only applied in SceneTransition (may be overridden by per-scene bootstraps).
-- No LOD on paper models (evaluated: not needed — models use < 100 tris via quads/cubes; adding LOD would add complexity with zero visual/perf gain on target devices).
+- (Resolved) Basic LOD implemented for paper models via PaperModelLOD component (distance-based disable of wing tips).
 
 **Low / Nice-to-Have**
 - No haptic feedback on purchases or strong thermals.
@@ -135,6 +135,16 @@ From Master Project Roadmap:
 - [ ] App launches without crash.
 - [ ] 30+ FPS, particles reduced significantly.
 - [ ] Basic flows work, even if some effects simplified.
+
+### Final Polish Items
+- [ ] UI responsiveness: Hub, Settings, Selection, and Flight HUD feel instant with no perceptible lag on tap
+- [ ] Touch targets: All interactive elements >= 56px (tested on tablets and phones)
+- [ ] Sound balance: Folding clicks, launch whoosh, flight wind/thermal sounds, and UI feedback are well mixed and comfortable at normal volume
+- [ ] Visual consistency: No color shifts, z-fighting, or clipping across all regions and lighting conditions
+- [ ] Animation quality: Folding steps and 3D model rotations are smooth; no popping on LOD transitions
+- [ ] No stray Debug.Logs or warnings in a release build
+- [ ] Battery & thermal: 20+ minute play session on target devices stays under comfortable temps with graceful performance
+- [ ] Edge case polish: Signing out during flight, rapid region switches, multiple quick purchases, orientation changes (if supported)
 
 ---
 

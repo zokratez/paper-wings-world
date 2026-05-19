@@ -32,26 +32,9 @@ namespace PaperWings.Core
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Phase 6 mobile optimization - device tier aware
-            Application.targetFrameRate = 60;
-            QualitySettings.vSyncCount = 0;
-
-            IsLowEndDevice = SystemInfo.systemMemorySize < 3000 || SystemInfo.processorCount <= 4 || SystemInfo.graphicsMemorySize < 512;
-
-            if (IsLowEndDevice)
-            {
-                // Lower shadow quality and overall for low-end devices to maintain 60 FPS
-                QualitySettings.SetQualityLevel(1, true);
-                QualitySettings.shadowResolution = ShadowResolution.Low;
-                QualitySettings.shadowDistance = 20f;
-                QualitySettings.shadowCascades = 1;
-                // Note: Post-processing (if any URP Volume features like Bloom/AA) would be reduced by lower quality level
-            }
-            else if (QualitySettings.GetQualityLevel() > 3)
-            {
-                // Balanced for tablets
-                QualitySettings.SetQualityLevel(3, true);
-            }
+            // Centralized Phase 6 performance settings
+            PerformanceManager.EnsurePerformanceSettings();
+            IsLowEndDevice = PerformanceManager.IsLowEndDevice;
 
             CreateFadeOverlay();
         }

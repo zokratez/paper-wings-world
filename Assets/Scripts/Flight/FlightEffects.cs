@@ -25,11 +25,10 @@ namespace PaperWings.Flight
         private ParticleSystem.EmissionModule trailEmission;
 
         private FlightRegion currentRegion;
-        private bool isMobile;
 
         private void Start()
         {
-            isMobile = SystemInfo.deviceType == DeviceType.Handheld;
+            PerformanceManager.EnsurePerformanceSettings();
 
             if (flutterParticles == null)
             {
@@ -84,7 +83,7 @@ namespace PaperWings.Flight
             main.startSpeed = 2.5f;
             main.startSize = 0.12f;
             main.startColor = new Color(0.95f, 0.93f, 0.88f, 0.7f);
-            main.maxParticles = isMobile ? 25 : 50;
+            main.maxParticles = PerformanceManager.IsLowEndDevice ? 25 : 50;
 
             var emission = ps.emission;
             emission.rateOverTime = 0;
@@ -107,7 +106,7 @@ namespace PaperWings.Flight
 
             float speed = planeRigidbody.velocity.magnitude;
             bool fast = speed > minSpeedForFlutter;
-            float mobileMult = isMobile ? 0.55f : 1f;
+            float mobileMult = PerformanceManager.IsLowEndDevice ? 0.55f : 1f;
 
             // Paper flutter (always paper-like)
             if (flutterParticles != null && emissionModule.enabled)
@@ -152,7 +151,7 @@ namespace PaperWings.Flight
                 // Bigger, more dramatic launch burst (reduced on mobile for perf)
                 var main = flutterParticles.main;
                 main.startSize = 0.25f;
-                int burstCount = isMobile ? 20 : 40;
+                int burstCount = PerformanceManager.IsLowEndDevice ? 20 : 40;
                 var burst = new ParticleSystem.Burst(0f, burstCount, 1, 0.1f);
                 flutterParticles.emission.SetBurst(0, burst);
                 flutterParticles.Play();
@@ -178,7 +177,7 @@ namespace PaperWings.Flight
             main.startSpeed = 0.1f;
             main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.14f);
             main.startColor = new Color(1f, 1f, 1f, 0.35f);
-            main.maxParticles = isMobile ? 40 : 80;
+            main.maxParticles = PerformanceManager.IsLowEndDevice ? 40 : 80;
 
             var emission = ps.emission;
             emission.rateOverTime = 0;
@@ -207,7 +206,7 @@ namespace PaperWings.Flight
             var main = ps.main;
             main.startLifetime = 2.2f;
             main.startSpeed = 1.8f;
-            main.maxParticles = isMobile ? 15 : 30;
+            main.maxParticles = PerformanceManager.IsLowEndDevice ? 15 : 30;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
 
             var emission = ps.emission;

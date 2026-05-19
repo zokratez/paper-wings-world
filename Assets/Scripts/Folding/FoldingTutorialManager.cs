@@ -879,6 +879,10 @@ namespace PaperWings.Folding
                     currentRealAnimator = modelInstance.AddComponent<PaperPlaneAnimator>();
 
                 currentRealAnimator.Initialize();
+
+                // Basic LOD: simplify at distance (disables wing tips to reduce draw calls)
+                var lod = modelInstance.AddComponent<PaperModelLOD>();
+                lod.targetCamera = foldingCamera;
             }
             else
             {

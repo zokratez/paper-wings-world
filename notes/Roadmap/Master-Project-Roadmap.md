@@ -65,11 +65,11 @@ The app combines:
 - Monetization foundation: 2 products, purchase buttons on locked content, Premium badges, Settings screen with Restore & Sign Out, success toasts
 
 ### What Is Next (Phase 6)
-- Expanded device-specific test cases in `Phase-6-Testing.md`
-- Performance: Mobile particle optimization + centralized low-end shadow/post-processing reduction (QualitySettings + shadowDistance on low-end devices via SceneTransition)
-- Simple splash/loading screen on initial launch
-- Known Issues expanded with gaps (duplicated perf code, LOD not needed)
-- Maintain checklist and prepare for real device QA
+- Performance fully centralized via new PerformanceManager.EnsurePerformanceSettings() (removes duplication across SceneTransition + bootstraps)
+- Basic distance LOD added for 3D paper models (wing tips disabled beyond threshold)
+- Final Polish Items section added to testing checklist (UI responsiveness, touch targets, sound balance, etc.)
+- Known Issues updated with evaluation (LOD was evaluated and implemented simply where valuable)
+- Maintain checklist and prepare device QA / store submission
 
 See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issues.
 

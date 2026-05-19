@@ -38,9 +38,8 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 - Unlock buttons, "⭐ Premium" badges, Settings screen, Restore Purchases, success toasts.
 
 **Phase 6 (Testing, Optimization & Final Polish) is in progress**:
-- Expanded device testing checklist with specific cases.
-- Performance: 60 FPS, mobile particle throttling, low-end shadow/post quality reduction, simple splash on launch.
-- Known Issues expanded in Phase-6-Testing.md.
+- Performance centralized (PerformanceManager), basic LOD for paper models, splash screen, expanded final polish checklist.
+- Known Issues and device test cases maintained in Phase-6-Testing.md.
 
 See `notes/Roadmap/Phase-0-Checklist.md` and `notes/Roadmap/Phase-6-Testing.md` for detailed task tracking.
 
