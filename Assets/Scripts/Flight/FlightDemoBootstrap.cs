@@ -27,17 +27,24 @@ namespace PaperWings.Demo
                 env.BuildEnvironment();
             }
 
-            PaperPlaneDefinition planeDef = SelectedPlaneHolder.SelectedPlane;
+            PaperPlaneDefinition planeDef = FlightSessionData.SelectedPlane;
+            FlightRegion region = FlightSessionData.SelectedRegion;
 
             if (planeDef == null)
             {
-                Debug.LogWarning("[FlightDemo] No plane selected via holder. Spawning default test plane.");
+                Debug.LogWarning("[FlightDemo] No plane selected via FlightSessionData. Spawning default test plane.");
+            }
+
+            if (region == null)
+            {
+                Debug.LogWarning("[FlightDemo] No region selected. Using default environment.");
             }
 
             // Spawn the plane at a good height
             GameObject planeGO = new GameObject(planeDef != null ? planeDef.displayName : "Paper Plane");
             planeGO.transform.SetParent(spawnPoint);
-            planeGO.transform.localPosition = new Vector3(0, 18f, 0); // Start reasonably high
+            float spawnHeight = region != null ? region.defaultSpawnHeight : 18f;
+            planeGO.transform.localPosition = new Vector3(0, spawnHeight, 0) + (region?.defaultSpawnOffset ?? Vector3.zero);
             planeGO.transform.localRotation = Quaternion.Euler(-6f, 0, 0);
 
             // Add physics + controller
@@ -49,6 +56,13 @@ namespace PaperWings.Demo
                 physics.InitializeFromDefinition(planeDef);
             }
 
+            // Apply region-specific flight environment
+            if (region != null && physics != null)
+            {
+                physics.windDirection = region.baseWindDirection;
+                physics.baseWindStrength = region.baseWindStrength;
+            }
+
             // Nice launch
             controller.LaunchFromFoldingScreen();
 
@@ -57,13 +71,6 @@ namespace PaperWings.Demo
             {
                 var follower = flightCamera.gameObject.AddComponent<FlightCameraFollower>();
                 follower.target = planeGO.transform;
-            }
-
-            // Pleasant starting wind for Grand Canyon feel
-            if (physics != null)
-            {
-                physics.windDirection = new Vector3(0.35f, 0.08f, 0.15f);
-                physics.baseWindStrength = 0.9f;
             }
 
             // Add simple UI for return button
@@ -77,6 +84,32 @@ namespace PaperWings.Demo
 
             // Add flight performance stats
             gameObject.AddComponent<PaperWings.Flight.FlightStatsDisplay>();
+        }
+
+        private void ApplyRegionVisuals(FlightRegion region)
+        {
+            // Skybox
+            if (region.skyboxMaterial != null && flightCamera != null)
+            {
+                RenderSettings.skybox = region.skyboxMaterial;
+            }
+
+            // Ambient light
+            RenderSettings.ambientLight = region.ambientLightColor;
+            RenderSettings.ambientIntensity = region.ambientIntensity;
+
+            // Fog
+            RenderSettings.fog = true;
+            RenderSettings.fogColor = region.fogColor;
+            RenderSettings.fogDensity = region.fogDensity;
+            RenderSettings.fogMode = FogMode.Exponential;
+
+            // Camera background as fallback
+            if (flightCamera != null)
+            {
+                flightCamera.backgroundColor = region.fogColor;
+            }
+        }
 
             Debug.Log($"[FlightDemo] Spawned {(planeDef != null ? planeDef.displayName : "test plane")} successfully.");
         }

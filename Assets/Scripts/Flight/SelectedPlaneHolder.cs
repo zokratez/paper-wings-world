@@ -4,22 +4,31 @@ using PaperWings.Folding;
 namespace PaperWings.Flight
 {
     /// <summary>
-    /// Simple static holder used during development to pass the chosen plane
-    /// from the Folding scene to the Flight scene.
-    /// In a full game this would be replaced by a proper state manager or scene transition system.
+    /// Holds the current flight session data (plane + region) between scenes.
+    /// This is a temporary solution during development. In a full build this
+    /// would be replaced by a proper persistent game state manager.
     /// </summary>
-    public static class SelectedPlaneHolder
+    public static class FlightSessionData
     {
         public static PaperPlaneDefinition SelectedPlane { get; private set; }
+        public static FlightRegion SelectedRegion { get; private set; }
 
-        public static void SetPlane(PaperPlaneDefinition plane)
+        public static void SetSession(PaperPlaneDefinition plane, FlightRegion region)
         {
             SelectedPlane = plane;
+            SelectedRegion = region ?? GetDefaultRegion();
         }
 
         public static void Clear()
         {
             SelectedPlane = null;
+            SelectedRegion = null;
+        }
+
+        private static FlightRegion GetDefaultRegion()
+        {
+            // Fallback if no library is set up yet
+            return null;
         }
     }
 }

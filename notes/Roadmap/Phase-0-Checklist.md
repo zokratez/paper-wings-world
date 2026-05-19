@@ -72,6 +72,26 @@ updated: 2026-05
 
 **Phase 2 is ready for final testing.**
 
+### Phase 3 — World Expansion & Progression (Foundation Started)
+
+**Status: Foundation in progress.**
+
+- `FlightRegion` ScriptableObject + `FlightRegionLibrary` created for data-driven regions.
+- 3 regions defined with distinct wind, thermal, and challenge profiles:
+  - Grand Canyon
+  - Fuji Foothills
+  - Norwegian Coast
+- Region selection appears after completing a plane (simple buttons for foundation).
+- `FlightSessionData` now carries both plane and chosen region.
+- `FlightDemoBootstrap` applies region-specific visuals and flight parameters.
+- Editor tool added to generate the 3 default regions.
+- Documentation added: `notes/Game-Features/Regions.md`
+
+Next work in Phase 3 will include:
+- Proper region selection UI / carousel
+- Region-specific environments and particle effects
+- Challenge tracking and region unlocking system
+
 ### Technical Skeleton
 - [ ] Add a proper Unity `.gitignore` (standard + Cesium/Mapbox specifics)
 - [ ] Create `ProjectSettings/` placeholder (or actually open in Unity and save once)

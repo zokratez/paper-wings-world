@@ -279,6 +279,8 @@ namespace PaperWings.Folding
             }
         }
 
+        private FlightRegion selectedRegionForLaunch;
+
         private void ShowSuccessScreen()
         {
             if (successPanel != null)
@@ -288,8 +290,12 @@ namespace PaperWings.Folding
                     successTitle.text = $"Great job!\n{currentPlane.displayName} complete!";
             }
 
+            // Hide launch button until region is chosen
             if (launchToFlightBtn != null)
-                launchToFlightBtn.style.display = DisplayStyle.Flex;
+                launchToFlightBtn.style.display = DisplayStyle.None;
+
+            // Show region selection (simple for foundation)
+            ShowRegionSelection();
 
             if (audioPlayer != null)
                 audioPlayer.PlaySuccessSound();
@@ -297,15 +303,70 @@ namespace PaperWings.Folding
             Debug.Log($"[Folding] {currentPlane.displayName} folding tutorial completed successfully.");
         }
 
+        private void ShowRegionSelection()
+        {
+            // For Phase 3 foundation, we create 3 simple buttons dynamically if they don't exist.
+            // In a polished build this would be a proper carousel or list in UI Builder.
+
+            var regionContainer = foldingRoot.Q<VisualElement>("region-selection");
+            if (regionContainer == null)
+            {
+                regionContainer = new VisualElement { name = "region-selection" };
+                regionContainer.style.flexDirection = FlexDirection.Row;
+                regionContainer.style.justifyContent = Justify.Center;
+                regionContainer.style.marginTop = 12;
+                foldingRoot.Add(regionContainer);
+            }
+
+            regionContainer.Clear();
+
+            // Hardcoded 3 regions for foundation (will come from library later)
+            CreateRegionButton(regionContainer, "Grand Canyon", "grand_canyon");
+            CreateRegionButton(regionContainer, "Fuji Foothills", "fuji_foothills");
+            CreateRegionButton(regionContainer, "Norwegian Coast", "norwegian_coast");
+        }
+
+        private void CreateRegionButton(VisualElement container, string displayName, string regionId)
+        {
+            var btn = new Button { text = displayName };
+            btn.style.marginRight = 8;
+            btn.style.paddingLeft = 12;
+            btn.style.paddingRight = 12;
+            btn.style.paddingTop = 8;
+            btn.style.paddingBottom = 8;
+
+            btn.clicked += () =>
+            {
+                // Load the region asset (in real build this would come from FlightRegionLibrary)
+                selectedRegionForLaunch = LoadRegionById(regionId);
+
+                // Enable launch button
+                if (launchToFlightBtn != null)
+                    launchToFlightBtn.style.display = DisplayStyle.Flex;
+
+                Debug.Log($"Region selected: {displayName}");
+            };
+
+            container.Add(btn);
+        }
+
+        private FlightRegion LoadRegionById(string id)
+        {
+            // In production we load from a FlightRegionLibrary asset.
+            // For the current demo foundation, we try to find it via Resources (user can move the 3 region assets into a Resources/FlightRegions folder).
+            return Resources.Load<FlightRegion>($"FlightRegions/{id}");
+        }
+
         private void LaunchToFlight()
         {
             if (currentPlane == null) return;
 
-            Debug.Log($"[Folding] Launching {currentPlane.displayName} into Flight Scene...");
+            var regionToUse = selectedRegionForLaunch ?? Resources.Load<FlightRegion>("FlightRegions/grand_canyon");
 
-            PaperWings.Flight.SelectedPlaneHolder.SetPlane(currentPlane);
+            PaperWings.Flight.FlightSessionData.SetSession(currentPlane, regionToUse);
 
-            // Use smooth fade transition
+            Debug.Log($"[Folding] Launching {currentPlane.displayName} into {regionToUse?.displayName ?? "default"}...");
+
             var transition = FindObjectOfType<PaperWings.Core.SceneTransition>();
             if (transition != null)
             {
@@ -313,7 +374,6 @@ namespace PaperWings.Folding
             }
             else
             {
-                // Fallback if transition object not present
                 UnityEngine.SceneManagement.SceneManager.LoadScene("FlightDemo");
             }
         }

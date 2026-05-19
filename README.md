@@ -32,6 +32,12 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 - Live flight stats (altitude, distance, time + best time).
 - Complete fold → launch → fly → return flow works end-to-end.
 
+**Phase 3 Foundation (World Expansion) is in progress**:
+- Region system (`FlightRegion` + `FlightRegionLibrary`) created.
+- 3 distinct regions defined: Grand Canyon, Fuji Foothills, Norwegian Coast.
+- Region selection appears after successfully folding a plane.
+- Each region can have unique visuals, wind, thermals, and challenges.
+
 See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
 
 ### How to Test the Current Build (Recommended Order)

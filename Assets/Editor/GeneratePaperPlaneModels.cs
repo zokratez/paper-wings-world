@@ -91,6 +91,72 @@ namespace PaperWings.Editor
                 "Models refreshed!\n\nReload the demo scenes to see the latest 3D models in action.", "OK");
         }
 
+        [MenuItem("Paper Wings/Generate Default Flight Regions")]
+        public static void GenerateDefaultFlightRegions()
+        {
+            string regionPath = "Assets/ScriptableObjects/FlightRegions/";
+            if (!AssetDatabase.IsValidFolder(regionPath))
+                AssetDatabase.CreateFolder("Assets/ScriptableObjects", "FlightRegions");
+
+            CreateRegion("Grand Canyon", "grand_canyon", new Color(0.6f, 0.75f, 0.9f));
+            CreateRegion("Fuji Foothills", "fuji_foothills", new Color(0.7f, 0.85f, 0.7f));
+            CreateRegion("Norwegian Coast", "norwegian_coast", new Color(0.55f, 0.75f, 0.85f));
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log("Created 3 default FlightRegion assets in " + regionPath);
+        }
+
+        private static void CreateRegion(string name, string id, Color fogColor)
+        {
+            string path = $"Assets/ScriptableObjects/FlightRegions/{id}.asset";
+            if (AssetDatabase.LoadAssetAtPath<FlightRegion>(path) != null)
+            {
+                Debug.Log($"{name} region already exists. Skipping.");
+                return;
+            }
+
+            var region = ScriptableObject.CreateInstance<FlightRegion>();
+            region.regionId = id;
+            region.displayName = name;
+            region.fogColor = fogColor;
+
+            // Distinct per-region settings for interesting gameplay
+            switch (id)
+            {
+                case "grand_canyon":
+                    region.baseWindDirection = new Vector3(0.35f, 0.08f, 0.15f);
+                    region.baseWindStrength = 0.85f;
+                    region.thermalStrengthMultiplier = 1.0f;
+                    region.distanceGoal = 650f;
+                    region.glideTimeGoal = 52f;
+                    region.defaultSpawnHeight = 22f;
+                    break;
+
+                case "fuji_foothills":
+                    region.baseWindDirection = new Vector3(0.15f, 0.12f, 0.45f); // more vertical lift
+                    region.baseWindStrength = 0.65f;
+                    region.thermalStrengthMultiplier = 1.35f; // strong thermals near volcano
+                    region.distanceGoal = 480f;
+                    region.glideTimeGoal = 68f;
+                    region.defaultSpawnHeight = 28f;
+                    break;
+
+                case "norwegian_coast":
+                    region.baseWindDirection = new Vector3(0.55f, 0.03f, 0.25f); // strong consistent wind
+                    region.baseWindStrength = 1.25f;
+                    region.thermalStrengthMultiplier = 0.75f; // fewer thermals, more wind
+                    region.distanceGoal = 720f;
+                    region.glideTimeGoal = 41f;
+                    region.defaultSpawnHeight = 15f;
+                    break;
+            }
+
+            AssetDatabase.CreateAsset(region, path);
+            Debug.Log($"Created FlightRegion: {name}");
+        }
+
         private enum PlaneStyle
         {
             Dart,
