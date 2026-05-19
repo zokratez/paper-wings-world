@@ -104,21 +104,25 @@ create policy "Users can update own progress"
 - `FlightRegion` extended with `isFree` + `unlockProductId` for consistent region gating.
 - `PaperPlaneDefinition` already had the unlock fields (reused).
 
-**Wired into playable demo (latest)**:
+**Wired into playable demo (latest polish)**:
 - Editor tool: "Paper Wings / Phase 5 - Create Supabase Config Asset" generates the required asset.
 - `FoldingDemoBootstrap` now creates persistent `SupabaseAuth` + `SupabaseProgressService` singletons (with config) that survive scene loads.
-- Main Hub now has a dedicated **Permanent Account (Email)** section with Email + Password fields, Sign Up (supports Anonymous → Email upgrade), Sign In, and Sign Out.
-- Existing dev tools panel kept (with Anonymous + manual Load/Save Cloud Progress) for continued testing.
+- Main Hub features:
+  - Prominent **Account Status** bar near the top (shows "Signed in as: email" or "Anonymous User").
+  - Improved **Permanent Account (Email)** section with labeled fields, red error messages for validation/server errors, loading states (buttons disabled + feedback), and nicer spacing/palette.
+  - Existing dev tools panel kept unchanged for quick anonymous testing.
+- SupabaseAuth now exposes `OnAuthError` with friendly messages (wrong password, weak password, invalid email, etc.).
 - Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` (locked cards are visually disabled with message).
 - Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` (consistent with planes + future IAP).
 
 **Not yet production-ready**:
-- Proper error handling, token refresh, and advanced anonymous → email migration (basic upgrade works by signing up)
+- Token refresh / session expiration handling
+- Advanced anonymous → email identity linking (basic upgrade flow works)
 - RevenueCat / Unity IAP integration + real purchase restoration
-- Advanced conflict resolution (last-write-wins vs server authoritative)
+- Advanced conflict resolution for progress
 - Secure key storage and production Supabase RLS hardening
 - Actual Supabase project + SQL schema applied by the developer
-- Polished production UI for login (current is functional foundation)
+- Full production-grade login screen (current Hub integration is solid foundation)
 
 The architecture is clean, testable, and ready for the next concrete steps.
 

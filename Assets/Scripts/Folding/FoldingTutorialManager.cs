@@ -116,8 +116,14 @@ namespace PaperWings.Folding
             var subtitle = new Label("Fold amazing planes. Fly them across the world.");
             subtitle.style.fontSize = 18;
             subtitle.style.color = textMuted;
-            subtitle.style.marginBottom = 30;
+            subtitle.style.marginBottom = 16;
             mainMenuContainer.Add(subtitle);
+
+            // ============================================================
+            // Phase 5 Account Status (prominent, updates live)
+            // ============================================================
+            var accountStatus = CreateAccountStatusBar();
+            mainMenuContainer.Add(accountStatus);
 
             // Icon / Logo area (kid-friendly placeholder)
             var iconArea = new VisualElement();
@@ -330,144 +336,279 @@ namespace PaperWings.Folding
 
         /// <summary>
         /// Phase 5 Email authentication section for the Main Hub.
-        /// Provides Sign Up (supports Anonymous → Email upgrade) and Sign In.
-        /// Keeps the dev tools panel untouched as requested.
+        /// Improved with labels, error display, loading states, and nicer spacing/palette consistency.
         /// </summary>
         private VisualElement CreateEmailAuthSection()
         {
             var panel = new VisualElement();
-            panel.style.marginTop = 20;
-            panel.style.paddingTop = 12;
-            panel.style.paddingBottom = 12;
-            panel.style.paddingLeft = 16;
-            panel.style.paddingRight = 16;
-            panel.style.backgroundColor = new Color(0.93f, 0.95f, 0.98f, 0.95f);
-            panel.style.borderRadius = 12;
+            panel.style.marginTop = 16;
+            panel.style.paddingTop = 14;
+            panel.style.paddingBottom = 14;
+            panel.style.paddingLeft = 18;
+            panel.style.paddingRight = 18;
+            panel.style.backgroundColor = CreamBg;
+            panel.style.borderRadius = 14;
             panel.style.alignItems = Align.Center;
-            panel.style.width = Length.Percent(85);
-            panel.style.maxWidth = 480;
+            panel.style.width = Length.Percent(88);
+            panel.style.maxWidth = 420;
 
-            var header = new Label("Permanent Account (Email)");
-            header.style.fontSize = 16;
+            // Header
+            var header = new Label("✉️  Permanent Account (Email)");
+            header.style.fontSize = 17;
             header.style.color = TitleColor;
             header.style.unityFontStyleAndWeight = FontStyle.Bold;
-            header.style.marginBottom = 6;
+            header.style.marginBottom = 4;
             panel.Add(header);
 
-            var hint = new Label("Create a real account to save progress across devices. Anonymous accounts are temporary.");
+            var hint = new Label("Save your flights and best scores across devices. Upgrade from anonymous anytime.");
             hint.style.fontSize = 11;
             hint.style.color = TextMuted;
-            hint.style.marginBottom = 10;
+            hint.style.marginBottom = 12;
             panel.Add(hint);
 
-            // Email field
-            var emailField = new TextField { placeholderText = "your@email.com" };
+            // Email label + field
+            var emailLabel = new Label("Email");
+            emailLabel.style.fontSize = 12;
+            emailLabel.style.color = TitleColor;
+            emailLabel.style.alignSelf = Align.FlexStart;
+            emailLabel.style.marginLeft = 4;
+            emailLabel.style.marginBottom = 2;
+            panel.Add(emailLabel);
+
+            var emailField = new TextField { placeholderText = "you@example.com" };
             emailField.style.width = Length.Percent(100);
-            emailField.style.maxWidth = 380;
-            emailField.style.marginBottom = 6;
+            emailField.style.maxWidth = 360;
+            emailField.style.marginBottom = 10;
             emailField.style.fontSize = 14;
+            emailField.style.unityFontStyleAndWeight = FontStyle.Normal;
             panel.Add(emailField);
 
-            // Password field
-            var passwordField = new TextField { placeholderText = "Password", isPassword = true };
+            // Password label + field
+            var passLabel = new Label("Password");
+            passLabel.style.fontSize = 12;
+            passLabel.style.color = TitleColor;
+            passLabel.style.alignSelf = Align.FlexStart;
+            passLabel.style.marginLeft = 4;
+            passLabel.style.marginBottom = 2;
+            panel.Add(passLabel);
+
+            var passwordField = new TextField { placeholderText = "At least 6 characters", isPassword = true };
             passwordField.style.width = Length.Percent(100);
-            passwordField.style.maxWidth = 380;
-            passwordField.style.marginBottom = 10;
+            passwordField.style.maxWidth = 360;
+            passwordField.style.marginBottom = 12;
             passwordField.style.fontSize = 14;
             panel.Add(passwordField);
 
+            // Error label (red, for validation + server errors)
+            var errorLabel = new Label("");
+            errorLabel.style.fontSize = 11;
+            errorLabel.style.color = new Color(0.8f, 0.2f, 0.2f);
+            errorLabel.style.marginBottom = 6;
+            errorLabel.style.display = DisplayStyle.None; // hidden by default
+            panel.Add(errorLabel);
+
+            // Status label (success / loading / signed in)
             var statusLabel = new Label("Not signed in with email");
             statusLabel.style.fontSize = 12;
             statusLabel.style.color = TextMuted;
-            statusLabel.style.marginBottom = 8;
+            statusLabel.style.marginBottom = 10;
             panel.Add(statusLabel);
 
             // Buttons row
             var btnRow = new VisualElement();
             btnRow.style.flexDirection = FlexDirection.Row;
             btnRow.style.justifyContent = Justify.Center;
+            btnRow.style.marginTop = 4;
             panel.Add(btnRow);
 
-            Button MakeSmallButton(string text, Color bg)
+            Button MakeAuthButton(string text, Color bg)
             {
                 var b = new Button { text = text };
                 b.style.fontSize = 13;
                 b.style.backgroundColor = bg;
                 b.style.color = Color.white;
-                b.style.borderRadius = 8;
-                b.style.paddingLeft = 14;
-                b.style.paddingRight = 14;
-                b.style.paddingTop = 8;
-                b.style.paddingBottom = 8;
+                b.style.borderRadius = 10;
+                b.style.paddingLeft = 16;
+                b.style.paddingRight = 16;
+                b.style.paddingTop = 9;
+                b.style.paddingBottom = 9;
                 b.style.margin = 4;
+                b.style.minWidth = 110;
                 return b;
             }
 
-            var signUpBtn = MakeSmallButton("Sign Up (or Upgrade)", PrimaryBlue);
+            var signUpBtn = MakeAuthButton("Sign Up (Upgrade)", PrimaryBlue);
+            var signInBtn = MakeAuthButton("Sign In", WarmAccent);
+            var signOutBtn = MakeAuthButton("Sign Out", new Color(0.65f, 0.4f, 0.4f));
+
+            btnRow.Add(signUpBtn);
+            btnRow.Add(signInBtn);
+            btnRow.Add(signOutBtn);
+
+            // Helper to set loading state
+            void SetLoading(bool loading, string loadingText = "Working...")
+            {
+                signUpBtn.SetEnabled(!loading);
+                signInBtn.SetEnabled(!loading);
+                signOutBtn.SetEnabled(!loading);
+
+                if (loading)
+                {
+                    statusLabel.text = loadingText;
+                    errorLabel.style.display = DisplayStyle.None;
+                }
+            }
+
+            // Clear error helper
+            void ClearError()
+            {
+                errorLabel.text = "";
+                errorLabel.style.display = DisplayStyle.None;
+            }
+
             signUpBtn.clicked += () =>
             {
+                ClearError();
                 if (SupabaseAuth.Instance != null)
                 {
+                    SetLoading(true, "Creating / upgrading account...");
                     SupabaseAuth.Instance.SignUpWithEmail(emailField.value, passwordField.value);
-                    statusLabel.text = "Creating / upgrading account...";
                 }
                 else
                 {
-                    statusLabel.text = "Backend not ready. Configure SupabaseConfig first.";
+                    errorLabel.text = "Backend not configured.";
+                    errorLabel.style.display = DisplayStyle.Flex;
                 }
             };
-            btnRow.Add(signUpBtn);
 
-            var signInBtn = MakeSmallButton("Sign In", WarmAccent);
             signInBtn.clicked += () =>
             {
+                ClearError();
                 if (SupabaseAuth.Instance != null)
                 {
+                    SetLoading(true, "Signing in...");
                     SupabaseAuth.Instance.SignInWithEmail(emailField.value, passwordField.value);
-                    statusLabel.text = "Signing in...";
                 }
                 else
                 {
-                    statusLabel.text = "Backend not ready.";
+                    errorLabel.text = "Backend not configured.";
+                    errorLabel.style.display = DisplayStyle.Flex;
                 }
             };
-            btnRow.Add(signInBtn);
 
-            // Sign out button (small, for email session)
-            var signOutBtn = MakeSmallButton("Sign Out", new Color(0.6f, 0.4f, 0.4f));
             signOutBtn.clicked += () =>
             {
+                ClearError();
                 if (SupabaseAuth.Instance != null)
                 {
                     SupabaseAuth.Instance.SignOut();
                     statusLabel.text = "Signed out.";
                     emailField.value = "";
                     passwordField.value = "";
+                    SetLoading(false);
                 }
             };
-            btnRow.Add(signOutBtn);
 
-            // Live status updates via events
+            // Wire auth events for this section (error + success)
+            if (SupabaseAuth.Instance != null)
+            {
+                SupabaseAuth.Instance.OnAuthError += (msg) =>
+                {
+                    errorLabel.text = msg;
+                    errorLabel.style.display = DisplayStyle.Flex;
+                    statusLabel.text = "Please try again.";
+                    SetLoading(false);
+                };
+
+                SupabaseAuth.Instance.OnSignedIn += () =>
+                {
+                    ClearError();
+                    SetLoading(false);
+
+                    if (!string.IsNullOrEmpty(SupabaseAuth.Instance.CurrentEmail))
+                    {
+                        statusLabel.text = "✓ Signed in as: " + SupabaseAuth.Instance.CurrentEmail;
+                        statusLabel.style.color = new Color(0.2f, 0.55f, 0.3f);
+                    }
+                    else
+                    {
+                        statusLabel.text = "Signed in (anonymous)";
+                        statusLabel.style.color = TextMuted;
+                    }
+                };
+
+                SupabaseAuth.Instance.OnSignedOut += () =>
+                {
+                    ClearError();
+                    statusLabel.text = "Not signed in with email";
+                    statusLabel.style.color = TextMuted;
+                    SetLoading(false);
+                };
+            }
+
+            return panel;
+        }
+
+        /// <summary>
+        /// Simple live account status bar shown at the top of the Hub.
+        /// Shows either the email or "Anonymous User".
+        /// </summary>
+        private VisualElement CreateAccountStatusBar()
+        {
+            var bar = new VisualElement();
+            bar.style.flexDirection = FlexDirection.Row;
+            bar.style.justifyContent = Justify.Center;
+            bar.style.alignItems = Align.Center;
+            bar.style.marginBottom = 20;
+            bar.style.paddingLeft = 12;
+            bar.style.paddingRight = 12;
+            bar.style.paddingTop = 6;
+            bar.style.paddingBottom = 6;
+            bar.style.backgroundColor = new Color(0.9f, 0.92f, 0.95f, 0.8f);
+            bar.style.borderRadius = 999;
+
+            var icon = new Label("👤");
+            icon.style.fontSize = 14;
+            icon.style.marginRight = 6;
+            bar.Add(icon);
+
+            var statusText = new Label("Checking account...");
+            statusText.style.fontSize = 13;
+            statusText.style.color = TitleColor;
+            statusText.style.unityFontStyleAndWeight = FontStyle.Normal;
+            bar.Add(statusText);
+
+            // Initial state
+            if (SupabaseAuth.Instance != null && SupabaseAuth.Instance.IsAuthenticated)
+            {
+                if (!string.IsNullOrEmpty(SupabaseAuth.Instance.CurrentEmail))
+                    statusText.text = "Signed in as: " + SupabaseAuth.Instance.CurrentEmail;
+                else
+                    statusText.text = "Anonymous User (local progress)";
+            }
+            else
+            {
+                statusText.text = "Not signed in";
+            }
+
+            // Live updates
             if (SupabaseAuth.Instance != null)
             {
                 SupabaseAuth.Instance.OnSignedIn += () =>
                 {
                     if (!string.IsNullOrEmpty(SupabaseAuth.Instance.CurrentEmail))
-                    {
-                        statusLabel.text = "Signed in as: " + SupabaseAuth.Instance.CurrentEmail;
-                    }
+                        statusText.text = "Signed in as: " + SupabaseAuth.Instance.CurrentEmail;
                     else
-                    {
-                        statusLabel.text = "Signed in (anonymous)";
-                    }
+                        statusText.text = "Anonymous User (local progress)";
                 };
+
                 SupabaseAuth.Instance.OnSignedOut += () =>
                 {
-                    statusLabel.text = "Signed out.";
+                    statusText.text = "Not signed in";
                 };
             }
 
-            return panel;
+            return bar;
         }
 
         #endregion

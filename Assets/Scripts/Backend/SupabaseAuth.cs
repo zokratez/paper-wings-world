@@ -27,6 +27,7 @@ namespace PaperWings.Backend
 
         public event Action OnSignedIn;
         public event Action OnSignedOut;
+        public event Action<string> OnAuthError;
 
         private void Awake()
         {
@@ -52,9 +53,10 @@ namespace PaperWings.Backend
 
         public void SignUpWithEmail(string email, string password)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            string error;
+            if (!ValidateEmailAndPassword(email, password, out error))
             {
-                Debug.LogWarning("[SupabaseAuth] Email and password are required for sign up.");
+                OnAuthError?.Invoke(error);
                 return;
             }
             StartCoroutine(SignUpWithEmailRoutine(email, password));
@@ -62,19 +64,47 @@ namespace PaperWings.Backend
 
         public void SignInWithEmail(string email, string password)
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            string error;
+            if (!ValidateEmailAndPassword(email, password, out error))
             {
-                Debug.LogWarning("[SupabaseAuth] Email and password are required for sign in.");
+                OnAuthError?.Invoke(error);
                 return;
             }
             StartCoroutine(SignInWithEmailRoutine(email, password));
+        }
+
+        private bool ValidateEmailAndPassword(string email, string password, out string error)
+        {
+            error = null;
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                error = "Email and password are required.";
+                return false;
+            }
+
+            if (!email.Contains("@") || !email.Contains("."))
+            {
+                error = "Please enter a valid email address.";
+                return false;
+            }
+
+            if (password.Length < 6)
+            {
+                error = "Password must be at least 6 characters.";
+                return false;
+            }
+
+            return true;
         }
 
         private IEnumerator SignInAnonymouslyRoutine()
         {
             if (config == null || string.IsNullOrEmpty(config.anonKey))
             {
-                Debug.LogError("[SupabaseAuth] SupabaseConfig is missing or incomplete.");
+                string msg = "Supabase is not configured. Please set up your SupabaseConfig asset.";
+                Debug.LogError("[SupabaseAuth] " + msg);
+                OnAuthError?.Invoke(msg);
                 yield break;
             }
 
@@ -100,7 +130,9 @@ namespace PaperWings.Backend
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError($"[SupabaseAuth] Anonymous signup failed: {request.error}\n{request.downloadHandler.text}");
+                    string friendly = ExtractFriendlyError(request.downloadHandler.text, request.error);
+                    Debug.LogError($"[SupabaseAuth] Anonymous signup failed: {friendly}");
+                    OnAuthError?.Invoke(friendly);
                     yield break;
                 }
 
@@ -118,7 +150,9 @@ namespace PaperWings.Backend
         {
             if (config == null || string.IsNullOrEmpty(config.anonKey))
             {
-                Debug.LogError("[SupabaseAuth] SupabaseConfig is missing or incomplete.");
+                string msg = "Supabase is not configured. Please set up your SupabaseConfig asset.";
+                Debug.LogError("[SupabaseAuth] " + msg);
+                OnAuthError?.Invoke(msg);
                 yield break;
             }
 
@@ -145,7 +179,9 @@ namespace PaperWings.Backend
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError($"[SupabaseAuth] Email sign up failed: {request.error}\n{request.downloadHandler.text}");
+                    string friendly = ExtractFriendlyError(request.downloadHandler.text, request.error);
+                    Debug.LogError($"[SupabaseAuth] Email sign up failed: {friendly}");
+                    OnAuthError?.Invoke(friendly);
                     yield break;
                 }
 
@@ -162,7 +198,9 @@ namespace PaperWings.Backend
         {
             if (config == null || string.IsNullOrEmpty(config.anonKey))
             {
-                Debug.LogError("[SupabaseAuth] SupabaseConfig is missing or incomplete.");
+                string msg = "Supabase is not configured. Please set up your SupabaseConfig asset.";
+                Debug.LogError("[SupabaseAuth] " + msg);
+                OnAuthError?.Invoke(msg);
                 yield break;
             }
 
@@ -190,7 +228,9 @@ namespace PaperWings.Backend
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError($"[SupabaseAuth] Email sign in failed: {request.error}\n{request.downloadHandler.text}");
+                    string friendly = ExtractFriendlyError(request.downloadHandler.text, request.error);
+                    Debug.LogError($"[SupabaseAuth] Email sign in failed: {friendly}");
+                    OnAuthError?.Invoke(friendly);
                     yield break;
                 }
 
@@ -237,6 +277,48 @@ namespace PaperWings.Backend
             {
                 Debug.LogWarning("[SupabaseAuth] Failed to parse session response cleanly: " + e.Message);
             }
+        }
+
+        /// <summary>
+        /// Extracts a user-friendly error message from Supabase error responses.
+        /// </summary>
+        private string ExtractFriendlyError(string responseText, string unityError)
+        {
+            if (!string.IsNullOrEmpty(responseText))
+            {
+                // Common Supabase error shapes: {"error":"...","error_description":"..."} or {"msg":"..."}
+                if (responseText.Contains("error_description"))
+                {
+                    int start = responseText.IndexOf("\"error_description\":\"") + 21;
+                    int end = responseText.IndexOf("\"", start);
+                    if (end > start)
+                    {
+                        string desc = responseText.Substring(start, end - start);
+                        if (desc.Contains("Invalid login credentials")) return "Wrong email or password.";
+                        if (desc.Contains("User already registered")) return "An account with this email already exists.";
+                        return desc;
+                    }
+                }
+
+                if (responseText.Contains("\"error\":\""))
+                {
+                    int start = responseText.IndexOf("\"error\":\"") + 9;
+                    int end = responseText.IndexOf("\"", start);
+                    if (end > start)
+                    {
+                        string err = responseText.Substring(start, end - start);
+                        if (err == "invalid_grant") return "Wrong email or password.";
+                        if (err == "weak_password") return "Password is too weak.";
+                        return err;
+                    }
+                }
+            }
+
+            // Fallback
+            if (!string.IsNullOrEmpty(unityError) && unityError != "Unknown Error")
+                return unityError;
+
+            return "Something went wrong. Please try again.";
         }
 
         [Serializable]
