@@ -305,49 +305,108 @@ namespace PaperWings.Folding
 
         private void ShowRegionSelection()
         {
-            // For Phase 3 foundation, we create 3 simple buttons dynamically if they don't exist.
-            // In a polished build this would be a proper carousel or list in UI Builder.
+            // Phase 3 Region Selection "screen" - appears after successful fold, before launch.
+            // Clean, tablet-friendly, with short descriptions so the player understands the personality of each place.
 
             var regionContainer = foldingRoot.Q<VisualElement>("region-selection");
             if (regionContainer == null)
             {
                 regionContainer = new VisualElement { name = "region-selection" };
-                regionContainer.style.flexDirection = FlexDirection.Row;
-                regionContainer.style.justifyContent = Justify.Center;
-                regionContainer.style.marginTop = 12;
+                regionContainer.style.flexDirection = FlexDirection.Column;
+                regionContainer.style.alignItems = Align.Center;
+                regionContainer.style.marginTop = 16;
                 foldingRoot.Add(regionContainer);
             }
 
             regionContainer.Clear();
 
-            // Hardcoded 3 regions for foundation (will come from library later)
-            CreateRegionButton(regionContainer, "Grand Canyon", "grand_canyon");
-            CreateRegionButton(regionContainer, "Fuji Foothills", "fuji_foothills");
-            CreateRegionButton(regionContainer, "Norwegian Coast", "norwegian_coast");
+            // Header
+            var header = new Label("Choose Your Flying Region");
+            header.style.fontSize = 22;
+            header.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.style.color = new Color(0.15f, 0.25f, 0.35f);
+            header.style.marginBottom = 12;
+            regionContainer.Add(header);
+
+            // Sub header hint
+            var hint = new Label("Each region feels different — wind, lift, and scenery change how your plane flies.");
+            hint.style.fontSize = 14;
+            hint.style.color = new Color(0.4f, 0.45f, 0.5f);
+            hint.style.marginBottom = 16;
+            regionContainer.Add(hint);
+
+            // Horizontal row of region choices (simple cards via buttons for now)
+            var buttonRow = new VisualElement();
+            buttonRow.style.flexDirection = FlexDirection.Row;
+            buttonRow.style.justifyContent = Justify.Center;
+            regionContainer.Add(buttonRow);
+
+            // Only show unlocked regions (progression-aware)
+            // Grand Canyon is always available as the starter region.
+            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon"))
+            {
+                CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
+                    "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f));
+            }
+
+            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("fuji_foothills"))
+            {
+                CreateRegionChoice(buttonRow, "Fuji Foothills", "fuji_foothills", 
+                    "Strong volcanic lift • Misty forests • Long graceful flights", "🗻", new Color(0.35f, 0.65f, 0.45f));
+            }
+
+            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("norwegian_coast"))
+            {
+                CreateRegionChoice(buttonRow, "Norwegian Coast", "norwegian_coast", 
+                    "Powerful sea winds • Dramatic fjords • Fast distance runs", "🌊", new Color(0.35f, 0.55f, 0.75f));
+            }
+
+            // If nothing is unlocked (shouldn't happen), fall back to Grand Canyon
+            if (buttonRow.childCount == 0 && PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon"))
+            {
+                CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
+                    "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f));
+            }
         }
 
-        private void CreateRegionButton(VisualElement container, string displayName, string regionId)
+        private void CreateRegionChoice(VisualElement container, string displayName, string regionId, string description, string iconEmoji, Color iconBg)
         {
-            var btn = new Button { text = displayName };
-            btn.style.marginRight = 8;
-            btn.style.paddingLeft = 12;
-            btn.style.paddingRight = 12;
-            btn.style.paddingTop = 8;
-            btn.style.paddingBottom = 8;
+            // Polished region "card" using VisualElement + labels for much better visual quality.
+            // Large touch target, clear hierarchy (icon + title + personality hint), card styling via USS.
 
-            btn.clicked += () =>
+            var card = new VisualElement();
+            card.AddToClassList("region-card");
+
+            // Icon / thumbnail placeholder (colored rounded square with emoji for now)
+            var icon = new Label(iconEmoji);
+            icon.AddToClassList("region-card-icon");
+            icon.style.backgroundColor = iconBg;
+            icon.style.color = Color.white;
+            icon.style.unityTextAlign = TextAnchor.MiddleCenter;
+            card.Add(icon);
+
+            // Title
+            var title = new Label(displayName);
+            title.AddToClassList("region-card-title");
+            card.Add(title);
+
+            // Description / personality hint
+            var desc = new Label(description);
+            desc.AddToClassList("region-card-desc");
+            card.Add(desc);
+
+            // Click handler on the whole card (large target)
+            card.RegisterCallback<ClickEvent>(evt =>
             {
-                // Load the region asset (in real build this would come from FlightRegionLibrary)
                 selectedRegionForLaunch = LoadRegionById(regionId);
 
-                // Enable launch button
                 if (launchToFlightBtn != null)
                     launchToFlightBtn.style.display = DisplayStyle.Flex;
 
-                Debug.Log($"Region selected: {displayName}");
-            };
+                Debug.Log($"[Region Selection] Selected: {displayName}");
+            });
 
-            container.Add(btn);
+            container.Add(card);
         }
 
         private FlightRegion LoadRegionById(string id)

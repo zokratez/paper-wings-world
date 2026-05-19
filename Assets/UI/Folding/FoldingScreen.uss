@@ -106,3 +106,51 @@
     min-width: 220px;
     height: 62px;
 }
+
+/* Region Selection Cards (Phase 3) */
+.region-selection {
+    width: 100%;
+}
+
+.region-card {
+    background-color: #FFFFFF;
+    border-radius: 14px;
+    border-width: 2px;
+    border-color: #E5E7EB;
+    padding: 12px 14px;
+    min-width: 170px;
+    min-height: 85px;
+    margin: 0 6px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.region-card:hover {
+    border-color: #3B82F6;
+    background-color: #F8FAFC;
+}
+
+.region-card-icon {
+    font-size: 22px;
+    margin-bottom: 4px;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}
+
+.region-card-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: #1F2937;
+    margin-bottom: 2px;
+}
+
+.region-card-desc {
+    font-size: 11px;
+    color: #6B7280;
+    white-space: normal;
+}

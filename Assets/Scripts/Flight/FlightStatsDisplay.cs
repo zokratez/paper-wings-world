@@ -21,6 +21,10 @@ namespace PaperWings.Flight
         private float bestTime = float.MaxValue;
         private const string BestTimeKey = "PaperWings_BestFlightTime";
 
+        // Expose current flight results for progression system
+        public float CurrentDistance { get; private set; }
+        public float CurrentFlightTime { get; private set; }
+
         private void Start()
         {
             // Load best time from previous sessions
@@ -58,6 +62,7 @@ namespace PaperWings.Flight
             if (distanceText != null)
             {
                 float dist = Vector3.Distance(plane.position, startPosition);
+                CurrentDistance = dist;
                 distanceText.text = $"Dist: {dist:F0}m";
             }
 
@@ -65,6 +70,7 @@ namespace PaperWings.Flight
             if (timeText != null)
             {
                 float elapsed = Time.time - startTime;
+                CurrentFlightTime = elapsed;
                 string timeStr = $"Time: {elapsed:F1}s";
 
                 if (bestTime < float.MaxValue)

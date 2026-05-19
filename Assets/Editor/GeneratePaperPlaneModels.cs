@@ -102,10 +102,37 @@ namespace PaperWings.Editor
             CreateRegion("Fuji Foothills", "fuji_foothills", new Color(0.7f, 0.85f, 0.7f));
             CreateRegion("Norwegian Coast", "norwegian_coast", new Color(0.55f, 0.75f, 0.85f));
 
+            // Also create a ready-to-use library asset that references all three (for clean runtime loading)
+            CreateDefaultRegionLibrary(regionPath);
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("Created 3 default FlightRegion assets in " + regionPath);
+            Debug.Log("Created 3 default FlightRegion assets + FlightRegionLibrary in " + regionPath);
+        }
+
+        private static void CreateDefaultRegionLibrary(string regionFolder)
+        {
+            string libPath = "Assets/ScriptableObjects/FlightRegionLibrary.asset";
+            if (AssetDatabase.LoadAssetAtPath<FlightRegionLibrary>(libPath) != null)
+            {
+                Debug.Log("FlightRegionLibrary already exists. Skipping recreation.");
+                return;
+            }
+
+            var lib = ScriptableObject.CreateInstance<FlightRegionLibrary>();
+
+            // Load the three we just created (or existing ones)
+            var gc = AssetDatabase.LoadAssetAtPath<FlightRegion>(regionFolder + "grand_canyon.asset");
+            var fuji = AssetDatabase.LoadAssetAtPath<FlightRegion>(regionFolder + "fuji_foothills.asset");
+            var nor = AssetDatabase.LoadAssetAtPath<FlightRegion>(regionFolder + "norwegian_coast.asset");
+
+            if (gc) lib.regions.Add(gc);
+            if (fuji) lib.regions.Add(fuji);
+            if (nor) lib.regions.Add(nor);
+
+            AssetDatabase.CreateAsset(lib, libPath);
+            Debug.Log("Created FlightRegionLibrary with the 3 starter regions.");
         }
 
         private static void CreateRegion(string name, string id, Color fogColor)
@@ -132,24 +159,38 @@ namespace PaperWings.Editor
                     region.distanceGoal = 650f;
                     region.glideTimeGoal = 52f;
                     region.defaultSpawnHeight = 22f;
+                    region.environmentPrimaryColor = new Color(0.75f, 0.55f, 0.4f);   // warm sandstone
+                    region.environmentSecondaryColor = new Color(0.6f, 0.5f, 0.4f);
                     break;
 
                 case "fuji_foothills":
-                    region.baseWindDirection = new Vector3(0.15f, 0.12f, 0.45f); // more vertical lift
+                    // Strong lift from volcanic slopes, calmer winds, long graceful flights
+                    region.baseWindDirection = new Vector3(0.15f, 0.12f, 0.45f);
                     region.baseWindStrength = 0.65f;
-                    region.thermalStrengthMultiplier = 1.35f; // strong thermals near volcano
+                    region.thermalStrengthMultiplier = 1.35f;
                     region.distanceGoal = 480f;
                     region.glideTimeGoal = 68f;
                     region.defaultSpawnHeight = 28f;
+                    region.ambientLightColor = new Color(0.95f, 0.97f, 1f);
+                    region.ambientIntensity = 0.95f;
+                    region.fogDensity = 0.006f;
+                    region.environmentPrimaryColor = new Color(0.3f, 0.55f, 0.35f);   // deep forest green
+                    region.environmentSecondaryColor = new Color(0.45f, 0.5f, 0.4f);
                     break;
 
                 case "norwegian_coast":
-                    region.baseWindDirection = new Vector3(0.55f, 0.03f, 0.25f); // strong consistent wind
+                    // Strong consistent sea winds, dramatic cliffs, faster travel, fewer thermals
+                    region.baseWindDirection = new Vector3(0.55f, 0.03f, 0.25f);
                     region.baseWindStrength = 1.25f;
-                    region.thermalStrengthMultiplier = 0.75f; // fewer thermals, more wind
+                    region.thermalStrengthMultiplier = 0.75f;
                     region.distanceGoal = 720f;
                     region.glideTimeGoal = 41f;
                     region.defaultSpawnHeight = 15f;
+                    region.ambientLightColor = new Color(0.85f, 0.9f, 0.95f);
+                    region.ambientIntensity = 0.85f;
+                    region.fogDensity = 0.011f;
+                    region.environmentPrimaryColor = new Color(0.3f, 0.45f, 0.6f);    // cool ocean/granite
+                    region.environmentSecondaryColor = new Color(0.4f, 0.45f, 0.5f);
                     break;
             }
 
@@ -190,6 +231,9 @@ namespace PaperWings.Editor
             // Apply plane-specific shaping
             ApplyPlaneStyle(style, body, leftWing, rightWing, leftTip, rightTip, tail);
 
+            // Give the body a little paper thickness (card stock volume) — all planes benefit
+            if (body) body.localScale = new Vector3(body.localScale.x, body.localScale.y * 1.45f, body.localScale.z);
+
             // Add the animator
             root.AddComponent<PaperPlaneAnimator>();
 
@@ -208,40 +252,64 @@ namespace PaperWings.Editor
         }
 
         /// <summary>
-        /// Adds extra geometry to simulate paper creases and subtle folds.
-        /// This makes the low-poly models look more like real folded paper.
+        /// Adds extra geometry to simulate paper creases, leading-edge rolls, and subtle thickness.
+        /// This gives the low-poly models a much more convincing "real folded paper" look
+        /// while staying extremely cheap (a few extra quads per plane).
+        /// Special care is taken for The Ring (tubular/annular) and The Bird (layered accordion).
         /// </summary>
         private static void AddPaperCreases(PlaneStyle style, Transform leftWing, Transform rightWing, 
                                            Transform leftTip, Transform rightTip, Transform tail)
         {
-            // Subtle crease lines along typical fold paths
+            // === General paper crease + edge treatment (most planes) ===
             if (style != PlaneStyle.Ring)
             {
-                CreateCrease(leftWing, "LeftCrease", new Vector3(0.48f, 0.008f, 1f), new Vector3(0, 0.004f, 0));
-                CreateCrease(rightWing, "RightCrease", new Vector3(0.48f, 0.008f, 1f), new Vector3(0, 0.004f, 0));
+                // Primary fold crease running span-wise
+                CreateCrease(leftWing, "LeftCrease", new Vector3(0.48f, 0.006f, 0.98f), new Vector3(0, 0.003f, 0));
+                CreateCrease(rightWing, "RightCrease", new Vector3(0.48f, 0.006f, 0.98f), new Vector3(0, 0.003f, 0));
             }
 
-            // Better wing edge detail - leading edge "roll"
-            CreateEdgeDetail(leftWing, "LeftLeadingEdge", new Vector3(0.06f, 0.015f, 1f), new Vector3(-0.22f, 0.008f, 0));
-            CreateEdgeDetail(rightWing, "RightLeadingEdge", new Vector3(0.06f, 0.015f, 1f), new Vector3(0.22f, 0.008f, 0));
+            // Leading edge "roll" detail — makes wings look thicker and more aerodynamic
+            CreateEdgeDetail(leftWing, "LeftLeadingEdge", new Vector3(0.055f, 0.012f, 1f), new Vector3(-0.23f, 0.006f, 0.01f));
+            CreateEdgeDetail(rightWing, "RightLeadingEdge", new Vector3(0.055f, 0.012f, 1f), new Vector3(0.23f, 0.006f, 0.01f));
 
-            // Slight thickness on wing tips for paper feel
-            if (ltip) ltip.localScale = new Vector3(ltip.localScale.x, ltip.localScale.y * 1.15f, ltip.localScale.z);
-            if (rtip) rtip.localScale = new Vector3(rtip.localScale.x, rtip.localScale.y * 1.15f, rtip.localScale.z);
+            // Trailing edge subtle thickness (gives the wing a real paper card feel)
+            CreateEdgeDetail(leftWing, "LeftTrailingEdge", new Vector3(0.04f, 0.01f, 1f), new Vector3(-0.23f, -0.002f, 0.01f));
+            CreateEdgeDetail(rightWing, "RightTrailingEdge", new Vector3(0.04f, 0.01f, 1f), new Vector3(0.23f, -0.002f, 0.01f));
 
-            // Extra layered look for The Bird (accordion style)
+            // === The Bird — layered accordion / pleated wings ===
             if (style == PlaneStyle.Bird)
             {
-                CreateCrease(leftWing, "LeftLayer2", new Vector3(0.42f, 0.01f, 0.92f), new Vector3(0, 0.01f, 0.03f));
-                CreateCrease(rightWing, "RightLayer2", new Vector3(0.42f, 0.01f, 0.92f), new Vector3(0, 0.01f, 0.03f));
+                // Second and third layer creases to simulate the bird-like folded pleats
+                CreateCrease(leftWing, "LeftLayer2", new Vector3(0.38f, 0.009f, 0.88f), new Vector3(-0.02f, 0.008f, 0.04f));
+                CreateCrease(rightWing, "RightLayer2", new Vector3(0.38f, 0.009f, 0.88f), new Vector3(0.02f, 0.008f, 0.04f));
+
+                CreateCrease(leftWing, "LeftLayer3", new Vector3(0.32f, 0.007f, 0.78f), new Vector3(-0.04f, 0.014f, 0.08f));
+                CreateCrease(rightWing, "RightLayer3", new Vector3(0.32f, 0.007f, 0.78f), new Vector3(0.04f, 0.014f, 0.08f));
+
+                // Extra tip "feather" layers
+                if (leftTip) leftTip.localScale = new Vector3(leftTip.localScale.x, leftTip.localScale.y * 1.35f, leftTip.localScale.z);
+                if (rightTip) rightTip.localScale = new Vector3(rightTip.localScale.x, rightTip.localScale.y * 1.35f, rightTip.localScale.z);
             }
 
-            // Ring - more distinctive tubular structure
+            // === The Ring — tubular / annular structure ===
             if (style == PlaneStyle.Ring)
             {
-                CreateCrease(leftWing, "InnerRing", new Vector3(0.20f, 0.018f, 0.85f), new Vector3(0, 0.012f, 0));
-                CreateCrease(rightWing, "InnerRing", new Vector3(0.20f, 0.018f, 0.85f), new Vector3(0, 0.012f, 0));
+                // Inner tube wall to give real depth to the ring (the "hole" effect)
+                CreateCrease(leftWing, "RingInnerLeft", new Vector3(0.16f, 0.022f, 0.82f), new Vector3(0.01f, 0.01f, 0));
+                CreateCrease(rightWing, "RingInnerRight", new Vector3(0.16f, 0.022f, 0.82f), new Vector3(-0.01f, 0.01f, 0));
+
+                // Top and bottom "lip" of the ring tube for thickness
+                CreateEdgeDetail(leftWing, "RingLipTopL", new Vector3(0.28f, 0.008f, 0.18f), new Vector3(0, 0.018f, 0.42f));
+                CreateEdgeDetail(rightWing, "RingLipTopR", new Vector3(0.28f, 0.008f, 0.18f), new Vector3(0, 0.018f, 0.42f));
+
+                // Give the main ring walls more "height" (thickness of the paper tube)
+                if (leftWing) leftWing.localScale = new Vector3(leftWing.localScale.x, leftWing.localScale.y * 1.6f, leftWing.localScale.z);
+                if (rightWing) rightWing.localScale = new Vector3(rightWing.localScale.x, rightWing.localScale.y * 1.6f, rightWing.localScale.z);
             }
+
+            // === Universal tip thickness pass ===
+            if (leftTip) leftTip.localScale = new Vector3(leftTip.localScale.x, leftTip.localScale.y * 1.25f, leftTip.localScale.z);
+            if (rightTip) rightTip.localScale = new Vector3(rightTip.localScale.x, rightTip.localScale.y * 1.25f, rightTip.localScale.z);
         }
 
         private static void CreateEdgeDetail(Transform parent, string name, Vector3 scale, Vector3 localPos)
@@ -274,7 +342,7 @@ namespace PaperWings.Editor
             if (renderer != null)
             {
                 var mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-                mat.color = new Color(0.85f, 0.85f, 0.85f); // slightly darker for crease effect
+                mat.color = new Color(0.78f, 0.78f, 0.78f); // darker crease line for realistic folded paper shadow
                 renderer.material = mat;
             }
         }
@@ -357,11 +425,16 @@ namespace PaperWings.Editor
             switch (style)
             {
                 case PlaneStyle.Ring:
-                    // More tubular, ring-like
+                    // More tubular, ring-like - enhanced for distinct annular silhouette
                     body.localRotation = Quaternion.Euler(0, 0, 0);
-                    lw.localRotation = Quaternion.Euler(0, 0, 25);
-                    rw.localRotation = Quaternion.Euler(0, 0, -25);
-                    tail.localScale = new Vector3(0.05f, 0.05f, 1f);
+                    body.localScale = new Vector3(0.08f, 0.08f, 0.32f); // thicker tube body
+                    lw.localRotation = Quaternion.Euler(0, 0, 22);
+                    rw.localRotation = Quaternion.Euler(0, 0, -22);
+                    // Slight forward sweep on ring walls for 3D hoop feel
+                    lw.localPosition = new Vector3(lw.localPosition.x, lw.localPosition.y, 0.02f);
+                    rw.localPosition = new Vector3(rw.localPosition.x, rw.localPosition.y, 0.02f);
+                    tail.localScale = new Vector3(0.04f, 0.04f, 0.9f);
+                    tail.localPosition = new Vector3(0, 0.08f, -0.30f);
                     break;
 
                 case PlaneStyle.Glider:
@@ -387,11 +460,14 @@ namespace PaperWings.Editor
                     break;
 
                 case PlaneStyle.Bird:
-                    // Layered, accordion-like wings
-                    lw.localRotation = Quaternion.Euler(0, 0, 15);
-                    rw.localRotation = Quaternion.Euler(0, 0, -15);
-                    ltip.localRotation = Quaternion.Euler(0, 0, 28);
-                    rtip.localRotation = Quaternion.Euler(0, 0, -28);
+                    // Layered, accordion-like wings - more bird-like with pronounced layering and slight anhedral
+                    lw.localRotation = Quaternion.Euler(0, 0, 18);
+                    rw.localRotation = Quaternion.Euler(0, 0, -18);
+                    ltip.localRotation = Quaternion.Euler(0, 0, 32);
+                    rtip.localRotation = Quaternion.Euler(0, 0, -32);
+                    // Slight downward droop on tips for natural bird wing look
+                    if (ltip) ltip.localPosition = new Vector3(ltip.localPosition.x, -0.01f, ltip.localPosition.z);
+                    if (rtip) rtip.localPosition = new Vector3(rtip.localPosition.x, -0.01f, rtip.localPosition.z);
                     break;
 
                 default:

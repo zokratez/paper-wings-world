@@ -20,11 +20,22 @@ namespace PaperWings.Demo
 
         private void Start()
         {
-            // Build nice environment first
+            // Build nice environment first — now region-aware for distinct visual personality
+            FlightEnvironment env = null;
             if (buildCanyonEnvironment)
             {
-                var env = gameObject.AddComponent<FlightEnvironment>();
-                env.BuildEnvironment();
+                env = gameObject.AddComponent<FlightEnvironment>();
+            }
+
+            // Use RegionManager if present in scene (preferred clean path)
+            var regionManager = FindObjectOfType<RegionManager>();
+            if (regionManager != null && region != null)
+            {
+                regionManager.ApplyRegion(region, flightCamera, null, env); // physics applied below
+            }
+            else if (env != null)
+            {
+                env.BuildEnvironment(region);
             }
 
             PaperPlaneDefinition planeDef = FlightSessionData.SelectedPlane;
@@ -56,17 +67,32 @@ namespace PaperWings.Demo
                 physics.InitializeFromDefinition(planeDef);
             }
 
-            // Apply region-specific flight environment
+            // Apply region-specific flight tuning via manager if available, otherwise direct
             if (region != null && physics != null)
             {
-                physics.windDirection = region.baseWindDirection;
-                physics.baseWindStrength = region.baseWindStrength;
+                var rm = FindObjectOfType<RegionManager>();
+                if (rm != null)
+                {
+                    rm.ApplyRegion(region, flightCamera, physics, null); // visuals + physics in one place
+                }
+                else
+                {
+                    physics.windDirection = region.baseWindDirection;
+                    physics.baseWindStrength = region.baseWindStrength;
+                    physics.thermalMultiplier = region.thermalStrengthMultiplier;
+                }
             }
 
             // Nice launch
             controller.LaunchFromFoldingScreen();
 
-            // Following camera
+            // Apply rich region visuals (sky, fog, ambient) — this is what makes each place feel different
+            if (region != null)
+            {
+                ApplyRegionVisuals(region);
+            }
+
+            // Following camera (right-half free look supported)
             if (flightCamera != null)
             {
                 var follower = flightCamera.gameObject.AddComponent<FlightCameraFollower>();
@@ -84,34 +110,8 @@ namespace PaperWings.Demo
 
             // Add flight performance stats
             gameObject.AddComponent<PaperWings.Flight.FlightStatsDisplay>();
-        }
 
-        private void ApplyRegionVisuals(FlightRegion region)
-        {
-            // Skybox
-            if (region.skyboxMaterial != null && flightCamera != null)
-            {
-                RenderSettings.skybox = region.skyboxMaterial;
-            }
-
-            // Ambient light
-            RenderSettings.ambientLight = region.ambientLightColor;
-            RenderSettings.ambientIntensity = region.ambientIntensity;
-
-            // Fog
-            RenderSettings.fog = true;
-            RenderSettings.fogColor = region.fogColor;
-            RenderSettings.fogDensity = region.fogDensity;
-            RenderSettings.fogMode = FogMode.Exponential;
-
-            // Camera background as fallback
-            if (flightCamera != null)
-            {
-                flightCamera.backgroundColor = region.fogColor;
-            }
-        }
-
-            Debug.Log($"[FlightDemo] Spawned {(planeDef != null ? planeDef.displayName : "test plane")} successfully.");
+            Debug.Log($"[FlightDemo] Spawned {(planeDef != null ? planeDef.displayName : "test plane")} into {(region != null ? region.displayName : "default area")}.");
         }
 
         private void CreateReturnToFoldingUI()
@@ -156,7 +156,12 @@ namespace PaperWings.Demo
 
         private void ReturnToFolding()
         {
+            // Record progress before leaving the flight scene
+            RecordFlightProgress();
+
+            // Clear session (legacy + new)
             SelectedPlaneHolder.Clear();
+            FlightSessionData.Clear();
 
             var transition = FindObjectOfType<PaperWings.Core.SceneTransition>();
             if (transition != null)
@@ -168,83 +173,22 @@ namespace PaperWings.Demo
                 UnityEngine.SceneManagement.SceneManager.LoadScene("FoldingTutorialDemo");
             }
         }
-    }
 
-    /// <summary>
-    /// High-quality camera follower for the flight demo.
-    /// Features smooth following + optional free-look mode (two-finger drag).
-    /// </summary>
-    public class FlightCameraFollower : MonoBehaviour
-    {
-        public Transform target;
-
-        [Header("Follow Settings")]
-        public float followDistance = 4.8f;
-        public float heightOffset = 1.6f;
-        public float smoothSpeed = 4.0f;
-
-        [Header("Free Look")]
-        [Tooltip("Allow two-finger drag to look around while still following the plane")]
-        public bool allowFreeLook = true;
-        public float freeLookSensitivity = 0.4f;
-
-        private Vector3 velocity;
-        private float currentYaw;
-        private float currentPitch;
-        private bool isFreeLooking = false;
-        private Vector2 lastLookPosition;
-
-        private void LateUpdate()
+        private void RecordFlightProgress()
         {
-            if (target == null) return;
+            var stats = FindObjectOfType<FlightStatsDisplay>();
+            var planeDef = FlightSessionData.SelectedPlane;
+            var region = FlightSessionData.SelectedRegion;
 
-            HandleFreeLookInput();
-
-            // Calculate base follow position
-            Vector3 followDirection = Quaternion.Euler(currentPitch, currentYaw, 0) * Vector3.back;
-            Vector3 desiredPosition = target.position + followDirection * followDistance + Vector3.up * heightOffset;
-
-            transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref velocity, 1f / smoothSpeed);
-
-            // Look at the plane with a slight lead
-            Vector3 lookTarget = target.position + target.forward * 2.5f + Vector3.up * 0.6f;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookTarget - transform.position), Time.deltaTime * 6f);
-        }
-
-        private void HandleFreeLookInput()
-        {
-            if (!allowFreeLook) return;
-
-            if (Input.touchCount == 2)
+            if (stats != null && planeDef != null && region != null)
             {
-                isFreeLooking = true;
-                Touch t0 = Input.GetTouch(0);
-                Touch t1 = Input.GetTouch(1);
+                float dist = stats.CurrentDistance;
+                float time = stats.CurrentFlightTime;
 
-                Vector2 avgPos = (t0.position + t1.position) / 2f;
-
-                if (t0.phase == TouchPhase.Began || t1.phase == TouchPhase.Began)
+                if (dist > 5f || time > 2f) // ignore trivial "flights"
                 {
-                    lastLookPosition = avgPos;
+                    PaperWings.Progression.FlightProgress.RecordFlight(planeDef.planeId, region.regionId, dist, time);
                 }
-                else if (t0.phase == TouchPhase.Moved || t1.phase == TouchPhase.Moved)
-                {
-                    Vector2 delta = avgPos - lastLookPosition;
-
-                    currentYaw += delta.x * freeLookSensitivity;
-                    currentPitch -= delta.y * freeLookSensitivity * 0.7f;
-                    currentPitch = Mathf.Clamp(currentPitch, -35f, 45f);
-
-                    lastLookPosition = avgPos;
-                }
-            }
-            else
-            {
-                isFreeLooking = false;
-
-                // Slowly return to following behind the plane
-                currentYaw = Mathf.LerpAngle(currentYaw, 0f, Time.deltaTime * 2.5f);
-                currentPitch = Mathf.Lerp(currentPitch, 8f, Time.deltaTime * 2.5f);
             }
         }
     }

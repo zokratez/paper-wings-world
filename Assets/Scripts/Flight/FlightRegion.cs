@@ -32,5 +32,9 @@ namespace PaperWings.Flight
         [Header("Challenges (Future)")]
         public float distanceGoal = 500f;
         public float glideTimeGoal = 45f;
+
+        [Header("Environment Theme (used by FlightEnvironment)")]
+        public Color environmentPrimaryColor = new Color(0.6f, 0.5f, 0.4f);
+        public Color environmentSecondaryColor = new Color(0.5f, 0.45f, 0.4f);
     }
 }
