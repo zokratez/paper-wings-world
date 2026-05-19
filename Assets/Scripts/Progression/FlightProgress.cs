@@ -182,6 +182,49 @@ namespace PaperWings.Progression
         }
 
         /// <summary>
+        /// Simple mastery tiers based on best distance achieved for a plane + region.
+        /// Thresholds are tuned for the current v1.0 regions (easy to adjust).
+        /// </summary>
+        public enum MasteryTier
+        {
+            None,
+            Bronze,
+            Silver,
+            Gold
+        }
+
+        public static MasteryTier GetMasteryTier(string planeId, string regionId)
+        {
+            var (dist, _) = GetBest(planeId, regionId);
+            if (dist >= 950f) return MasteryTier.Gold;
+            if (dist >= 650f) return MasteryTier.Silver;
+            if (dist >= 400f) return MasteryTier.Bronze;
+            return MasteryTier.None;
+        }
+
+        public static string GetBadgeEmoji(MasteryTier tier)
+        {
+            return tier switch
+            {
+                MasteryTier.Gold => "🥇",
+                MasteryTier.Silver => "🥈",
+                MasteryTier.Bronze => "🥉",
+                _ => ""
+            };
+        }
+
+        public static string GetBadgeLabel(MasteryTier tier)
+        {
+            return tier switch
+            {
+                MasteryTier.Gold => "Gold",
+                MasteryTier.Silver => "Silver",
+                MasteryTier.Bronze => "Bronze",
+                _ => ""
+            };
+        }
+
+        /// <summary>
         /// Debug helper - reset everything (useful during development)
         /// </summary>
         public static void ResetAllProgress()

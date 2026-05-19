@@ -24,6 +24,7 @@ namespace PaperWings.Flight
         // Expose current flight results for progression system
         public float CurrentDistance { get; private set; }
         public float CurrentFlightTime { get; private set; }
+        public float MaxAltitude { get; private set; }
 
         private void Start()
         {
@@ -38,6 +39,7 @@ namespace PaperWings.Flight
                 rb = physics.GetComponent<Rigidbody>();
                 startPosition = plane.position;
                 startTime = Time.time;
+                MaxAltitude = plane.position.y;
             }
 
             // Create UI if not assigned
@@ -55,6 +57,7 @@ namespace PaperWings.Flight
             if (altitudeText != null)
             {
                 float alt = Mathf.Max(0, plane.position.y);
+                MaxAltitude = Mathf.Max(MaxAltitude, alt);
                 altitudeText.text = $"Alt: {alt:F1}m";
             }
 
