@@ -67,6 +67,16 @@ namespace PaperWings.Demo
                 physics.InitializeFromDefinition(planeDef);
             }
 
+            // Add flight audio (dynamic wind/whoosh)
+            var flightAudio = gameObject.AddComponent<FlightAudio>();
+            flightAudio.planeTransform = planeGO.transform;
+            flightAudio.planeRigidbody = physics.GetComponent<Rigidbody>();
+
+            // Add flight visual effects (paper flutter)
+            var flightEffects = gameObject.AddComponent<FlightEffects>();
+            flightEffects.planeTransform = planeGO.transform;
+            flightEffects.planeRigidbody = physics.GetComponent<Rigidbody>();
+
             // Apply region-specific flight tuning via manager if available, otherwise direct
             if (region != null && physics != null)
             {
@@ -85,6 +95,20 @@ namespace PaperWings.Demo
 
             // Nice launch
             controller.LaunchFromFoldingScreen();
+
+            // Strong initial whoosh on launch
+            var flightAudio = GetComponent<FlightAudio>();
+            if (flightAudio != null)
+            {
+                flightAudio.PlayLaunchWhoosh();
+            }
+
+            // Launch visual burst (paper particles)
+            var flightEffects = GetComponent<FlightEffects>();
+            if (flightEffects != null)
+            {
+                flightEffects.PlayLaunchBurst();
+            }
 
             // Apply rich region visuals (sky, fog, ambient) — this is what makes each place feel different
             if (region != null)

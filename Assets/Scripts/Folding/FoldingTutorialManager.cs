@@ -433,6 +433,29 @@ namespace PaperWings.Folding
             if (audioPlayer != null) audioPlayer.PlaySuccessSound();
         }
 
+        private System.Collections.IEnumerator LaunchModelPop()
+        {
+            if (modelParent == null) yield break;
+
+            Vector3 originalScale = modelParent.localScale;
+            float duration = 0.35f;
+            float t = 0;
+
+            // Quick scale up for satisfying "launch away" pop (kid-friendly)
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                float progress = t / duration;
+                float eased = 1f - Mathf.Pow(1f - progress, 3f);
+
+                modelParent.localScale = originalScale * Mathf.Lerp(1f, 1.4f, eased);
+                yield return null;
+            }
+
+            if (modelParent != null)
+                modelParent.localScale = originalScale;
+        }
+
         private void NextStep()
         {
             if (currentStep < currentPlane.steps.Count - 1)
@@ -770,6 +793,12 @@ namespace PaperWings.Folding
             if (audioPlayer != null)
             {
                 audioPlayer.PlayLaunchSound();
+            }
+
+            // Simple launch visual pop on the model (kid-friendly "whoosh away" feel)
+            if (modelParent != null)
+            {
+                StartCoroutine(LaunchModelPop());
             }
 
             Debug.Log($"[Folding] Launching {currentPlane.displayName} into {regionToUse?.displayName ?? "default"}...");

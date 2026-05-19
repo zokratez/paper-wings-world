@@ -107,7 +107,16 @@
     height: 62px;
 }
 
-/* Region Selection Cards (Phase 3) */
+/* 
+Paper Wings Kid-Friendly Palette (Phase 4)
+- Primary Blue: #3B82F6 / soft sky blue
+- Warm Accent: #F59E0B / friendly orange
+- Forest Green: #10B981
+- Paper Cream: #FEF3C7 / #FFFBEB
+- Deep Text: #1E3A5F
+*/
+
+ /* Region Selection Cards (Phase 3) */
 .region-selection {
     width: 100%;
 }
