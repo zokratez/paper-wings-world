@@ -266,7 +266,6 @@ namespace PaperWings.Folding
                 {
                     SupabaseAuth.Instance.SignInAnonymously();
                     statusLabel.text = "Auth: Signing in (anonymous)...";
-                    // After sign-in the service will be ready; user can manually Load
                 }
                 else
                 {
@@ -290,21 +289,20 @@ namespace PaperWings.Folding
             };
             btnRow.Add(loadBtn);
 
-            var resetBtn = MakeDevButton("Reset Local Progress", new Color(0.7f, 0.3f, 0.3f));
-            resetBtn.clicked += () =>
+            var saveBtn = MakeDevButton("Save Cloud Progress", new Color(0.3f, 0.45f, 0.65f));
+            saveBtn.clicked += () =>
             {
-                FlightProgress.ResetAllProgress();
-                statusLabel.text = "Local progress reset (cloud untouched)";
+                if (SupabaseProgressService.Instance != null && SupabaseAuth.Instance != null && SupabaseAuth.Instance.IsAuthenticated)
+                {
+                    SupabaseProgressService.Instance.SaveProgress();
+                    statusLabel.text = "Manual save pushed to cloud.";
+                }
+                else
+                {
+                    statusLabel.text = "Sign in first, then Save Cloud Progress";
+                }
             };
-            btnRow.Add(resetBtn);
-
-            var grantAllBtn = MakeDevButton("Grant All Content (Debug)", new Color(0.55f, 0.45f, 0.2f));
-            grantAllBtn.clicked += () =>
-            {
-                ContentUnlockManager.GrantAllForDebug();
-                statusLabel.text = "DEBUG: All planes & regions unlocked locally";
-            };
-            btnRow.Add(grantAllBtn);
+            btnRow.Add(saveBtn);
 
             // Subscribe to auth events for live status if the singletons exist
             if (SupabaseAuth.Instance != null)

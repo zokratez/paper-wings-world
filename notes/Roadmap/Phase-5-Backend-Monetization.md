@@ -121,12 +121,69 @@ create policy "Users can update own progress"
 
 The architecture is clean, testable, and ready for the next concrete steps.
 
-**Immediate next actions (post this wiring):**
-- Run the new Editor menu item to generate `SupabaseConfig.asset`
-- Create real Supabase project + run the SQL schema from this document
-- Fill the config keys and (recommended) place a copy in a `Resources/` folder for zero-config play
-- Test the full anonymous → cloud sync flow using the dev panel on the Hub
-- Then proceed to email auth UI + real RevenueCat IAP wiring
+---
+
+## Exact Supabase Dashboard Setup & Test Instructions (User Has Existing Account)
+
+Since you already have a Supabase account, follow these precise steps:
+
+### 1. Create or Open a Project in Supabase Dashboard
+1. Go to https://supabase.com/dashboard and sign in.
+2. Click **"New Project"** (green button) or select an existing project you want to use for Paper Wings World.
+3. Give it a name (e.g. "paper-wings-world-dev"), choose a region close to you, and set a strong password for the database.
+4. Wait ~1-2 minutes for the project to provision.
+
+### 2. Enable Providers
+- In left sidebar: **Authentication** → **Providers**
+- Make sure **Anonymous** is **Enabled** (toggle on).
+- (Optional for later) Enable **Email** provider.
+
+### 3. Get Your URL and Anon Key (Critical)
+- In left sidebar: **Settings** (gear icon at bottom of sidebar) → **API**
+- Copy these two values exactly:
+  - **Project URL** → looks like `https://abcdefghijklmnop.supabase.co`
+  - **Project API keys** → the **anon** key (long string starting with `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` — the one labeled "anon" or "public").  
+    **Do not** copy the `service_role` key.
+
+### 4. Run the Database Schema (One-Time)
+- In left sidebar: **SQL Editor** (new query)
+- Copy the entire SQL block from the section **"Supabase Project Setup (Required)"** earlier in this document (the `CREATE TABLE`, `alter table`, and all `create policy` statements).
+- Paste into the SQL Editor and click **Run**.
+- You should see success messages. Verify the two tables appear under **Table Editor**.
+
+### 5. Create & Fill the Config in Unity
+1. In Unity: Menu → **Paper Wings → Phase 5 - Create Supabase Config Asset**
+2. The asset appears in `Assets/ScriptableObjects/SupabaseConfig.asset`
+3. Select it in the Project window and fill:
+   - **Supabase Url** = the Project URL you copied
+   - **Anon Key**   = the anon/public key you copied
+4. **Recommended for demo play:**
+   - Create folder `Assets/Resources/` if missing
+   - Copy the filled `SupabaseConfig.asset` into `Assets/Resources/`
+   - Ensure the file in Resources is named exactly `SupabaseConfig.asset`
+
+### 6. Test Using the Dev Tools Panel
+- Press Play in Unity.
+- On the **Main Hub** screen, scroll to the bottom — you will see the beige **🛠️ Phase 5 Dev Tools** bar with exactly three buttons:
+  - **Sign in Anonymously**
+  - **Load Cloud Progress**
+  - **Save Cloud Progress**
+- Use the flow described in the "Testing" section below.
+
+### 7. Verify Data in Supabase Dashboard
+- **Authentication → Users**: You should see your anonymous user appear (with a UUID).
+- **Table Editor → flight_progress**: After doing flights + using Save/Load, you will see a row containing your `user_id`, `best_flights` (json), and `unlocked_regions` (array).
+
+**Testing Flow (recommended order):**
+1. Click "Sign in Anonymously" → status label shows your user ID.
+2. Fly some planes in different regions and beat some scores (this auto-saves locally + pushes to cloud because of the event).
+3. Click "Save Cloud Progress" (manual) to force an explicit push.
+4. Click "Reset Local Progress" (or restart the app) to clear local data.
+5. Click "Load Cloud Progress" — your best scores and unlocked regions should return from the cloud.
+
+---
+
+**Note**: The current implementation uses anonymous login only. Email sign-up is architected but not yet exposed in UI.
 
 ---
 

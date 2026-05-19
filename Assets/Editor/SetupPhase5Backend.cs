@@ -40,10 +40,21 @@ namespace PaperWings.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log("✅ Phase 5 SupabaseConfig asset created!\n" +
-                      "1. Open it in the Inspector.\n" +
-                      "2. Fill in your real Supabase Project URL and anon public key (from Supabase Dashboard → Settings → API).\n" +
-                      "3. (Optional) Drag it into the FoldingDemoBootstrap in your scene for wiring.");
+            Debug.Log(@"✅ Phase 5 SupabaseConfig asset created at Assets/ScriptableObjects/SupabaseConfig.asset
+
+EXACT NEXT STEPS (user has Supabase account):
+
+1. Go to https://supabase.com/dashboard and create a new project (or use existing).
+2. In your project:
+   - Left sidebar → Settings (gear icon) → API
+   - Copy 'Project URL' (e.g. https://xyzabc123.supabase.co)
+   - Copy the 'anon public' key (long JWT starting with eyJ...)
+3. In Unity, select the new SupabaseConfig.asset in Project window.
+4. Paste the URL into 'Supabase Url' field.
+5. Paste the anon key into 'Anon Key' field.
+6. Recommended: Copy the .asset file into Assets/Resources/ (create the folder) and name it exactly 'SupabaseConfig.asset' so the demo auto-wires on Play.
+
+The asset is now ready for the Dev Tools panel on the Hub.");
 
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = AssetDatabase.LoadAssetAtPath<SupabaseConfig>(ConfigPath);

@@ -1,0 +1,47 @@
+# SupabaseConfig Example & Placement Instructions (Phase 5)
+
+This file explains how to create and configure the SupabaseConfig.asset for Paper Wings World.
+
+## Step-by-step (you have a Supabase account)
+
+1. Run in Unity:
+   Paper Wings > Phase 5 - Create Supabase Config Asset
+   (This creates Assets/ScriptableObjects/SupabaseConfig.asset)
+
+2. Exact Supabase Dashboard actions:
+   - Log into https://supabase.com/dashboard
+   - Click "New Project" (or open an existing one)
+   - After project is ready:
+     - In left menu: Settings → API
+     - Under "Project URL": copy the full https://...supabase.co value
+     - Under "Project API keys":
+       - Copy the "anon" / "public" key (starts with eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)
+   - Do NOT use the service_role key.
+
+3. In Unity Inspector for the SupabaseConfig.asset:
+   - Supabase Url  = the Project URL from dashboard
+   - Anon Key      = the anon/public key from dashboard
+
+4. Where to place the asset for automatic wiring:
+   - Best for demo: Copy SupabaseConfig.asset into a folder named:
+     Assets/Resources/
+   - Rename the copy to exactly: SupabaseConfig.asset
+   - The FoldingDemoBootstrap will auto-find it via Resources.Load when you press Play.
+
+Alternative: If you have a scene open with the FoldingDemoBootstrap GameObject visible, drag the asset onto the "Supabase Config" slot in the Inspector.
+
+## SQL Schema Reminder (run once in Supabase SQL Editor)
+
+Copy the full CREATE TABLE + RLS policy SQL from:
+notes/Roadmap/Phase-5-Backend-Monetization.md
+
+## Testing
+After filling keys:
+- Enter Play mode
+- On the Main Hub you will see the "🛠️ Phase 5 Dev Tools" strip at the bottom
+- Use the three buttons to test anonymous login + manual Load / Save of progress
+
+## Security Note
+Never commit real keys to git. The .asset file should be in .gitignore or use a build-time injection for production.
+
+*Delete this .txt file or move it to notes/ once your real config is set up.*
