@@ -98,6 +98,41 @@ From Master Project Roadmap:
 | iPhone (recent)      | P2       | Pending    | Secondary |
 | Low-end Android      | P2       | Pending    | Graceful degradation |
 
+### Specific Device Test Cases (Detailed)
+
+**iPad Pro 13" (M4) - P0 Hero Device**
+- [ ] Fresh launch: Custom splash ("Paper Wings World" + "Loading...") displays for 1.5s, then Hub at stable 60 FPS.
+- [ ] All 3 regions: 58+ FPS sustained, even with max thermals + particles + speed trail.
+- [ ] Monetization: From plane selection, buy Full Content Pack → instant toast + all locked planes show "⭐ Premium" badge and are playable.
+- [ ] From region selection, buy All Regions Pack → Fuji and Norway unlock with Premium badge (without full pack).
+- [ ] Email auth + cloud: Sign up, complete 2 flights in different regions, force close app, re-launch, sign in, verify best scores and unlocks restored from cloud.
+- [ ] Settings: Open from Hub, verify account email, tap Restore (no-op in sim but toast), Sign Out, confirm Hub status bar updates to Anonymous.
+- [ ] 15+ min continuous session: No frame drop, no audio stutter, no excessive heat (temp <42°C reported).
+
+**Samsung Galaxy Tab S9 Ultra (Android 14) - P0 High-End Android**
+- [ ] Launch performance: Splash + init <2s, 60 FPS in GC and coast regions.
+- [ ] Particle stress: In Fuji with falling petals + flutter at high speed — maintain >55 FPS.
+- [ ] Purchase simulation: Multiple buys (regions pack then full) — both products tracked, correct unlocks and badges.
+- [ ] Cross-region flight: Transition from GC to Fuji, verify region particles swap correctly without hitch.
+- [ ] Battery/thermal: 10 min flight in power-saving mode if available — graceful, no crash.
+- [ ] Touch: All buttons (unlock, settings, sign in) have large hit areas, no mis-taps on high DPI.
+
+**Google Pixel Tablet or Mid-range Android (e.g. Tab S7) - P1**
+- [ ] Target 50+ FPS in all regions with reduced particle counts (mobile optimization active).
+- [ ] No major hitching on scene load (loading text visible during black fade).
+- [ ] Full auth + purchase + progress loop works identically to iPad.
+- [ ] Low power test: App runs 20 min without thermal warning or performance cliff.
+
+**iPhone 15 Pro (iOS) - P2 Phone Validation**
+- [ ] Portrait/landscape handling if supported, or locked landscape.
+- [ ] 60 FPS on device, touch targets usable on smaller screen.
+- [ ] Quick test of one full flow (fold + fly + purchase sim).
+
+**Low-end Android Phone (e.g. older Samsung A-series) - P2 Graceful Degradation**
+- [ ] App launches without crash.
+- [ ] 30+ FPS, particles reduced significantly.
+- [ ] Basic flows work, even if some effects simplified.
+
 ---
 
 ## Performance Optimizations (Planned / In Progress)

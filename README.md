@@ -2,7 +2,7 @@
 
 Family-friendly mobile app that teaches kids and all ages how to fold real paper airplanes from around the world — then launch them into a realistic 3D flight over the actual Earth.
 
-**Current Phase**: Phase 3 — World Expansion & Progression (highly playable)  
+**Current Phase**: Phase 6 — Testing, Optimization & Final Polish (in progress)  
 **Target Platforms**: Tablet-first (iPad + high-end Android tablets)  
 **MVP Scope (locked)**: 8 paper airplanes + 3 starting flight regions
 
@@ -32,13 +32,18 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 - Live flight stats (altitude, distance, time + best time).
 - Complete fold → launch → fly → return flow works end-to-end.
 
-**Phase 3 Foundation (World Expansion) is in progress**:
-- Region system (`FlightRegion` + `FlightRegionLibrary`) created.
-- 3 distinct regions defined: Grand Canyon, Fuji Foothills, Norwegian Coast.
-- Region selection appears after successfully folding a plane.
-- Each region can have unique visuals, wind, thermals, and challenges.
+**Phase 5 (Backend, Accounts & Monetization) is Complete**:
+- Supabase auth (anonymous + email upgrade) + cloud progress sync.
+- PurchaseManager with 2 products (Full Content Pack $4.99, All Regions Pack $2.99).
+- Unlock buttons, "⭐ Premium" badges, Settings screen, Restore Purchases, success toasts.
 
-See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
+**Phase 6 (Testing, Optimization & Final Polish) is in progress**:
+- Expanded device testing checklist with specific cases for iPad Pro, Galaxy Tab S9, mid-range Android, iPhone, low-end.
+- Performance optimizations: 60 FPS target, mobile particle reduction (lower counts/rates on handheld for better draw call performance and consistent framerate).
+- Simple splash/loading screen on initial app launch.
+- Living Known Issues list in Phase-6-Testing.md.
+
+See `notes/Roadmap/Phase-0-Checklist.md` and `notes/Roadmap/Phase-6-Testing.md` for detailed task tracking.
 
 ## Current Playable Experience (Phase 4 Complete - Fully Polished)
 
