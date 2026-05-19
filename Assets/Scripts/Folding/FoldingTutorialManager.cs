@@ -200,10 +200,15 @@ namespace PaperWings.Folding
             mainMenuContainer.Add(emailAuthSection);
 
             // ============================================================
-            // Phase 5 Developer Debug Panel (Hub only - remove or hide for production builds)
+            // Phase 5 Developer Debug Panel (Hub only)
+            // Gated behind UNITY_EDITOR || DEVELOPMENT_BUILD so it is completely
+            // stripped from true release builds (when using the Remove Dev Tools helper
+            // + non-development build configuration).
             // ============================================================
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
             var devPanel = CreateDevBackendPanel();
             mainMenuContainer.Add(devPanel);
+#endif
 
             selectionRoot.Add(mainMenuContainer);
 
@@ -248,7 +253,9 @@ namespace PaperWings.Folding
         /// <summary>
         /// Phase 5 dev-only panel for testing auth and cloud sync directly from the Hub.
         /// Clearly marked so it is obvious this must be removed or gated before shipping.
+        /// The entire method is excluded in release builds via the same guard.
         /// </summary>
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         private VisualElement CreateDevBackendPanel()
         {
             var panel = new VisualElement();
@@ -359,6 +366,7 @@ namespace PaperWings.Folding
 
             return panel;
         }
+#endif
 
         /// <summary>
         /// Phase 5 Email authentication section for the Main Hub.

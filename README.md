@@ -108,6 +108,41 @@ All features are fully playable end-to-end in the demo scenes.
 
 See `Assets/Scripts/Folding/Demo/HOW_TO_TEST.md` for detailed controls and tips.
 
+## How to Build for Release (Final v1.0 Process)
+
+Use this when you are ready to produce builds for TestFlight, Play Internal test, or store submission.
+
+**Always run the preparation helpers in this exact order** (they are cumulative):
+
+1. Generate/refresh content if needed:
+   - **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
+   - **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
+   - **Paper Wings → Assign Real Models to All PaperPlaneDefinitions**
+   - **Paper Wings → Refresh All Models in Demo**
+
+2. Prepare scenes and settings:
+   - **Paper Wings → HIGH INTENSITY - Prepare Build Settings for Mobile Testing**
+
+3. Production configuration (run these three in order):
+   - **Paper Wings → HIGH INTENSITY - Prepare for Device Build (iOS + Android)**
+   - **Paper Wings → HIGH INTENSITY - Prepare Release Build**
+   - **Paper Wings → HIGH INTENSITY - Remove Dev Tools for Release**
+     (this step guarantees the Phase 5 dev panel and debug buttons are stripped from the final player)
+
+4. Open **File > Build Settings**, choose your target platform (iOS or Android), and **Build**.
+
+### Platform-Specific Notes
+- **iOS**: After Unity exports the Xcode project, open it in Xcode, archive, and distribute via Organizer to TestFlight or App Store Connect.
+- **Android**: Prefer building an App Bundle (AAB). Upload directly to the Google Play Console release track of your choice.
+
+**Verification after every release build**:
+- Install on a real device.
+- Confirm the dev tools panel is gone from the Main Hub.
+- Run the full Final Testing Checklist from `Phase-6-Testing.md`.
+- Test auth, purchases, cloud sync, and the Privacy Policy button.
+
+For the complete detailed workflow (including post-build verification steps for both platforms), see the "Build & Export Workflow" section in `notes/Roadmap/Phase-7-Release.md`.
+
 ## Documentation & Notes
 
 All planning, design decisions, research, and checklists live in the **Obsidian vault** located at `notes/`.

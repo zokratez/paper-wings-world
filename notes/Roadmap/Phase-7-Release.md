@@ -181,12 +181,80 @@
 New in Phase 7:
 - `Paper Wings / HIGH INTENSITY - Prepare for Device Build (iOS + Android)` — one-click configuration of production PlayerSettings, bundle IDs, version, IL2CPP, SDK targets, etc.
 - `Paper Wings / HIGH INTENSITY - Prepare Release Build` — turns Development Build OFF, disables profiler/debugging, enforces release optimizations.
+- `Paper Wings / HIGH INTENSITY - Remove Dev Tools for Release` — final step that guarantees the Phase 5 dev panel and all its debug buttons are stripped from the player (via the #if guard + non-development build).
 
-Run the Device Build helper first, then the Release Build helper immediately before every candidate build for TestFlight or Play track.
+Run the sequence in order before every production candidate:
+  1. Prepare for Device Build
+  2. Prepare Release Build
+  3. Remove Dev Tools for Release
 
 Also continue using:
 - Scene generation and model refresh tools
 - Previous mobile testing helper
+
+---
+
+## Build & Export Workflow (Step-by-Step for iOS and Android)
+
+This is the exact repeatable process for producing a release candidate build.
+
+### Prerequisites (one-time or before every release candidate)
+- All Phase 7 blockers resolved (real RevenueCat, production Supabase, hosted privacy policy, final assets).
+- Run the full asset generation + model refresh if content changed.
+- The project is on the correct branch with clean git state.
+
+### Universal Preparation Steps (Run These in Order)
+1. Open the project in Unity 6+ (clean Editor if possible).
+2. **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data** (if needed)
+3. **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
+4. **Paper Wings → Assign Real Models to All PaperPlaneDefinitions**
+5. **Paper Wings → Refresh All Models in Demo**
+6. **Paper Wings → HIGH INTENSITY - Prepare Build Settings for Mobile Testing** (adds scenes)
+7. **Paper Wings → HIGH INTENSITY - Prepare for Device Build (iOS + Android)**
+   - Sets bundle ID, version, company, IL2CPP, SDKs, ARM64, orientation, etc.
+8. **Paper Wings → HIGH INTENSITY - Prepare Release Build**
+   - Development Build = OFF, profiler/debug = OFF
+9. **Paper Wings → HIGH INTENSITY - Remove Dev Tools for Release**
+   - Final guarantee that the Phase 5 dev panel and buttons are excluded.
+
+### iOS Release Build (TestFlight / App Store)
+1. Switch platform to iOS in Build Settings if not already.
+2. In Build Settings:
+   - Ensure "Development Build" is **unchecked** (the helpers already enforce this).
+   - Select the correct iOS device or "Any iOS Device" for archive.
+   - (Optional) Enable "Create Xcode Project" for manual signing control.
+3. Click **Build**.
+4. Open the exported Xcode project.
+5. In Xcode:
+   - Select your team and provisioning profile (or automatic signing for TestFlight).
+   - Set version and build number (match Unity).
+   - Archive the app (Product → Archive).
+6. In Organizer, distribute to App Store Connect or TestFlight.
+7. In App Store Connect, add the build to the desired TestFlight group or submit for review.
+
+### Android Release Build (Internal / Production Track)
+1. Switch platform to Android.
+2. In Build Settings:
+   - Build System: Gradle
+   - Build App Bundle (AAB) — **recommended** for Play Console.
+   - "Development Build" unchecked.
+3. Click **Build**.
+4. Unity produces the .aab (or .apk for testing).
+5. Go to Google Play Console:
+   - Create or use an existing release track (Internal test → Closed → Production).
+   - Upload the AAB.
+   - Fill in release notes.
+   - Review and release to the track.
+6. For signed APK testing, you can also build a signed APK from Unity using your keystore.
+
+### Post-Build Verification (Always Do This)
+- Install the exact build on a physical hero device (not just simulator).
+- Confirm the dev tools panel does **not** appear on the Main Hub.
+- Run the full Top 10 Final Testing Checklist.
+- Verify purchases, cloud sync, and Settings (including Privacy Policy button) work.
+- Check no Unity splash, correct orientation, performance is good.
+
+**Pro Tip:** Create a Unity "Release" scene build profile or a small Editor script that runs the entire helper chain in one click if you do this frequently.
 
 ---
 
