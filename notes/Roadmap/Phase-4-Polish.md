@@ -137,6 +137,23 @@ This phase focuses on audio feedback, particle/visual effects, and consistent vi
     - Region-specific particles (warm dust in Grand Canyon, soft pink/green leaves in Fuji, sea spray in Norwegian Coast).
     - High-speed contrail / wind streak particles behind the plane.
     - Full integration with `FlightRegion` via `SetRegion()`.
+    - Dust emission increases when flying low in Grand Canyon (height-based).
+    - Improved falling leaves velocity for Fuji and spray spread for Norwegian.
+  - Launch burst particles + visual pop on the 3D model when launching from success screen (bigger and more dramatic).
+  - Wired into flight scene.
+
+- **Screen Shake / Feedback**:
+  - Added `Shake()` method to `FlightCameraFollower`.
+  - Gentle shake on strong launches for satisfying feedback.
+  - Integrated shake on strong thermals in `ThermalZone.cs`.
+
+- **Visual Polish**:
+  - Rolled out consistent kid-friendly color palette (primary blue #3B82F6, warm accent #F59E0B, deep text #1E3A5F, paper cream) across:
+    - Main Hub (buttons, title, icon)
+    - Region Selection cards (USS updated with palette colors + locked states)
+    - My Progress screen (background, title, content)
+    - Post-Flight Summary (panel, titles, buttons)
+  - Added official palette reference block in `FoldingScreen.uss`.
   - Launch burst + model pop effect now triggers from success screen.
 
 - **Screen Shake**:

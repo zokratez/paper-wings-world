@@ -122,7 +122,7 @@ Paper Wings Kid-Friendly Palette (Phase 4)
 }
 
 .region-card {
-    background-color: #FFFFFF;
+    background-color: #FFFBEB; /* Paper Cream from palette */
     border-radius: 14px;
     border-width: 2px;
     border-color: #E5E7EB;
@@ -137,8 +137,8 @@ Paper Wings Kid-Friendly Palette (Phase 4)
 }
 
 .region-card:hover {
-    border-color: #3B82F6;
-    background-color: #F8FAFC;
+    border-color: #3B82F6; /* Primary Blue */
+    background-color: #FEF3C7; /* Lighter Paper Cream */
 }
 
 .region-card-icon {
@@ -154,7 +154,7 @@ Paper Wings Kid-Friendly Palette (Phase 4)
 .region-card-title {
     font-size: 16px;
     -unity-font-style: bold;
-    color: #1F2937;
+    color: #1E3A5F; /* Deep Text from palette */
     margin-bottom: 2px;
 }
 
@@ -173,7 +173,7 @@ Paper Wings Kid-Friendly Palette (Phase 4)
 
 .region-card-locked .region-card-title,
 .region-card-locked .region-card-desc {
-    color: #9CA3AF;
+    color: #6B7280; /* Muted from palette */
 }
 
 /* Best scores in cards */

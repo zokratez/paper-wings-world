@@ -36,7 +36,18 @@ namespace PaperWings.Flight
                 distanceFactor = Mathf.InverseLerp(radius, 0f, dist);
             }
 
-            other.attachedRigidbody.AddForce(Vector3.up * force * distanceFactor, ForceMode.Acceleration);
+            float finalForce = force * distanceFactor;
+            other.attachedRigidbody.AddForce(Vector3.up * finalForce, ForceMode.Acceleration);
+
+            // Satisfying camera shake on strong thermals
+            if (finalForce > 5f)
+            {
+                var cam = Camera.main?.GetComponent<FlightCameraFollower>();
+                if (cam != null)
+                {
+                    cam.Shake(0.35f, 0.25f);
+                }
+            }
         }
 
         private void OnDrawGizmosSelected()

@@ -121,7 +121,19 @@ namespace PaperWings.Flight
             // Region-specific ambient particles (always on, low rate)
             if (regionParticles != null && regionEmission.enabled)
             {
-                regionEmission.rateOverTime = 4f; // gentle constant emission
+                float rate = 4f;
+
+                // Grand Canyon: more dust when flying low
+                if (currentRegion != null && currentRegion.regionId == "grand_canyon" && planeTransform != null)
+                {
+                    float height = planeTransform.position.y;
+                    if (height < 15f)
+                    {
+                        rate = Mathf.Lerp(4f, 18f, (15f - height) / 15f);
+                    }
+                }
+
+                regionEmission.rateOverTime = rate;
             }
         }
 
@@ -132,9 +144,19 @@ namespace PaperWings.Flight
         {
             if (flutterParticles != null)
             {
-                var burst = new ParticleSystem.Burst(0f, 25);
+                // Bigger, more dramatic launch burst
+                var main = flutterParticles.main;
+                main.startSize = 0.25f;
+                var burst = new ParticleSystem.Burst(0f, 40, 1, 0.1f);
                 flutterParticles.emission.SetBurst(0, burst);
                 flutterParticles.Play();
+
+                // Also boost the speed trail briefly if available
+                if (speedTrail != null)
+                {
+                    var trailMain = speedTrail.main;
+                    trailMain.startSize = new ParticleSystem.MinMaxCurve(0.1f, 0.25f);
+                }
             }
         }
 
@@ -202,16 +224,22 @@ namespace PaperWings.Flight
                 case "grand_canyon":
                     main.startColor = new Color(0.85f, 0.7f, 0.5f, 0.6f); // warm sand/dust
                     main.startSize = 0.18f;
+                    // Light dust when low - rate modulated in Update
                     break;
 
                 case "fuji_foothills":
-                    main.startColor = new Color(0.95f, 0.75f, 0.85f, 0.65f); // soft pink/green leaves
+                    main.startColor = new Color(0.95f, 0.75f, 0.85f, 0.65f); // soft pink/green leaves/petals
                     main.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.22f);
+                    // Gentle falling effect
+                    velocity.y = new ParticleSystem.MinMaxCurve(-1.2f, 0.3f);
                     break;
 
                 case "norwegian_coast":
-                    main.startColor = new Color(0.9f, 0.95f, 1f, 0.55f); // sea spray / light mist
-                    main.startSize = 0.15f;
+                    main.startColor = new Color(0.85f, 0.92f, 1f, 0.5f); // sea spray + light snow/fog
+                    main.startSize = new ParticleSystem.MinMaxCurve(0.1f, 0.2f);
+                    // More horizontal spread for spray
+                    velocity.x = new ParticleSystem.MinMaxCurve(-2.5f, 2.5f);
+                    velocity.y = new ParticleSystem.MinMaxCurve(0.1f, 1.2f);
                     break;
 
                 default:
