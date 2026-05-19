@@ -167,6 +167,25 @@ From Master Project Roadmap:
 
 ---
 
+## Final Testing Checklist — Top 10 Must-Test Items (Real Devices)
+
+**Run this exact list on at least one hero tablet (iPad Pro/Air M-series or Galaxy Tab S9/S10) and one mid/low Android device before any public build.**
+
+1. **Cold launch + custom splash**: App opens instantly to branded splash (no Unity splash), then lands on Main Hub with correct performance mode.
+2. **60 FPS sustained**: All regions in both Folding Tutorial and Flight Demo hold 55–60 FPS on hero device; no visible stutter during model rotation or flight.
+3. **LOD on paper models**: In Flight Demo, distant paper planes have wing tips disabled (visible pop-in/out at threshold) with no visual glitches.
+4. **Full auth flow end-to-end**: Anonymous sign-in, email sign-up/sign-in, anonymous→email upgrade, session restore after app kill, and Sign Out all work without crashes.
+5. **Cloud save + merge**: Flight bests and unlocked regions sync correctly between devices; local wins on conflict without data loss.
+6. **IAP simulation + Premium gates**: Both products unlock correctly, Premium badges appear, locked content shows "Unlock" buttons, Restore Purchases works, toasts fire on every grant.
+7. **Settings screen**: Restore Purchases, Sign Out, and Account Status bar all function; no layout clipping on different aspect ratios.
+8. **Scene transitions + loading**: Every hub→flight and return transition shows the loading indicator + clean fade; no black frames or stuck states.
+9. **Touch + UI responsiveness**: All 56 px+ targets respond on first tap, no accidental double-taps, scroll views smooth, keyboard never covers email fields.
+10. **15+ minute session + thermal**: Fly 15+ minutes continuously on hero device; check for heat, frame drops, or forced quality reduction. Confirm low-end device still feels usable.
+
+**Pass criteria**: Every item green on hero device + acceptable experience on at least one mid-range Android. Any red item blocks the build.
+
+---
+
 ## Next Steps in Phase 6
 
 1. Execute device testing matrix (start with hero devices).

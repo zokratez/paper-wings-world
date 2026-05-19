@@ -2,7 +2,7 @@
 
 Family-friendly mobile app that teaches kids and all ages how to fold real paper airplanes from around the world — then launch them into a realistic 3D flight over the actual Earth.
 
-**Current Phase**: Phase 6 — Testing, Optimization & Final Polish (in progress)  
+**Current Phase**: Phase 6 Complete — Ready for Real-Device Testing  
 **Target Platforms**: Tablet-first (iPad + high-end Android tablets)  
 **MVP Scope (locked)**: 8 paper airplanes + 3 starting flight regions
 
@@ -11,7 +11,7 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 ### Opening in Unity
 1. Open the folder `~/paper-wings-world/` directly in **Unity 6+**.
 2. Let Unity resolve packages on first open.
-3. Useful Editor menus are under **Paper Wings → ...** in the menu bar (especially the model generation, assignment, and refresh tools).
+3. Useful Editor menus are under **Paper Wings → ...** in the menu bar (especially the model generation tools and the new **HIGH INTENSITY - Prepare Build Settings for Mobile Testing** helper).
 
 ### Opening the Obsidian Vault (Documentation & Notes)
 1. Open **Obsidian**.
@@ -19,29 +19,24 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 3. Select the `notes/` folder inside this project.
 4. All planning, research, design decisions, and checklists live here.
 
-## Current Status (Phase 2 - Complete)
+## Current Status (Phase 6 Complete — Ready for Real-Device Testing)
 
-**Phase 2 is complete.** All major systems are functional and at a high standard:
+**Phase 6 is complete.** All optimization, polish, tooling, and documentation wrap-up items delivered.
 
-- All 8 MVP planes have **low-poly rigged 3D models** with proper bone hierarchy and improved paper-like geometry (creases, edge detail, subtle thickness).
-- All 8 planes are assigned real models by default.
-- Full folding tutorial system works with real 3D models + natural folding animations.
-- Flight physics (lift, drag, stability, thermals, wind) + kid-friendly auto-recovery.
-- Smooth third-person camera with right-side free-look.
-- Scene transitions with fade.
-- Live flight stats (altitude, distance, time + best time).
-- Complete fold → launch → fly → return flow works end-to-end.
+- Centralized `PerformanceManager` (single source of 60 FPS, low-end device detection, quality scaling)
+- Distance-based `PaperModelLOD` automatically attached to all real paper plane models
+- Custom splash screen on cold launch + loading indicators during transitions
+- Editor helper: **Paper Wings → HIGH INTENSITY - Prepare Build Settings for Mobile Testing** (auto-adds both demo scenes + applies correct landscape + mobile PlayerSettings)
+- Short "Final Testing Checklist" (top 10 must-test items) added to Phase-6-Testing.md
 
 **Phase 5 (Backend, Accounts & Monetization) is Complete**:
 - Supabase auth (anonymous + email upgrade) + cloud progress sync.
 - PurchaseManager with 2 products (Full Content Pack $4.99, All Regions Pack $2.99).
 - Unlock buttons, "⭐ Premium" badges, Settings screen, Restore Purchases, success toasts.
 
-**Phase 6 (Testing, Optimization & Final Polish) is in progress**:
-- Performance centralized (PerformanceManager), basic LOD for paper models, splash screen, expanded final polish checklist.
-- Known Issues and device test cases maintained in Phase-6-Testing.md.
+All foundation systems (folding, flight, progression, auth, IAP simulation) remain at the high standard established in prior phases.
 
-See `notes/Roadmap/Phase-0-Checklist.md` and `notes/Roadmap/Phase-6-Testing.md` for detailed task tracking.
+See `notes/Roadmap/Phase-6-Testing.md` (especially the new Final Testing Checklist) for the exact device testing matrix.
 
 ## Current Playable Experience (Phase 4 Complete - Fully Polished)
 
@@ -95,10 +90,10 @@ All features are fully playable end-to-end in the demo scenes.
    - **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
    - **Paper Wings → Assign Real Models to All PaperPlaneDefinitions**
    - **Paper Wings → Refresh All Models in Demo**
-3. Ensure both scenes are added to **Build Settings**:
-   - `FoldingTutorialDemo`
-   - `FlightDemo`
-4. (Optional) Rebuild the scenes using the menu items if they are missing or outdated.
+3. Run the new one-click helper:
+   - **Paper Wings → HIGH INTENSITY - Prepare Build Settings for Mobile Testing**
+     (automatically adds both demo scenes + sets correct mobile landscape orientation and performance defaults)
+4. (Optional) Rebuild the scenes using the other setup menu items if they are missing or outdated.
 5. Open `FoldingTutorialDemo.unity` and press **Play**.
 
 **Recommended test flow:**

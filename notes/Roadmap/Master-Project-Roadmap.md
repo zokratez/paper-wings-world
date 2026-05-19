@@ -55,7 +55,7 @@ The app combines:
 
 ## Current Phase Status (Phase 6 — Testing, Optimization & Final Polish)
 
-**Status:** Just started. Solid foundation from Phases 0–5 is in place and highly playable.
+**Status:** ✅ Phase 6 Complete. All wrap-up items delivered. Ready for real-device testing and closed beta.
 
 ### What Is Done (Phases 0–5 Summary)
 - Complete folding + real 3D rigged models + smooth animations
@@ -64,12 +64,11 @@ The app combines:
 - Supabase auth (anonymous + email upgrade) + cloud progress sync
 - Monetization foundation: 2 products, purchase buttons on locked content, Premium badges, Settings screen with Restore & Sign Out, success toasts
 
-### What Is Next (Phase 6)
-- Performance fully centralized via new PerformanceManager.EnsurePerformanceSettings() (removes duplication across SceneTransition + bootstraps)
-- Basic distance LOD added for 3D paper models (wing tips disabled beyond threshold)
-- Final Polish Items section added to testing checklist (UI responsiveness, touch targets, sound balance, etc.)
-- Known Issues updated with evaluation (LOD was evaluated and implemented simply where valuable)
-- Maintain checklist and prepare device QA / store submission
+### What Is Next (Phase 6 — Complete)
+- Editor helper "Paper Wings / HIGH INTENSITY - Prepare Build Settings for Mobile Testing" added (one-click scenes + mobile settings)
+- Short Final Testing Checklist (top 10 must-test items) added to Phase-6-Testing.md
+- PerformanceManager centralized, PaperModelLOD implemented, splash + polish items complete
+- Ready for device QA matrix and closed beta / store submission prep
 
 See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issues.
 
