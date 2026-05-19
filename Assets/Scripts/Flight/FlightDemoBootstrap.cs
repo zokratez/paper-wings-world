@@ -137,7 +137,7 @@ namespace PaperWings.Demo
             image.color = new Color(0.15f, 0.25f, 0.35f, 0.85f);
 
             var btn = returnBtn.GetComponent<UnityEngine.UI.Button>();
-            btn.onClick.AddListener(ReturnToFolding);
+            btn.onClick.AddListener(ShowPostFlightSummary);
 
             var textGO = new GameObject("Text", typeof(UnityEngine.UI.Text));
             textGO.transform.SetParent(returnBtn.transform);
@@ -154,24 +154,162 @@ namespace PaperWings.Demo
             txtRect.offsetMax = Vector2.zero;
         }
 
-        private void ReturnToFolding()
+        private void ShowPostFlightSummary()
         {
-            // Record progress before leaving the flight scene
+            // Record the flight (idempotent if already recorded)
             RecordFlightProgress();
 
-            // Clear session (legacy + new)
-            SelectedPlaneHolder.Clear();
-            FlightSessionData.Clear();
+            // Get final stats
+            var stats = FindObjectOfType<FlightStatsDisplay>();
+            var planeDef = FlightSessionData.SelectedPlane;
+            var region = FlightSessionData.SelectedRegion;
 
-            var transition = FindObjectOfType<PaperWings.Core.SceneTransition>();
-            if (transition != null)
+            float dist = stats != null ? stats.CurrentDistance : 0f;
+            float time = stats != null ? stats.CurrentFlightTime : 0f;
+            float maxAlt = stats != null ? stats.MaxAltitude : 0f;
+
+            // Check if this was a new personal best
+            bool newBest = false;
+            string celebration = "";
+            if (planeDef != null && region != null)
             {
-                transition.LoadSceneWithFade("FoldingTutorialDemo");
+                var (prevDist, _) = PaperWings.Progression.FlightProgress.GetBest(planeDef.planeId, region.regionId);
+                if (dist > prevDist + 1f) // small epsilon
+                {
+                    newBest = true;
+                    var tier = PaperWings.Progression.FlightProgress.GetMasteryTier(planeDef.planeId, region.regionId);
+                    string badge = PaperWings.Progression.FlightProgress.GetBadgeEmoji(tier);
+                    celebration = newBest ? $"🎉 New Personal Best! {badge}" : "";
+                }
             }
-            else
+
+            // Hide the return button UI
+            GameObject flightUI = GameObject.Find("FlightUI");
+            if (flightUI != null) flightUI.SetActive(false);
+
+            // Create polished summary canvas (centered card)
+            GameObject summaryGO = new GameObject("PostFlightSummary");
+            var canvas = summaryGO.AddComponent<UnityEngine.UI.Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+            var scaler = summaryGO.AddComponent<UnityEngine.UI.CanvasScaler>();
+            scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
+
+            // Background panel
+            GameObject panelGO = new GameObject("Panel", typeof(UnityEngine.UI.Image));
+            panelGO.transform.SetParent(summaryGO.transform);
+            var panelRect = panelGO.GetComponent<RectTransform>();
+            panelRect.anchorMin = new Vector2(0.5f, 0.5f);
+            panelRect.anchorMax = new Vector2(0.5f, 0.5f);
+            panelRect.anchoredPosition = Vector2.zero;
+            panelRect.sizeDelta = new Vector2(520, 380);
+
+            var panelImg = panelGO.GetComponent<UnityEngine.UI.Image>();
+            panelImg.color = new Color(0.98f, 0.98f, 0.96f, 0.97f);
+
+            // Add rounded look via material or just color for demo
+
+            // Title
+            var titleGO = CreateText(panelGO.transform, "Flight Complete", new Vector2(0, 140), 32, true, new Color(0.15f, 0.25f, 0.35f));
+
+            // Stats
+            string statsText = $"Distance: {dist:F0} m\nFlight Time: {time:F1} s\nMax Altitude: {maxAlt:F0} m";
+            CreateText(panelGO.transform, statsText, new Vector2(0, 40), 20, false, new Color(0.2f, 0.25f, 0.3f));
+
+            // Celebration
+            if (!string.IsNullOrEmpty(celebration))
             {
-                UnityEngine.SceneManagement.SceneManager.LoadScene("FoldingTutorialDemo");
+                CreateText(panelGO.transform, celebration, new Vector2(0, -30), 24, true, new Color(0.1f, 0.6f, 0.3f));
             }
+
+            // Buttons container
+            GameObject btnContainer = new GameObject("Buttons", typeof(UnityEngine.UI.HorizontalLayoutGroup));
+            btnContainer.transform.SetParent(panelGO.transform);
+            var btnRect = btnContainer.GetComponent<RectTransform>();
+            btnRect.anchorMin = new Vector2(0.5f, 0.5f);
+            btnRect.anchorMax = new Vector2(0.5f, 0.5f);
+            btnRect.anchoredPosition = new Vector2(0, -110);
+            btnRect.sizeDelta = new Vector2(480, 60);
+
+            var hlg = btnContainer.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+            hlg.spacing = 20;
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+
+            // Fly Again button
+            var flyAgainBtn = CreateButton(btnContainer.transform, "Fly Again in Same Region", new Color(0.2f, 0.5f, 0.8f));
+            flyAgainBtn.onClick.AddListener(() =>
+            {
+                // Simple and reliable for demo: reload the scene (static session data persists)
+                UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+            });
+
+            // Return to Folding button
+            var returnBtn = CreateButton(btnContainer.transform, "Return to Folding", new Color(0.2f, 0.6f, 0.4f));
+            returnBtn.onClick.AddListener(() =>
+            {
+                // Final return
+                SelectedPlaneHolder.Clear();
+                FlightSessionData.Clear();
+
+                var transition = FindObjectOfType<PaperWings.Core.SceneTransition>();
+                if (transition != null)
+                {
+                    transition.LoadSceneWithFade("FoldingTutorialDemo");
+                }
+                else
+                {
+                    UnityEngine.SceneManagement.SceneManager.LoadScene("FoldingTutorialDemo");
+                }
+            });
+        }
+
+        private UnityEngine.UI.Text CreateText(Transform parent, string text, Vector2 anchoredPos, int fontSize, bool bold, Color color)
+        {
+            GameObject go = new GameObject("Text", typeof(UnityEngine.UI.Text));
+            go.transform.SetParent(parent);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPos;
+            rect.sizeDelta = new Vector2(480, 80);
+
+            var txt = go.GetComponent<UnityEngine.UI.Text>();
+            txt.text = text;
+            txt.fontSize = fontSize;
+            txt.color = color;
+            txt.alignment = TextAnchor.MiddleCenter;
+            if (bold) txt.fontStyle = UnityEngine.FontStyle.Bold;
+
+            return txt;
+        }
+
+        private UnityEngine.UI.Button CreateButton(Transform parent, string label, Color bgColor)
+        {
+            GameObject go = new GameObject(label, typeof(UnityEngine.UI.Button), typeof(UnityEngine.UI.Image));
+            go.transform.SetParent(parent);
+            var rect = go.GetComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(220, 52);
+
+            var img = go.GetComponent<UnityEngine.UI.Image>();
+            img.color = bgColor;
+
+            var btn = go.GetComponent<UnityEngine.UI.Button>();
+
+            var textGO = new GameObject("Text", typeof(UnityEngine.UI.Text));
+            textGO.transform.SetParent(go.transform);
+            var tRect = textGO.GetComponent<RectTransform>();
+            tRect.anchorMin = Vector2.zero;
+            tRect.anchorMax = Vector2.one;
+            tRect.offsetMin = Vector2.zero;
+            tRect.offsetMax = Vector2.zero;
+
+            var txt = textGO.GetComponent<UnityEngine.UI.Text>();
+            txt.text = label;
+            txt.fontSize = 18;
+            txt.color = Color.white;
+            txt.alignment = TextAnchor.MiddleCenter;
+
+            return btn;
         }
 
         private void RecordFlightProgress()
