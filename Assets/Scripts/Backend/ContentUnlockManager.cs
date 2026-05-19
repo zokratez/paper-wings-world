@@ -70,6 +70,29 @@ namespace PaperWings.Backend
             return false;
         }
 
+        /// <summary>
+        /// ID-based version for UI code that hasn't loaded the FlightRegion asset yet.
+        /// Tries asset load for isFree/purchase check + always respects milestone unlocks in FlightProgress.
+        /// </summary>
+        public static bool IsRegionUnlocked(string regionId)
+        {
+            if (string.IsNullOrEmpty(regionId)) return false;
+
+            // Milestone unlocks from gameplay always take precedence
+            if (FlightProgress.IsRegionUnlocked(regionId)) return true;
+
+            // Try to load the region definition to respect isFree + purchased product
+            var region = Resources.Load<FlightRegion>($"FlightRegions/{regionId}");
+            if (region != null)
+            {
+                if (region.isFree) return true;
+                if (!string.IsNullOrEmpty(region.unlockProductId) && purchasedProductIds.Contains(region.unlockProductId))
+                    return true;
+            }
+
+            return false;
+        }
+
         // ============================================================
         // Purchase Integration Points (Foundation)
         // ============================================================

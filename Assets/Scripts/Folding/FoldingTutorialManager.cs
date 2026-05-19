@@ -3,6 +3,8 @@ using UnityEngine.UIElements;
 using System.Collections;
 using PaperWings.Folding;
 using PaperWings.Demo;
+using PaperWings.Backend;
+using PaperWings.Progression;
 
 namespace PaperWings.Folding
 {
@@ -158,6 +160,12 @@ namespace PaperWings.Folding
             };
             buttonRow.Add(progressBtn);
 
+            // ============================================================
+            // Phase 5 Developer Debug Panel (Hub only - remove or hide for production builds)
+            // ============================================================
+            var devPanel = CreateDevBackendPanel();
+            mainMenuContainer.Add(devPanel);
+
             selectionRoot.Add(mainMenuContainer);
 
             // Subtle fade in for Hub
@@ -196,6 +204,123 @@ namespace PaperWings.Folding
             btn.style.borderRadius = 16;
             btn.style.paddingLeft = 20;
             btn.style.paddingRight = 20;
+        }
+
+        /// <summary>
+        /// Phase 5 dev-only panel for testing auth and cloud sync directly from the Hub.
+        /// Clearly marked so it is obvious this must be removed or gated before shipping.
+        /// </summary>
+        private VisualElement CreateDevBackendPanel()
+        {
+            var panel = new VisualElement();
+            panel.style.marginTop = 40;
+            panel.style.paddingTop = 12;
+            panel.style.paddingBottom = 12;
+            panel.style.paddingLeft = 16;
+            panel.style.paddingRight = 16;
+            panel.style.backgroundColor = new Color(0.95f, 0.9f, 0.85f, 0.9f);
+            panel.style.borderRadius = 12;
+            panel.style.alignItems = Align.Center;
+            panel.style.width = Length.Percent(85);
+            panel.style.maxWidth = 480;
+
+            var header = new Label("🛠️ Phase 5 Dev Tools — Backend & Monetization (remove before public builds)");
+            header.style.fontSize = 13;
+            header.style.color = new Color(0.6f, 0.35f, 0.1f);
+            header.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.style.marginBottom = 8;
+            panel.Add(header);
+
+            var statusLabel = new Label("Auth: Not signed in");
+            statusLabel.style.fontSize = 12;
+            statusLabel.style.color = TextMuted;
+            statusLabel.style.marginBottom = 8;
+            panel.Add(statusLabel);
+
+            var btnRow = new VisualElement();
+            btnRow.style.flexDirection = FlexDirection.Row;
+            btnRow.style.justifyContent = Justify.Center;
+            btnRow.style.flexWrap = Wrap.Wrap;
+            panel.Add(btnRow);
+
+            // Helper for small dev buttons
+            Button MakeDevButton(string text, Color color)
+            {
+                var b = new Button { text = text };
+                b.style.fontSize = 12;
+                b.style.backgroundColor = color;
+                b.style.color = Color.white;
+                b.style.borderRadius = 8;
+                b.style.paddingLeft = 10;
+                b.style.paddingRight = 10;
+                b.style.paddingTop = 6;
+                b.style.paddingBottom = 6;
+                b.style.margin = 4;
+                return b;
+            }
+
+            var signInBtn = MakeDevButton("Sign in Anonymously", new Color(0.2f, 0.5f, 0.7f));
+            signInBtn.clicked += () =>
+            {
+                if (SupabaseAuth.Instance != null)
+                {
+                    SupabaseAuth.Instance.SignInAnonymously();
+                    statusLabel.text = "Auth: Signing in (anonymous)...";
+                    // After sign-in the service will be ready; user can manually Load
+                }
+                else
+                {
+                    statusLabel.text = "Backend not initialized (configure SupabaseConfig first)";
+                }
+            };
+            btnRow.Add(signInBtn);
+
+            var loadBtn = MakeDevButton("Load Cloud Progress", new Color(0.2f, 0.55f, 0.35f));
+            loadBtn.clicked += () =>
+            {
+                if (SupabaseProgressService.Instance != null && SupabaseAuth.Instance != null && SupabaseAuth.Instance.IsAuthenticated)
+                {
+                    SupabaseProgressService.Instance.LoadProgress();
+                    statusLabel.text = "Loading + merging cloud progress...";
+                }
+                else
+                {
+                    statusLabel.text = "Sign in first, then Load Cloud Progress";
+                }
+            };
+            btnRow.Add(loadBtn);
+
+            var resetBtn = MakeDevButton("Reset Local Progress", new Color(0.7f, 0.3f, 0.3f));
+            resetBtn.clicked += () =>
+            {
+                FlightProgress.ResetAllProgress();
+                statusLabel.text = "Local progress reset (cloud untouched)";
+            };
+            btnRow.Add(resetBtn);
+
+            var grantAllBtn = MakeDevButton("Grant All Content (Debug)", new Color(0.55f, 0.45f, 0.2f));
+            grantAllBtn.clicked += () =>
+            {
+                ContentUnlockManager.GrantAllForDebug();
+                statusLabel.text = "DEBUG: All planes & regions unlocked locally";
+            };
+            btnRow.Add(grantAllBtn);
+
+            // Subscribe to auth events for live status if the singletons exist
+            if (SupabaseAuth.Instance != null)
+            {
+                SupabaseAuth.Instance.OnSignedIn += () =>
+                {
+                    string id = SupabaseAuth.Instance.CurrentUserId ?? "unknown";
+                    statusLabel.text = $"Auth: Anonymous ✓  User: {id.Substring(0, Mathf.Min(8, id.Length))}...";
+                };
+                SupabaseAuth.Instance.OnSignedOut += () =>
+                {
+                    statusLabel.text = "Auth: Signed out";
+                };
+            }
+
+            return panel;
         }
 
         #endregion
@@ -257,11 +382,22 @@ namespace PaperWings.Folding
 
         private VisualElement CreatePlaneCard(PaperPlaneDefinition plane)
         {
+            bool isUnlocked = ContentUnlockManager.IsPlaneUnlocked(plane);
+
             var card = new VisualElement();
             card.AddToClassList("plane-card");
 
-            // Kid-friendly styling
-            card.style.backgroundColor = new Color(0.95f, 0.97f, 1f);
+            if (!isUnlocked)
+            {
+                // Locked styling (matches region locked cards)
+                card.style.backgroundColor = new Color(0.88f, 0.88f, 0.88f);
+                card.style.opacity = 0.75f;
+            }
+            else
+            {
+                card.style.backgroundColor = new Color(0.95f, 0.97f, 1f);
+            }
+
             card.style.borderRadius = 16;
             card.style.padding = 16;
             card.style.margin = 8;
@@ -274,16 +410,40 @@ namespace PaperWings.Folding
             var nameLabel = new Label(plane.displayName);
             nameLabel.style.fontSize = 20;
             nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-            nameLabel.style.color = new Color(0.1f, 0.25f, 0.45f);
+            nameLabel.style.color = isUnlocked ? new Color(0.1f, 0.25f, 0.45f) : new Color(0.5f, 0.5f, 0.5f);
 
             var meta = new Label($"{plane.difficulty}  •  {plane.primaryCategory}");
             meta.style.fontSize = 13;
-            meta.style.color = new Color(0.4f, 0.5f, 0.6f);
+            meta.style.color = isUnlocked ? new Color(0.4f, 0.5f, 0.6f) : new Color(0.6f, 0.6f, 0.6f);
 
             card.Add(nameLabel);
             card.Add(meta);
 
-            card.RegisterCallback<ClickEvent>(e => StartTutorial(plane));
+            if (!isUnlocked)
+            {
+                var lockLabel = new Label("🔒 Locked (IAP coming in Phase 5)");
+                lockLabel.style.fontSize = 11;
+                lockLabel.style.color = new Color(0.6f, 0.4f, 0.2f);
+                lockLabel.style.marginTop = 6;
+                card.Add(lockLabel);
+
+                // No click handler for locked planes
+            }
+            else
+            {
+                // Free badge for clarity on free content
+                if (plane.isFree)
+                {
+                    var free = new Label("✓ Free");
+                    free.style.fontSize = 11;
+                    free.style.color = new Color(0.2f, 0.55f, 0.3f);
+                    free.style.marginTop = 4;
+                    card.Add(free);
+                }
+
+                card.RegisterCallback<ClickEvent>(e => StartTutorial(plane));
+            }
+
             return card;
         }
 
@@ -689,10 +849,10 @@ namespace PaperWings.Folding
             buttonRow.style.justifyContent = Justify.Center;
             regionContainer.Add(buttonRow);
 
-            // Show all 3 regions, with locked state for progression
-            bool gcUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon");
-            bool fujiUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("fuji_foothills");
-            bool norUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("norwegian_coast");
+            // Show all 3 regions, with locked state for progression (now uses central ContentUnlockManager)
+            bool gcUnlocked = ContentUnlockManager.IsRegionUnlocked("grand_canyon");
+            bool fujiUnlocked = ContentUnlockManager.IsRegionUnlocked("fuji_foothills");
+            bool norUnlocked = ContentUnlockManager.IsRegionUnlocked("norwegian_coast");
 
             CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
                 "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f), !gcUnlocked);

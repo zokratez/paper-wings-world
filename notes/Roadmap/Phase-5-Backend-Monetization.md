@@ -104,6 +104,13 @@ create policy "Users can update own progress"
 - `FlightRegion` extended with `isFree` + `unlockProductId` for consistent region gating.
 - `PaperPlaneDefinition` already had the unlock fields (reused).
 
+**Wired into playable demo (this iteration)**:
+- Editor tool: "Paper Wings / Phase 5 - Create Supabase Config Asset" generates the required asset.
+- `FoldingDemoBootstrap` now creates persistent `SupabaseAuth` + `SupabaseProgressService` singletons (with config) that survive scene loads.
+- Developer debug panel added directly to the Main Hub (clearly labeled, safe to remove later): Sign in Anonymously, Load Cloud Progress, Reset Local, Grant All Debug.
+- Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` (locked cards are visually disabled with message).
+- Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` (consistent with planes + future IAP).
+
 **Not yet production-ready**:
 - Full email signup/login UI and flows
 - Proper error handling, token refresh, and anonymous → email migration
@@ -113,6 +120,13 @@ create policy "Users can update own progress"
 - Actual Supabase project + SQL schema applied by the developer
 
 The architecture is clean, testable, and ready for the next concrete steps.
+
+**Immediate next actions (post this wiring):**
+- Run the new Editor menu item to generate `SupabaseConfig.asset`
+- Create real Supabase project + run the SQL schema from this document
+- Fill the config keys and (recommended) place a copy in a `Resources/` folder for zero-config play
+- Test the full anonymous → cloud sync flow using the dev panel on the Hub
+- Then proceed to email auth UI + real RevenueCat IAP wiring
 
 ---
 
