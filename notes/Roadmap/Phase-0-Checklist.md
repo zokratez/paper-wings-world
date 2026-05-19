@@ -30,8 +30,9 @@ updated: 2026-05
 - [x] All 8 planes now have high-quality folding steps + educational data in the asset generator (matching Classic Dart standard)
 - [x] Real 3D model pipeline complete for all 8 planes: Editor tool generates low-poly rigged prefabs with improved paper-like geometry and correct bone hierarchy
 - [x] PaperPlaneAnimator + updated manager fully supports real models (first 4 key planes pre-assigned)
-- [x] All 8 planes now have proper rigged low-poly prefabs with improved paper-like geometry (creases, better proportions)
+- [x] All 8 planes now have proper rigged low-poly prefabs with improved paper-like geometry (creases, edge detail, thickness simulation)
 - [x] All 8 PaperPlaneDefinition assets now point to real 3D models by default
+- [x] Added "Refresh All Models in Demo" menu item for quick iteration
 - [x] Created `notes/Research/3D-Models.md` documenting current model quality and upgrade path
 
 ### Phase 1 – Core Folding System (High Intensity, Quality First)

@@ -11,7 +11,7 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 ### Opening in Unity
 1. Open the folder `~/paper-wings-world/` directly in **Unity 6+**.
 2. Let Unity resolve packages on first open.
-3. Useful Editor menus are under **Paper Wings → ...** in the menu bar (especially the model generation and assignment tools).
+3. Useful Editor menus are under **Paper Wings → ...** in the menu bar (especially the model generation, assignment, and refresh tools).
 
 ### Opening the Obsidian Vault (Documentation & Notes)
 1. Open **Obsidian**.
@@ -21,11 +21,11 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 
 ## Current Status (Phase 2)
 
-- All 8 MVP planes now have **low-poly rigged 3D models** with proper bone hierarchy.
-- The first 4 key planes (Classic Dart, The Ring, Nakamichi Glider, The Bird) are assigned real models by default.
-- Full folding tutorial system works with real 3D models (with procedural fallback for the others).
-- Flight physics, thermals, improved camera, and stats are implemented and playable.
-- Complete fold → launch → fly → return flow is functional.
+- All 8 MVP planes now have **low-poly rigged 3D models** with proper bone hierarchy and improved paper-like geometry.
+- All 8 planes are assigned real models by default (no procedural fallback needed).
+- Full folding tutorial system works with real 3D models.
+- Flight physics, thermals, improved camera (with free-look), and stats are implemented and playable.
+- Complete fold → launch → fly → return flow is functional and smooth.
 
 See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
 

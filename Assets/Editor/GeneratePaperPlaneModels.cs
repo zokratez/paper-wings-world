@@ -74,6 +74,23 @@ namespace PaperWings.Editor
             Debug.Log("All 8 PaperPlaneDefinitions now point to real 3D models.");
         }
 
+        [MenuItem("Paper Wings/Refresh All Models in Demo")]
+        public static void RefreshAllModelsInDemo()
+        {
+            // Regenerate models
+            GenerateAllEight();
+
+            // Re-assign to all definitions
+            AssignAllModelsToDefinitions();
+
+            // Ping the folders so user sees the update
+            AssetDatabase.Refresh();
+
+            Debug.Log("All models regenerated and re-assigned. Please reload the demo scenes (FoldingTutorialDemo + FlightDemo) to see changes.");
+            EditorUtility.DisplayDialog("Paper Wings", 
+                "Models refreshed!\n\nReload the demo scenes to see the latest 3D models in action.", "OK");
+        }
+
         private enum PlaneStyle
         {
             Dart,
@@ -131,25 +148,50 @@ namespace PaperWings.Editor
         private static void AddPaperCreases(PlaneStyle style, Transform leftWing, Transform rightWing, 
                                            Transform leftTip, Transform rightTip, Transform tail)
         {
-            // Add a subtle crease line on main wings for most planes
+            // Subtle crease lines along typical fold paths
             if (style != PlaneStyle.Ring)
             {
-                CreateCrease(leftWing, "LeftCrease", new Vector3(0.48f, 0.01f, 1f), new Vector3(0, 0.005f, 0));
-                CreateCrease(rightWing, "RightCrease", new Vector3(0.48f, 0.01f, 1f), new Vector3(0, 0.005f, 0));
+                CreateCrease(leftWing, "LeftCrease", new Vector3(0.48f, 0.008f, 1f), new Vector3(0, 0.004f, 0));
+                CreateCrease(rightWing, "RightCrease", new Vector3(0.48f, 0.008f, 1f), new Vector3(0, 0.004f, 0));
             }
+
+            // Better wing edge detail - leading edge "roll"
+            CreateEdgeDetail(leftWing, "LeftLeadingEdge", new Vector3(0.06f, 0.015f, 1f), new Vector3(-0.22f, 0.008f, 0));
+            CreateEdgeDetail(rightWing, "RightLeadingEdge", new Vector3(0.06f, 0.015f, 1f), new Vector3(0.22f, 0.008f, 0));
+
+            // Slight thickness on wing tips for paper feel
+            if (ltip) ltip.localScale = new Vector3(ltip.localScale.x, ltip.localScale.y * 1.15f, ltip.localScale.z);
+            if (rtip) rtip.localScale = new Vector3(rtip.localScale.x, rtip.localScale.y * 1.15f, rtip.localScale.z);
 
             // Extra layered look for The Bird (accordion style)
             if (style == PlaneStyle.Bird)
             {
-                CreateCrease(leftWing, "LeftLayer2", new Vector3(0.45f, 0.01f, 0.95f), new Vector3(0, 0.008f, 0.02f));
-                CreateCrease(rightWing, "RightLayer2", new Vector3(0.45f, 0.01f, 0.95f), new Vector3(0, 0.008f, 0.02f));
+                CreateCrease(leftWing, "LeftLayer2", new Vector3(0.42f, 0.01f, 0.92f), new Vector3(0, 0.01f, 0.03f));
+                CreateCrease(rightWing, "RightLayer2", new Vector3(0.42f, 0.01f, 0.92f), new Vector3(0, 0.01f, 0.03f));
             }
 
-            // Ring gets a more cylindrical feel with an inner ring indicator
+            // Ring - more distinctive tubular structure
             if (style == PlaneStyle.Ring)
             {
-                CreateCrease(leftWing, "InnerRing", new Vector3(0.22f, 0.015f, 0.9f), new Vector3(0, 0.01f, 0));
-                CreateCrease(rightWing, "InnerRing", new Vector3(0.22f, 0.015f, 0.9f), new Vector3(0, 0.01f, 0));
+                CreateCrease(leftWing, "InnerRing", new Vector3(0.20f, 0.018f, 0.85f), new Vector3(0, 0.012f, 0));
+                CreateCrease(rightWing, "InnerRing", new Vector3(0.20f, 0.018f, 0.85f), new Vector3(0, 0.012f, 0));
+            }
+        }
+
+        private static void CreateEdgeDetail(Transform parent, string name, Vector3 scale, Vector3 localPos)
+        {
+            GameObject edge = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            edge.name = name;
+            edge.transform.SetParent(parent);
+            edge.transform.localPosition = localPos;
+            edge.transform.localScale = scale;
+
+            var renderer = edge.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                var mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                mat.color = new Color(0.9f, 0.9f, 0.9f);
+                renderer.material = mat;
             }
         }
 
