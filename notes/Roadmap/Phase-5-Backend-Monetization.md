@@ -104,20 +104,21 @@ create policy "Users can update own progress"
 - `FlightRegion` extended with `isFree` + `unlockProductId` for consistent region gating.
 - `PaperPlaneDefinition` already had the unlock fields (reused).
 
-**Wired into playable demo (this iteration)**:
+**Wired into playable demo (latest)**:
 - Editor tool: "Paper Wings / Phase 5 - Create Supabase Config Asset" generates the required asset.
 - `FoldingDemoBootstrap` now creates persistent `SupabaseAuth` + `SupabaseProgressService` singletons (with config) that survive scene loads.
-- Developer debug panel added directly to the Main Hub (clearly labeled, safe to remove later): Sign in Anonymously, Load Cloud Progress, Reset Local, Grant All Debug.
+- Main Hub now has a dedicated **Permanent Account (Email)** section with Email + Password fields, Sign Up (supports Anonymous → Email upgrade), Sign In, and Sign Out.
+- Existing dev tools panel kept (with Anonymous + manual Load/Save Cloud Progress) for continued testing.
 - Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` (locked cards are visually disabled with message).
 - Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` (consistent with planes + future IAP).
 
 **Not yet production-ready**:
-- Full email signup/login UI and flows
-- Proper error handling, token refresh, and anonymous → email migration
+- Proper error handling, token refresh, and advanced anonymous → email migration (basic upgrade works by signing up)
 - RevenueCat / Unity IAP integration + real purchase restoration
 - Advanced conflict resolution (last-write-wins vs server authoritative)
 - Secure key storage and production Supabase RLS hardening
 - Actual Supabase project + SQL schema applied by the developer
+- Polished production UI for login (current is functional foundation)
 
 The architecture is clean, testable, and ready for the next concrete steps.
 
@@ -174,16 +175,28 @@ Since you already have a Supabase account, follow these precise steps:
 - **Authentication → Users**: You should see your anonymous user appear (with a UUID).
 - **Table Editor → flight_progress**: After doing flights + using Save/Load, you will see a row containing your `user_id`, `best_flights` (json), and `unlocked_regions` (array).
 
-**Testing Flow (recommended order):**
-1. Click "Sign in Anonymously" → status label shows your user ID.
-2. Fly some planes in different regions and beat some scores (this auto-saves locally + pushes to cloud because of the event).
-3. Click "Save Cloud Progress" (manual) to force an explicit push.
-4. Click "Reset Local Progress" (or restart the app) to clear local data.
-5. Click "Load Cloud Progress" — your best scores and unlocked regions should return from the cloud.
+**Testing Flow – Anonymous (Dev Tools panel at bottom of Hub):**
+1. Click "Sign in Anonymously" in the beige Dev Tools strip → status shows user ID.
+2. Fly planes, achieve best scores or unlock regions (auto-sync + manual Save button).
+3. Use "Load Cloud Progress" and "Save Cloud Progress" to test push/pull.
+4. Verify data appears in Supabase dashboard (Authentication → Users and Table Editor → flight_progress).
+
+**Testing Flow – Email Login + Anonymous Upgrade (main "Permanent Account (Email)" section):**
+1. Fill Email and Password fields in the blue-ish Email section on the Hub.
+2. Click **"Sign Up (or Upgrade)"**:
+   - If you were anonymous, this upgrades your temporary account to a permanent email account.
+   - If new, creates a real account.
+3. After success, the status should show "Signed in as: your@email.com".
+4. Click **"Sign In"** with the same credentials to test returning.
+5. Fly some planes — progress continues to sync to the cloud under the email user.
+6. Click **"Sign Out"** (in the email section) and sign back in to verify persistence.
+7. Check Supabase dashboard: the user should now have an email associated (instead of purely anonymous).
+
+**Tip**: You can mix flows for testing (sign in anonymously in dev panel, then upgrade via the email Sign Up button). The session token is shared.
 
 ---
 
-**Note**: The current implementation uses anonymous login only. Email sign-up is architected but not yet exposed in UI.
+**Important**: Both flows now work. The dev tools panel is intentionally kept for quick anonymous testing. The email section is the path toward real user accounts.
 
 ---
 

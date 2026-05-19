@@ -10,8 +10,8 @@ namespace PaperWings.Backend
     /// Foundation Supabase Auth client (email + anonymous).
     /// Uses REST API + UnityWebRequest so it works on all Unity platforms.
     /// 
-    /// Current state: Basic anonymous login + session storage.
-    /// Email signup/login and proper token refresh will be added next.
+    /// Supports: Anonymous login, Email Sign Up, Email Sign In.
+    /// Anonymous → Email upgrade is supported by simply signing up with email while having an anonymous session (creates a permanent account).
     /// </summary>
     public class SupabaseAuth : MonoBehaviour
     {
@@ -22,6 +22,7 @@ namespace PaperWings.Backend
 
         public string CurrentUserId { get; private set; }
         public string AccessToken { get; private set; }
+        public string CurrentEmail { get; private set; }
         public bool IsAuthenticated => !string.IsNullOrEmpty(AccessToken);
 
         public event Action OnSignedIn;
@@ -47,6 +48,26 @@ namespace PaperWings.Backend
         public void SignInAnonymously()
         {
             StartCoroutine(SignInAnonymouslyRoutine());
+        }
+
+        public void SignUpWithEmail(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                Debug.LogWarning("[SupabaseAuth] Email and password are required for sign up.");
+                return;
+            }
+            StartCoroutine(SignUpWithEmailRoutine(email, password));
+        }
+
+        public void SignInWithEmail(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                Debug.LogWarning("[SupabaseAuth] Email and password are required for sign in.");
+                return;
+            }
+            StartCoroutine(SignInWithEmailRoutine(email, password));
         }
 
         private IEnumerator SignInAnonymouslyRoutine()
@@ -93,12 +114,103 @@ namespace PaperWings.Backend
             }
         }
 
+        private IEnumerator SignUpWithEmailRoutine(string email, string password)
+        {
+            if (config == null || string.IsNullOrEmpty(config.anonKey))
+            {
+                Debug.LogError("[SupabaseAuth] SupabaseConfig is missing or incomplete.");
+                yield break;
+            }
+
+            string url = $"{config.AuthUrl}/signup";
+
+            var payload = new
+            {
+                email = email,
+                password = password
+            };
+
+            string json = JsonUtility.ToJson(payload);
+
+            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            {
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("apikey", config.anonKey);
+                request.SetRequestHeader("Authorization", $"Bearer {config.anonKey}");
+
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError($"[SupabaseAuth] Email sign up failed: {request.error}\n{request.downloadHandler.text}");
+                    yield break;
+                }
+
+                string responseText = request.downloadHandler.text;
+                ParseSessionFromResponse(responseText);
+
+                Debug.Log("[SupabaseAuth] Email sign up successful. User: " + CurrentEmail + " (ID: " + CurrentUserId + ")");
+                SaveSession();
+                OnSignedIn?.Invoke();
+            }
+        }
+
+        private IEnumerator SignInWithEmailRoutine(string email, string password)
+        {
+            if (config == null || string.IsNullOrEmpty(config.anonKey))
+            {
+                Debug.LogError("[SupabaseAuth] SupabaseConfig is missing or incomplete.");
+                yield break;
+            }
+
+            // Password grant flow for email sign in
+            string url = $"{config.AuthUrl}/token?grant_type=password";
+
+            var payload = new
+            {
+                email = email,
+                password = password
+            };
+
+            string json = JsonUtility.ToJson(payload);
+
+            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            {
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("apikey", config.anonKey);
+                request.SetRequestHeader("Authorization", $"Bearer {config.anonKey}");
+
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError($"[SupabaseAuth] Email sign in failed: {request.error}\n{request.downloadHandler.text}");
+                    yield break;
+                }
+
+                string responseText = request.downloadHandler.text;
+                ParseSessionFromResponse(responseText);
+
+                Debug.Log("[SupabaseAuth] Email sign in successful. User: " + CurrentEmail + " (ID: " + CurrentUserId + ")");
+                SaveSession();
+                OnSignedIn?.Invoke();
+            }
+        }
+
         public void SignOut()
         {
             CurrentUserId = null;
             AccessToken = null;
+            CurrentEmail = null;
             PlayerPrefs.DeleteKey("SupabaseUserId");
             PlayerPrefs.DeleteKey("SupabaseAccessToken");
+            PlayerPrefs.DeleteKey("SupabaseEmail");
             PlayerPrefs.Save();
 
             Debug.Log("[SupabaseAuth] Signed out.");
@@ -117,6 +229,7 @@ namespace PaperWings.Backend
                     if (session.user != null)
                     {
                         CurrentUserId = session.user.id;
+                        CurrentEmail = session.user.email;
                     }
                 }
             }
@@ -137,6 +250,7 @@ namespace PaperWings.Backend
         private class SupabaseUser
         {
             public string id;
+            public string email;
         }
 
         private void SaveSession()
@@ -145,6 +259,8 @@ namespace PaperWings.Backend
                 PlayerPrefs.SetString("SupabaseUserId", CurrentUserId);
             if (!string.IsNullOrEmpty(AccessToken))
                 PlayerPrefs.SetString("SupabaseAccessToken", AccessToken);
+            if (!string.IsNullOrEmpty(CurrentEmail))
+                PlayerPrefs.SetString("SupabaseEmail", CurrentEmail);
             PlayerPrefs.Save();
         }
 
@@ -152,10 +268,11 @@ namespace PaperWings.Backend
         {
             CurrentUserId = PlayerPrefs.GetString("SupabaseUserId", null);
             AccessToken = PlayerPrefs.GetString("SupabaseAccessToken", null);
+            CurrentEmail = PlayerPrefs.GetString("SupabaseEmail", null);
 
             if (IsAuthenticated)
             {
-                Debug.Log("[SupabaseAuth] Restored session for user: " + CurrentUserId);
+                Debug.Log("[SupabaseAuth] Restored session for user: " + CurrentUserId + (string.IsNullOrEmpty(CurrentEmail) ? " (anonymous)" : " (" + CurrentEmail + ")"));
                 OnSignedIn?.Invoke();
             }
         }

@@ -161,6 +161,13 @@ namespace PaperWings.Folding
             buttonRow.Add(progressBtn);
 
             // ============================================================
+            // Phase 5 Email Auth Section (Permanent accounts)
+            // Simple email + password flow + Anonymous → Email upgrade support
+            // ============================================================
+            var emailAuthSection = CreateEmailAuthSection();
+            mainMenuContainer.Add(emailAuthSection);
+
+            // ============================================================
             // Phase 5 Developer Debug Panel (Hub only - remove or hide for production builds)
             // ============================================================
             var devPanel = CreateDevBackendPanel();
@@ -315,6 +322,148 @@ namespace PaperWings.Folding
                 SupabaseAuth.Instance.OnSignedOut += () =>
                 {
                     statusLabel.text = "Auth: Signed out";
+                };
+            }
+
+            return panel;
+        }
+
+        /// <summary>
+        /// Phase 5 Email authentication section for the Main Hub.
+        /// Provides Sign Up (supports Anonymous → Email upgrade) and Sign In.
+        /// Keeps the dev tools panel untouched as requested.
+        /// </summary>
+        private VisualElement CreateEmailAuthSection()
+        {
+            var panel = new VisualElement();
+            panel.style.marginTop = 20;
+            panel.style.paddingTop = 12;
+            panel.style.paddingBottom = 12;
+            panel.style.paddingLeft = 16;
+            panel.style.paddingRight = 16;
+            panel.style.backgroundColor = new Color(0.93f, 0.95f, 0.98f, 0.95f);
+            panel.style.borderRadius = 12;
+            panel.style.alignItems = Align.Center;
+            panel.style.width = Length.Percent(85);
+            panel.style.maxWidth = 480;
+
+            var header = new Label("Permanent Account (Email)");
+            header.style.fontSize = 16;
+            header.style.color = TitleColor;
+            header.style.unityFontStyleAndWeight = FontStyle.Bold;
+            header.style.marginBottom = 6;
+            panel.Add(header);
+
+            var hint = new Label("Create a real account to save progress across devices. Anonymous accounts are temporary.");
+            hint.style.fontSize = 11;
+            hint.style.color = TextMuted;
+            hint.style.marginBottom = 10;
+            panel.Add(hint);
+
+            // Email field
+            var emailField = new TextField { placeholderText = "your@email.com" };
+            emailField.style.width = Length.Percent(100);
+            emailField.style.maxWidth = 380;
+            emailField.style.marginBottom = 6;
+            emailField.style.fontSize = 14;
+            panel.Add(emailField);
+
+            // Password field
+            var passwordField = new TextField { placeholderText = "Password", isPassword = true };
+            passwordField.style.width = Length.Percent(100);
+            passwordField.style.maxWidth = 380;
+            passwordField.style.marginBottom = 10;
+            passwordField.style.fontSize = 14;
+            panel.Add(passwordField);
+
+            var statusLabel = new Label("Not signed in with email");
+            statusLabel.style.fontSize = 12;
+            statusLabel.style.color = TextMuted;
+            statusLabel.style.marginBottom = 8;
+            panel.Add(statusLabel);
+
+            // Buttons row
+            var btnRow = new VisualElement();
+            btnRow.style.flexDirection = FlexDirection.Row;
+            btnRow.style.justifyContent = Justify.Center;
+            panel.Add(btnRow);
+
+            Button MakeSmallButton(string text, Color bg)
+            {
+                var b = new Button { text = text };
+                b.style.fontSize = 13;
+                b.style.backgroundColor = bg;
+                b.style.color = Color.white;
+                b.style.borderRadius = 8;
+                b.style.paddingLeft = 14;
+                b.style.paddingRight = 14;
+                b.style.paddingTop = 8;
+                b.style.paddingBottom = 8;
+                b.style.margin = 4;
+                return b;
+            }
+
+            var signUpBtn = MakeSmallButton("Sign Up (or Upgrade)", PrimaryBlue);
+            signUpBtn.clicked += () =>
+            {
+                if (SupabaseAuth.Instance != null)
+                {
+                    SupabaseAuth.Instance.SignUpWithEmail(emailField.value, passwordField.value);
+                    statusLabel.text = "Creating / upgrading account...";
+                }
+                else
+                {
+                    statusLabel.text = "Backend not ready. Configure SupabaseConfig first.";
+                }
+            };
+            btnRow.Add(signUpBtn);
+
+            var signInBtn = MakeSmallButton("Sign In", WarmAccent);
+            signInBtn.clicked += () =>
+            {
+                if (SupabaseAuth.Instance != null)
+                {
+                    SupabaseAuth.Instance.SignInWithEmail(emailField.value, passwordField.value);
+                    statusLabel.text = "Signing in...";
+                }
+                else
+                {
+                    statusLabel.text = "Backend not ready.";
+                }
+            };
+            btnRow.Add(signInBtn);
+
+            // Sign out button (small, for email session)
+            var signOutBtn = MakeSmallButton("Sign Out", new Color(0.6f, 0.4f, 0.4f));
+            signOutBtn.clicked += () =>
+            {
+                if (SupabaseAuth.Instance != null)
+                {
+                    SupabaseAuth.Instance.SignOut();
+                    statusLabel.text = "Signed out.";
+                    emailField.value = "";
+                    passwordField.value = "";
+                }
+            };
+            btnRow.Add(signOutBtn);
+
+            // Live status updates via events
+            if (SupabaseAuth.Instance != null)
+            {
+                SupabaseAuth.Instance.OnSignedIn += () =>
+                {
+                    if (!string.IsNullOrEmpty(SupabaseAuth.Instance.CurrentEmail))
+                    {
+                        statusLabel.text = "Signed in as: " + SupabaseAuth.Instance.CurrentEmail;
+                    }
+                    else
+                    {
+                        statusLabel.text = "Signed in (anonymous)";
+                    }
+                };
+                SupabaseAuth.Instance.OnSignedOut += () =>
+                {
+                    statusLabel.text = "Signed out.";
                 };
             }
 
