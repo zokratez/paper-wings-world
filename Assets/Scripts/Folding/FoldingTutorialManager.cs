@@ -536,7 +536,7 @@ namespace PaperWings.Folding
             progressBtn.style.paddingTop = 8;
             progressBtn.style.paddingBottom = 8;
             progressBtn.style.fontSize = 16;
-            progressBtn.style.backgroundColor = new Color(0.2f, 0.4f, 0.6f);
+            progressBtn.style.backgroundColor = WarmAccent; // Consistent with unified palette
             progressBtn.style.color = Color.white;
             progressBtn.style.borderRadius = 8;
 

@@ -90,6 +90,37 @@ namespace PaperWings.Flight
             AudioSource.PlayClipAtPoint(GenerateSimpleWhooshClip(), transform.position, 0.95f);
         }
 
+        /// <summary>
+        /// Satisfying uplifting whoosh sound when hitting a strong thermal.
+        /// Kid-friendly celebratory lift feel.
+        /// </summary>
+        public void PlayStrongThermalSound()
+        {
+            // Rising tone + whoosh for "lift" sensation
+            AudioSource.PlayClipAtPoint(GenerateStrongThermalClip(), transform.position, 0.8f);
+        }
+
+        private AudioClip GenerateStrongThermalClip()
+        {
+            int sampleRate = 44100;
+            float duration = 0.6f;
+            int samples = Mathf.FloorToInt(sampleRate * duration);
+            float[] data = new float[samples];
+
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (float)i / sampleRate;
+                // Rising pitch for lift feeling
+                float freq = Mathf.Lerp(400f, 900f, t);
+                float envelope = Mathf.Sin(Mathf.PI * t) * (1 - t * 0.5f);
+                data[i] = Mathf.Sin(2 * Mathf.PI * freq * t) * envelope * 0.7f;
+            }
+
+            AudioClip clip = AudioClip.Create("StrongThermal", samples, 1, sampleRate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
         private AudioClip GenerateSimpleWhooshClip()
         {
             int sampleRate = 44100;

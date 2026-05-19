@@ -39,13 +39,20 @@ namespace PaperWings.Flight
             float finalForce = force * distanceFactor;
             other.attachedRigidbody.AddForce(Vector3.up * finalForce, ForceMode.Acceleration);
 
-            // Satisfying camera shake on strong thermals
+            // Satisfying camera shake + sound on strong thermals
             if (finalForce > 5f)
             {
                 var cam = Camera.main?.GetComponent<FlightCameraFollower>();
                 if (cam != null)
                 {
                     cam.Shake(0.35f, 0.25f);
+                }
+
+                // Play uplifting thermal sound
+                var flightAudio = FindObjectOfType<FlightAudio>();
+                if (flightAudio != null)
+                {
+                    flightAudio.PlayStrongThermalSound();
                 }
             }
         }

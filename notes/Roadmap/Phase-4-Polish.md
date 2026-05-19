@@ -159,7 +159,11 @@ This phase focuses on audio feedback, particle/visual effects, and consistent vi
 - **Screen Shake**:
   - Added `Shake()` method to `FlightCameraFollower`.
   - Gentle shake on strong launches for satisfying feedback.
-  - Ready for strong thermals.
+  - Integrated on strong thermals in `ThermalZone.cs`.
+
+- **Audio Polish**:
+  - Added `PlayStrongThermalSound()` in `FlightAudio.cs` for satisfying lift sound on strong thermals.
+  - Wired into `ThermalZone` for strong upward forces.
 
 - **Visual Polish**:
   - Rolled out consistent kid-friendly color palette (primary blue, warm accent, title cream tones) across:
@@ -168,8 +172,15 @@ This phase focuses on audio feedback, particle/visual effects, and consistent vi
     - Post-Flight Summary
     - Region Selection cards (via USS + dynamic styling)
   - Added official palette reference block in `FoldingScreen.uss`.
+  - Confirmed full cohesion on all listed screens.
 
-All changes maintain mobile performance and the existing data-driven region system.
+**Phase 4 Final Status: COMPLETE**
+
+- All audio, region-specific effects, feedback (shake, bursts, thermal sound), palette consistency, and subtle transitions implemented to high quality.
+- The sensory and visual experience is now cohesive, immersive, and kid-friendly across the entire app.
+- Phase 4 wrapped up successfully.
+
+*Phase 4 marked complete as of this update.*
 
 All work will be done with the same high-quality, readable, data-driven standards used in previous phases.
 

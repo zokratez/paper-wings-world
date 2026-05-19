@@ -57,6 +57,22 @@ The experience feels cohesive, kid-friendly, and rewarding. Best scores and unlo
 
 **Phase 4 Polish Applied**: Region-specific particles, dynamic wind audio, camera shake on thermals/launches, bigger launch effects, unified kid-friendly color palette, and subtle fade transitions between screens. The app now delivers a premium sensory experience.
 
+## Playable Demo Features
+
+You can currently experience:
+
+- **Main Hub** with friendly navigation to flight or progress
+- **8 Unique Paper Airplanes** with real 3D rigged models and step-by-step folding tutorials
+- **3 Distinct Flight Regions** (Grand Canyon, Fuji Foothills, Norwegian Coast) with unique wind, thermals, and visuals
+- **Region-specific particles** (sand/dust, falling leaves/petals, sea spray)
+- **Full Progression System** including personal bests, mastery badges (🥉/🥈/🥇), and region unlocking
+- **Post-Flight Summary** with stats, celebrations, and replay options
+- **Immersive Audio** including varied folding sounds, launch effects, wind/whoosh, and thermal lift sounds
+- **Satisfying Feedback** like camera shake on strong thermals and launches, paper flutter particles, and speed contrails
+- **Cohesive Kid-Friendly UI** with unified color palette and subtle fade transitions across all screens
+
+All features are fully playable end-to-end in the demo scenes.
+
 ### How to Test the Current Build (Recommended Order)
 
 1. Open the project in **Unity 6+**.
