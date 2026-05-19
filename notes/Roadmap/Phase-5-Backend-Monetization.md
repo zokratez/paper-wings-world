@@ -112,13 +112,15 @@ create policy "Users can update own progress"
   - Improved **Permanent Account (Email)** section with labeled fields, red error messages for validation/server errors, loading states (buttons disabled + feedback), and nicer spacing/palette.
   - Existing dev tools panel kept unchanged for quick anonymous testing.
 - SupabaseAuth now exposes `OnAuthError` with friendly messages (wrong password, weak password, invalid email, etc.).
-- Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` (locked cards are visually disabled with message).
-- Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` (consistent with planes + future IAP).
+- Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` and show an "Unlock for $4.99" button on locked items (buys the full content pack).
+- Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` and shows purchase buttons on locked regions.
+- New `PurchaseManager` abstraction (simulation mode) + wired into `ContentUnlockManager` for real gating. One foundation product: "full_content_pack".
 
 **Not yet production-ready**:
 - Token refresh / session expiration handling
 - Advanced anonymous → email identity linking (basic upgrade flow works)
-- RevenueCat / Unity IAP integration + real purchase restoration
+- Real RevenueCat SDK wiring (current PurchaseManager is a clean, testable abstraction)
+- Actual in-app purchase flow with real money (simulation mode only)
 - Advanced conflict resolution for progress
 - Secure key storage and production Supabase RLS hardening
 - Actual Supabase project + SQL schema applied by the developer
@@ -201,6 +203,22 @@ Since you already have a Supabase account, follow these precise steps:
 ---
 
 **Important**: Both flows now work. The dev tools panel is intentionally kept for quick anonymous testing. The email section is the path toward real user accounts.
+
+### RevenueCat / IAP Testing (Foundation Phase)
+
+**Current state**: PurchaseManager is in pure simulation mode. Clicking "Unlock for $4.99" instantly grants the `full_content_pack` product locally. This lets us build and test the entire gating + UI flow without the real SDK.
+
+**To move to real purchases later**:
+1. Create a RevenueCat account and a new app for iOS + Android.
+2. In RevenueCat dashboard:
+   - Add the product `full_content_pack` (one-time purchase or subscription — your choice).
+   - Set the price (e.g. $4.99).
+   - Note the product identifier exactly.
+3. Import the official RevenueCat Unity SDK (via their installer or Package Manager).
+4. In `PurchaseManager.cs`, replace the simulation block in `BuyProduct()` and `RestorePurchases()` with real `Purchases.PurchasePackage(...)` and `Purchases.RestorePurchases(...)` calls.
+5. Listen to `Purchases.OnPurchaseCompleted` etc. and forward to the same `GrantPurchaseInternal` path.
+
+For now, the simulation is intentional so you can immediately see locked → purchased → unlocked behavior in Plane and Region Selection.
 
 ---
 

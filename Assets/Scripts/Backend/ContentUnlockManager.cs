@@ -49,7 +49,13 @@ namespace PaperWings.Backend
         {
             if (def == null) return false;
             if (def.isFree) return true;
-            if (!string.IsNullOrEmpty(def.unlockProductId) && purchasedProductIds.Contains(def.unlockProductId))
+
+            // Check individual product
+            if (!string.IsNullOrEmpty(def.unlockProductId) && HasProduct(def.unlockProductId))
+                return true;
+
+            // Full content pack unlocks everything
+            if (HasFullContentAccess())
                 return true;
 
             return false;
@@ -64,7 +70,11 @@ namespace PaperWings.Backend
             if (region == null) return false;
             if (region.isFree) return true;
             if (FlightProgress.IsRegionUnlocked(region.regionId)) return true;
-            if (!string.IsNullOrEmpty(region.unlockProductId) && purchasedProductIds.Contains(region.unlockProductId))
+
+            if (!string.IsNullOrEmpty(region.unlockProductId) && HasProduct(region.unlockProductId))
+                return true;
+
+            if (HasFullContentAccess())
                 return true;
 
             return false;
@@ -86,9 +96,12 @@ namespace PaperWings.Backend
             if (region != null)
             {
                 if (region.isFree) return true;
-                if (!string.IsNullOrEmpty(region.unlockProductId) && purchasedProductIds.Contains(region.unlockProductId))
+                if (!string.IsNullOrEmpty(region.unlockProductId) && HasProduct(region.unlockProductId))
                     return true;
             }
+
+            if (HasFullContentAccess())
+                return true;
 
             return false;
         }
@@ -155,6 +168,39 @@ namespace PaperWings.Backend
                         purchasedProductIds.Add(id);
                 }
             }
+        }
+
+        // ============================================================
+        // PurchaseManager Integration (Phase 5 IAP foundation)
+        // ============================================================
+
+        /// <summary>
+        /// Returns true if the given product has been purchased (via PurchaseManager or legacy cache).
+        /// </summary>
+        public static bool HasProduct(string productId)
+        {
+            if (string.IsNullOrEmpty(productId)) return false;
+
+            PurchaseManager.EnsureExists();
+
+            // Prefer the real PurchaseManager when present
+            if (PurchaseManager.Instance != null && PurchaseManager.Instance.HasPurchased(productId))
+                return true;
+
+            return purchasedProductIds.Contains(productId);
+        }
+
+        /// <summary>
+        /// Returns true if the user owns the full content pack (unlocks everything).
+        /// </summary>
+        public static bool HasFullContentAccess()
+        {
+            PurchaseManager.EnsureExists();
+
+            if (PurchaseManager.Instance != null && PurchaseManager.Instance.HasFullContentAccess())
+                return true;
+
+            return purchasedProductIds.Contains(PurchaseManager.FullContentProductId);
         }
     }
 }

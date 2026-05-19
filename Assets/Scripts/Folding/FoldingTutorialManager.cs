@@ -709,13 +709,37 @@ namespace PaperWings.Folding
 
             if (!isUnlocked)
             {
-                var lockLabel = new Label("🔒 Locked (IAP coming in Phase 5)");
+                var lockLabel = new Label("🔒 Locked");
                 lockLabel.style.fontSize = 11;
                 lockLabel.style.color = new Color(0.6f, 0.4f, 0.2f);
-                lockLabel.style.marginTop = 6;
+                lockLabel.style.marginTop = 4;
                 card.Add(lockLabel);
 
-                // No click handler for locked planes
+                // Purchase button for the foundation demo
+                var unlockBtn = new Button { text = $"Unlock for {PurchaseManager.FullContentDisplayPrice}" };
+                unlockBtn.style.fontSize = 10;
+                unlockBtn.style.backgroundColor = WarmAccent;
+                unlockBtn.style.color = Color.white;
+                unlockBtn.style.borderRadius = 6;
+                unlockBtn.style.paddingLeft = 8;
+                unlockBtn.style.paddingRight = 8;
+                unlockBtn.style.marginTop = 6;
+                unlockBtn.clicked += () =>
+                {
+                    PurchaseManager.EnsureExists();
+                    if (PurchaseManager.Instance != null)
+                    {
+                        PurchaseManager.Instance.BuyProduct(PurchaseManager.FullContentProductId);
+                        Debug.Log("[Plane Selection] Purchase requested for full content pack");
+                    }
+                    else
+                    {
+                        ContentUnlockManager.GrantPurchase(PurchaseManager.FullContentProductId);
+                    }
+                };
+                card.Add(unlockBtn);
+
+                // No main card click for locked planes
             }
             else
             {
@@ -1190,16 +1214,31 @@ namespace PaperWings.Folding
                 lockLabel.AddToClassList("region-card-lock");
                 card.Add(lockLabel);
 
-                string unlockHint = regionId == "fuji_foothills" 
-                    ? "Reach 500m in Grand Canyon to unlock" 
-                    : "Reach 600m in Fuji Foothills to unlock";
-                var hint = new Label(unlockHint);
-                hint.style.fontSize = 10;
-                hint.style.color = new Color(0.6f, 0.6f, 0.6f);
-                hint.style.whiteSpace = WhiteSpace.Normal;
-                card.Add(hint);
+                // Purchase button (foundation demo uses the full content pack)
+                var unlockBtn = new Button { text = $"Unlock for {PurchaseManager.FullContentDisplayPrice}" };
+                unlockBtn.style.fontSize = 10;
+                unlockBtn.style.backgroundColor = WarmAccent;
+                unlockBtn.style.color = Color.white;
+                unlockBtn.style.borderRadius = 6;
+                unlockBtn.style.paddingLeft = 6;
+                unlockBtn.style.paddingRight = 6;
+                unlockBtn.style.marginTop = 4;
+                unlockBtn.clicked += () =>
+                {
+                    PurchaseManager.EnsureExists();
+                    if (PurchaseManager.Instance != null)
+                    {
+                        PurchaseManager.Instance.BuyProduct(PurchaseManager.FullContentProductId);
+                    }
+                    else
+                    {
+                        ContentUnlockManager.GrantPurchase(PurchaseManager.FullContentProductId);
+                    }
+                    Debug.Log("[Region Selection] Purchase requested for full content pack");
+                };
+                card.Add(unlockBtn);
 
-                // No click handler for locked
+                // No click handler for locked (the button handles purchase)
             }
             else
             {
