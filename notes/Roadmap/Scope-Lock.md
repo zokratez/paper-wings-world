@@ -11,9 +11,11 @@ updated: 2026-05
 
 This document is the single source of truth. Anything not listed here is explicitly out of scope for v1.0.
 
-## Planes (Exactly 8)
+## Planes (Exactly 8 for v1.0)
 
-See [Paper-Airplanes.md](../Game-Features/Paper-Airplanes.md) for the full locked list and details.
+The 8 core planes are locked (see `Game-Features/Paper-Airplanes.md`).
+
+The complete research master list of 36+ high-quality designs lives in `Research/Paper-Airplane-Library.md`. The technical systems are being built from day one to support the full library with minimal additional engineering.
 
 - Free (3): Classic Dart, Glider (Nakamichi), Ring/Annular
 - Paid Unlock (5): Nakamura Lock, Canard, Delta Wing, Twin-Fin Stabilizer, Scale-Model Style

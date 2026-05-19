@@ -25,6 +25,8 @@ updated: 2026-05
 ## Remaining Phase 0 Tasks (Low Priority, Can Be Done Slowly)
 
 ### Documentation & Research
+- [x] Master Paper Airplane Library research complete (36 planes curated from FoldNfly + Red Bull + record holders) → `Research/Paper-Airplane-Library.md`
+- [x] **Priority Task #1 complete**: Final 8 MVP planes locked and documented with full profiles in `Game-Features/Paper-Airplanes.md` (3 Beginner, 3 Gliders/Long Distance, 2 Stunt, 2 Cultural/Educational)
 - [ ] Create `Designs/Folding-UI-Patterns.md` (how the step-by-step tutorial screen should feel)
 - [ ] Create `Aerodynamics/First-Principles.md` (basic lift, drag, stability notes for the 8 planes)
 - [ ] Create `Marketing/Positioning.md` (one-pager for App Store + future site)
