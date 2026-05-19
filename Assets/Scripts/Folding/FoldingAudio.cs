@@ -62,5 +62,23 @@ namespace PaperWings.Folding
             clip.SetData(data, 0);
             return clip;
         }
+
+        /// <summary>
+        /// Kid-friendly chime for new personal bests (higher, celebratory tone)
+        /// </summary>
+        public void PlayNewBestSound()
+        {
+            AudioSource.PlayClipAtPoint(GenerateTone(1400, 0.35f), transform.position, 0.9f);
+            // Play a quick follow-up note for "sparkle" feel
+            AudioSource.PlayClipAtPoint(GenerateTone(1750, 0.2f), transform.position, 0.7f);
+        }
+
+        /// <summary>
+        /// Pleasant unlock sound for new badges / mastery tiers
+        /// </summary>
+        public void PlayBadgeUnlockSound()
+        {
+            AudioSource.PlayClipAtPoint(GenerateTone(950, 0.4f), transform.position, 0.85f);
+        }
     }
 }

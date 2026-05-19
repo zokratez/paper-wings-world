@@ -1,0 +1,216 @@
+---
+type: research
+title: "Tech Stack — Paper Wings World"
+status: active
+updated: 2026-05
+---
+
+# Tech Stack — Paper Wings World
+
+**Project:** Paper Wings World  
+**Engine:** Unity 6 (URP)  
+**Target Platforms (v1.0):** iOS + Android (tablet-first)  
+**Last Updated:** May 2026
+
+---
+
+## 1. Current Tech Stack Overview
+
+| Layer                    | Technology                          | Status       | Notes |
+|--------------------------|-------------------------------------|--------------|-------|
+| **Game Engine**          | Unity 6 (URP)                       | Core         | Primary runtime and editor |
+| **Programming**          | C# 10+                              | Core         | Modern C# features used |
+| **Architecture**         | Data-driven (ScriptableObject)      | Core         | Planes, Regions, Steps defined as assets |
+| **UI (Folding Tutorial)**| UI Toolkit (UXML + USS)             | Production   | Tablet-optimized touch UI |
+| **UI (Flight Demo)**     | Legacy Unity UI (Canvas + Text)     | Demo         | Temporary for flight prototype |
+| **Physics**              | Unity Rigidbody + custom aerodynamics | Core     | Lift, drag, torque, wind, thermals |
+| **3D Models**            | Low-poly rigged prefabs (procedural generation) | Current | Generated via Editor tools; bone hierarchy contract |
+| **Animation**            | Custom `PaperPlaneAnimator` + bone-driven | Core | Runtime folding animations |
+| **Persistence**          | JSON (Application.persistentDataPath) | Production | `FlightProgress` system |
+| **Editor Tooling**       | Custom Editor scripts + MenuItems   | Core         | Asset generators, refresh tools |
+| **Version Control**      | Git + GitHub                        | Core         | Clean commit history enforced |
+
+---
+
+## 2. Core Game Engine & Why Unity 6
+
+**Decision:** Unity 6 (Universal Render Pipeline)
+
+**Rationale:**
+- Mature mobile performance pipeline (URP, Addressables-ready, device-adaptive quality).
+- Excellent tooling for 3D content, physics, and custom editors — critical for a folding + flight experience.
+- Strong community and production precedent for simulation-style games on mobile/tablet.
+- Free for our revenue threshold (Personal license).
+- Unity 6 brings improved stability, rendering, and C# version support over 2022 LTS.
+
+We deliberately avoided Godot at this stage due to smaller mobile 3D simulation precedent and less mature editor tooling for the specific workflow we needed (procedural model generation + bone-driven animation).
+
+---
+
+## 3. Programming & Architecture
+
+- **Language:** C# (targeting modern features)
+- **Primary Pattern:** Data-driven design using `ScriptableObject`
+  - `PaperPlaneDefinition`
+  - `FoldingStep`
+  - `FlightRegion`
+  - `FlightRegionLibrary`
+- **Runtime State:** Static holders (`FlightSessionData`, `FlightProgress`)
+- **Separation of Concerns:**
+  - `Folding/` — tutorial flow, animation, UI
+  - `Flight/` — physics, camera, environment, regions
+  - `Progression/` — persistence and mastery
+  - `Core/` — shared utilities (transitions, enums)
+
+This architecture allows content creators to add planes or regions with zero code changes.
+
+---
+
+## 4. UI / UX Layer
+
+**Folding Tutorial (Primary Experience)**
+- **Technology:** UI Toolkit (UXML + USS)
+- **Strengths:** Vector-based, excellent for complex layouts, strong styling system
+- **Touch Optimization:** Large targets (56px+), clear visual feedback
+
+**Flight Demo (Current Prototype)**
+- Legacy `Canvas` + `Text` + `Button` components
+- Used for rapid iteration of the flight experience
+
+**Future Direction:** Full migration of flight UI to UI Toolkit once the core flight loop is stable. Consistent design system across both experiences is a goal.
+
+---
+
+## 5. Data & Content Management
+
+**Primary System:** ScriptableObject + Editor Generators
+
+- All core content lives as assets:
+  - Paper planes (`PaperPlaneDefinition`)
+  - Folding steps (`FoldingStep`)
+  - Flight regions (`FlightRegion`)
+- Editor tools (`GeneratePaperPlaneModels`, region generators) create and assign these assets
+- This approach gives us:
+  - Inspector editing
+  - Strong typing
+  - No runtime parsing
+  - Easy iteration
+
+**Future (post-revenue):** Addressables for asset streaming and downloadable content packs.
+
+---
+
+## 6. Physics & Flight System
+
+- **Base:** Unity `Rigidbody` (non-kinematic)
+- **Custom Aerodynamics:** `PaperAirplanePhysics`
+  - Lift, drag, torque/stability
+  - Wind (direction + strength from region)
+  - Thermals (`ThermalZone`)
+  - Gentle auto-recovery for kid-friendly experience
+- **Input:** Touch drag (primary) + optional accelerometer tilt
+- **Camera:** `FlightCameraFollower` with right-half free-look
+
+All flight tuning lives on `PaperPlaneDefinition.FlightCharacteristics` and `FlightRegion`.
+
+---
+
+## 7. 3D Models & Animation
+
+**Current Approach (MVP):**
+- Low-poly rigged prefabs generated by Editor tool
+- Strict bone hierarchy contract:
+  - `Body`
+  - `LeftWing` / `RightWing`
+  - `LeftWingTip` / `RightWingTip`
+  - `Tail`
+- Runtime folding via `PaperPlaneAnimator` (bone rotation/scale)
+- Special geometry treatment for distinctive planes (`The Ring`, `The Bird`)
+
+**Pipeline:**
+1. Editor generator creates base geometry + bones
+2. `PaperPlaneAnimator` drives folding steps
+3. Same rig works for both procedural fallback and "real" models
+
+**Future:** Artist-authored models in Blender following the same bone contract. Seamless swap possible.
+
+---
+
+## 8. Progression & Persistence
+
+**Current System:** `FlightProgress` (static class)
+
+- JSON serialization to `Application.persistentDataPath`
+- Tracks:
+  - Best distance + glide time per (plane + region)
+  - Unlocked regions
+  - Mastery tiers (Bronze / Silver / Gold)
+- Simple milestone-based unlocking
+- No cloud sync yet (local-first)
+
+**Design Goal:** Easy to later wrap with Supabase or a custom backend without changing game logic.
+
+---
+
+## 9. Planned / Future Technologies
+
+| Area              | Technology          | Status      | Rationale |
+|-------------------|---------------------|-------------|---------|
+| **Backend / Auth**| Supabase            | Planned     | User accounts, cloud save, events |
+| **Payments**      | Stripe (web) + RevenueCat (mobile) | Planned | Matches Huh? stack; one-time + subscription |
+| **Analytics**     | PostHog             | Planned     | Funnels, retention, feature usage |
+| **Crash Reporting**| Sentry             | Planned     | Production stability |
+| **Asset Delivery**| Addressables        | Planned     | DLC, region packs, plane expansions |
+| **Monetization**  | IAP + possible ads (non-intrusive) | Planned | Freemium model |
+
+These are explicitly deferred until after a revenue-generating product exists.
+
+---
+
+## 10. Editor Tooling & Workflow
+
+**Current Tools:**
+- `GeneratePaperPlaneModels.cs` — creates all 8 rigged planes + 3 regions
+- `Refresh All Models in Demo`
+- `Assign Real Models to All PaperPlaneDefinitions`
+- Region and plane asset generators
+
+**Philosophy:**
+- One-click regeneration of content
+- No manual asset wiring where possible
+- Strong comments and menu organization under **Paper Wings/**
+
+This workflow is critical for a solo developer moving fast between content and systems.
+
+---
+
+## 11. Deployment Targets
+
+**Primary (v1.0):**
+- **iPad Pro / iPad Air** (M-series) — hero devices
+- **High-end Android tablets**
+- **Flagship phones** (secondary, with quality scaling)
+
+**Technical Positioning:**
+- "Best experienced on tablet"
+- Aggressive quality scaling (High / Medium / Low profiles)
+- Thermal and performance budgets respected
+
+**Future Platforms (post v1.0):**
+- Windows / macOS (Steam?)
+- Possible VR / AR experiments (long term)
+
+---
+
+## Summary
+
+Paper Wings World is built on a **data-first, editor-heavy Unity 6 stack** optimized for rapid content iteration and a delightful folding + flight experience on tablets. All major systems are intentionally designed to be replaceable or extensible once revenue justifies backend and live-service features.
+
+The current stack prioritizes:
+- **Developer velocity** (strong editor tooling)
+- **Content flexibility** (ScriptableObject architecture)
+- **Player delight** (kid-friendly physics + clear progression)
+
+---
+
+*This document is the single source of truth for the current and planned technology decisions.*

@@ -2,7 +2,7 @@
 
 Family-friendly mobile app that teaches kids and all ages how to fold real paper airplanes from around the world — then launch them into a realistic 3D flight over the actual Earth.
 
-**Current Phase**: Phase 2 — 3D Flight Physics (in active development)  
+**Current Phase**: Phase 3 — World Expansion & Progression (highly playable)  
 **Target Platforms**: Tablet-first (iPad + high-end Android tablets)  
 **MVP Scope (locked)**: 8 paper airplanes + 3 starting flight regions
 
@@ -39,6 +39,21 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 - Each region can have unique visuals, wind, thermals, and challenges.
 
 See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
+
+## Current Playable Experience (Phase 3)
+
+You can now experience a complete, motivating loop:
+
+1. **Main Hub** — Friendly welcome screen with title, icon, and two big buttons.
+2. **Start New Flight** — Choose from all 8 unique paper airplanes.
+3. **Folding Tutorial** — Step-by-step 3D folding with real models and smooth animations.
+4. **Region Selection** — After folding, pick from 3 beautiful regions (with personality hints and current best scores).
+5. **3D Flight** — Fly your plane with realistic (but forgiving) physics, wind, and thermals that feel different per region.
+6. **Post-Flight Summary** — See your distance, time, max altitude + celebration for new personal bests and badges.
+7. **My Progress** — View best scores and mastery badges (🥉 Bronze / 🥈 Silver / 🥇 Gold) across all planes and regions.
+8. **Progression** — Unlock new regions by achieving distance milestones.
+
+The experience feels cohesive, kid-friendly, and rewarding. Best scores and unlocks persist between sessions.
 
 ### How to Test the Current Build (Recommended Order)
 

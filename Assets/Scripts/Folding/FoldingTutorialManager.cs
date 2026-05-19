@@ -57,8 +57,126 @@ namespace PaperWings.Folding
                 return;
             }
 
-            ShowSelectionScreen();
+            ShowMainMenu();
         }
+
+        #region Main Menu / Hub
+
+        private VisualElement mainMenuContainer;
+
+        private void ShowMainMenu()
+        {
+            if (foldingDocument) foldingDocument.rootVisualElement.style.display = DisplayStyle.None;
+            if (selectionDocument) selectionDocument.rootVisualElement.style.display = DisplayStyle.Flex;
+
+            selectionRoot = selectionDocument.rootVisualElement;
+
+            // Hide the plane grid for now
+            var grid = selectionRoot.Q<VisualElement>("plane-grid");
+            if (grid != null) grid.style.display = DisplayStyle.None;
+
+            // Remove old menu if exists
+            if (mainMenuContainer != null && mainMenuContainer.parent != null)
+                mainMenuContainer.parent.Remove(mainMenuContainer);
+
+            // Create Hub container
+            mainMenuContainer = new VisualElement();
+            mainMenuContainer.name = "main-hub";
+            mainMenuContainer.style.flexDirection = FlexDirection.Column;
+            mainMenuContainer.style.alignItems = Align.Center;
+            mainMenuContainer.style.justifyContent = Justify.Center;
+            mainMenuContainer.style.flexGrow = 1;
+            mainMenuContainer.style.paddingTop = 40;
+            mainMenuContainer.style.paddingBottom = 40;
+
+            // Title
+            var title = new Label("Paper Wings World");
+            title.style.fontSize = 42;
+            title.style.unityFontStyleAndWeight = FontStyle.Bold;
+            title.style.color = new Color(0.15f, 0.35f, 0.55f);
+            title.style.marginBottom = 8;
+            mainMenuContainer.Add(title);
+
+            // Friendly subtitle
+            var subtitle = new Label("Fold amazing planes. Fly them across the world.");
+            subtitle.style.fontSize = 18;
+            subtitle.style.color = new Color(0.3f, 0.4f, 0.5f);
+            subtitle.style.marginBottom = 30;
+            mainMenuContainer.Add(subtitle);
+
+            // Icon / Logo area (kid-friendly placeholder)
+            var iconArea = new VisualElement();
+            iconArea.style.width = 120;
+            iconArea.style.height = 120;
+            iconArea.style.backgroundColor = new Color(0.3f, 0.65f, 0.85f);
+            iconArea.style.borderRadius = 60;
+            iconArea.style.alignItems = Align.Center;
+            iconArea.style.justifyContent = Justify.Center;
+            iconArea.style.marginBottom = 40;
+
+            var icon = new Label("🪁");
+            icon.style.fontSize = 64;
+            iconArea.Add(icon);
+            mainMenuContainer.Add(iconArea);
+
+            // Buttons container
+            var buttonRow = new VisualElement();
+            buttonRow.style.flexDirection = FlexDirection.Column;
+            buttonRow.style.alignItems = Align.Center;
+            buttonRow.style.width = Length.Percent(80);
+            mainMenuContainer.Add(buttonRow);
+
+            // Start New Flight button
+            var startBtn = new Button { text = "✈️  Start New Flight" };
+            StyleBigButton(startBtn, new Color(0.2f, 0.55f, 0.85f));
+            startBtn.clicked += () =>
+            {
+                HideMainMenu();
+                ShowSelectionScreen();
+            };
+            buttonRow.Add(startBtn);
+
+            // My Progress button
+            var progressBtn = new Button { text = "📊  My Progress" };
+            StyleBigButton(progressBtn, new Color(0.85f, 0.55f, 0.2f));
+            progressBtn.clicked += () =>
+            {
+                ShowMyProgressScreen();
+            };
+            buttonRow.Add(progressBtn);
+
+            selectionRoot.Add(mainMenuContainer);
+        }
+
+        private void HideMainMenu()
+        {
+            if (mainMenuContainer != null && mainMenuContainer.parent != null)
+            {
+                mainMenuContainer.parent.Remove(mainMenuContainer);
+                mainMenuContainer = null;
+            }
+
+            // Show the grid again
+            var grid = selectionRoot.Q<VisualElement>("plane-grid");
+            if (grid != null) grid.style.display = DisplayStyle.Flex;
+        }
+
+        private void StyleBigButton(Button btn, Color bgColor)
+        {
+            btn.style.width = Length.Percent(100);
+            btn.style.maxWidth = 420;
+            btn.style.height = 72;
+            btn.style.marginBottom = 16;
+            btn.style.backgroundColor = bgColor;
+            btn.style.color = Color.white;
+            btn.style.fontSize = 22;
+            btn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            btn.style.borderRadius = 16;
+            btn.style.paddingLeft = 20;
+            btn.style.paddingRight = 20;
+        }
+
+        #endregion
 
         #region Selection Screen
 
@@ -68,6 +186,43 @@ namespace PaperWings.Folding
             if (selectionDocument) selectionDocument.rootVisualElement.style.display = DisplayStyle.Flex;
 
             selectionRoot = selectionDocument.rootVisualElement;
+
+            // Add a friendly header with back to hub
+            var header = selectionRoot.Q<VisualElement>("selection-header");
+            if (header == null)
+            {
+                header = new VisualElement();
+                header.name = "selection-header";
+                header.style.flexDirection = FlexDirection.Row;
+                header.style.justifyContent = Justify.SpaceBetween;
+                header.style.alignItems = Align.Center;
+                header.style.marginBottom = 16;
+                header.style.paddingLeft = 20;
+                header.style.paddingRight = 20;
+
+                var backBtn = new Button { text = "← Hub" };
+                backBtn.style.fontSize = 16;
+                backBtn.style.backgroundColor = new Color(0.7f, 0.7f, 0.75f);
+                backBtn.style.color = Color.white;
+                backBtn.style.borderRadius = 8;
+                backBtn.clicked += () =>
+                {
+                    if (selectionDocument) selectionDocument.rootVisualElement.style.display = DisplayStyle.None;
+                    ShowMainMenu();
+                };
+
+                var headerTitle = new Label("Choose Your Plane");
+                headerTitle.style.fontSize = 24;
+                headerTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
+                headerTitle.style.color = new Color(0.15f, 0.3f, 0.5f);
+
+                header.Add(backBtn);
+                header.Add(headerTitle);
+
+                // Insert at top of the document root
+                selectionRoot.Insert(0, header);
+            }
+
             var grid = selectionRoot.Q<VisualElement>("plane-grid");
             grid.Clear();
 
@@ -83,12 +238,25 @@ namespace PaperWings.Folding
             var card = new VisualElement();
             card.AddToClassList("plane-card");
 
-            var nameLabel = new Label(plane.displayName);
-            nameLabel.style.fontSize = 18;
-            nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            // Kid-friendly styling
+            card.style.backgroundColor = new Color(0.95f, 0.97f, 1f);
+            card.style.borderRadius = 16;
+            card.style.padding = 16;
+            card.style.margin = 8;
+            card.style.minWidth = 160;
+            card.style.minHeight = 90;
+            card.style.flexDirection = FlexDirection.Column;
+            card.style.alignItems = Align.Center;
+            card.style.justifyContent = Justify.Center;
 
-            var meta = new Label($"{plane.difficulty} • {plane.primaryCategory}");
-            meta.style.fontSize = 12;
+            var nameLabel = new Label(plane.displayName);
+            nameLabel.style.fontSize = 20;
+            nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            nameLabel.style.color = new Color(0.1f, 0.25f, 0.45f);
+
+            var meta = new Label($"{plane.difficulty}  •  {plane.primaryCategory}");
+            meta.style.fontSize = 13;
+            meta.style.color = new Color(0.4f, 0.5f, 0.6f);
 
             card.Add(nameLabel);
             card.Add(meta);

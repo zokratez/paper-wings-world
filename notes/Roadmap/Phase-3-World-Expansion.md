@@ -383,6 +383,19 @@ The foundation is now solid, clean, and extensible. Adding a 4th region is now a
 
 All changes keep the system clean, data-driven, and easy to extend (new region = one asset + generator entry + optional prop theme).
 
+### 6. Main Menu / Hub + Final Polish (Latest)
+- Added a friendly **Main Menu / Hub** as the new entry point:
+  - Big title "Paper Wings World" with kid-friendly icon area (🪁)
+  - "✈️ Start New Flight" → takes you to the plane selection grid
+  - "📊 My Progress" → opens the full progress overview
+- Plane Selection now has a clear "← Hub" back button for easy navigation.
+- Consistent kid-friendly styling applied across cards and menus (rounded corners, bright colors, large readable text).
+- Added placeholder celebratory sound effects:
+  - New Personal Best chime (higher sparkling tones)
+  - Badge unlock sound (warm unlock tone)
+  - Integrated via `FoldingAudio` extensions + direct playback in flight summary.
+- All screens now feel more cohesive and welcoming for the target audience (kids & families).
+
 ## Latest Additions (Current Session)
 
 ### 1. Best Scores in Region Selection Cards

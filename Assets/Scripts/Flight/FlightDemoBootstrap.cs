@@ -180,6 +180,9 @@ namespace PaperWings.Demo
                     var tier = PaperWings.Progression.FlightProgress.GetMasteryTier(planeDef.planeId, region.regionId);
                     string badge = PaperWings.Progression.FlightProgress.GetBadgeEmoji(tier);
                     celebration = newBest ? $"🎉 New Personal Best! {badge}" : "";
+
+                    // Placeholder celebratory sound (kid-friendly chime)
+                    AudioSource.PlayClipAtPoint(GenerateSimpleTone(1400, 0.35f), Vector3.zero, 0.9f);
                 }
             }
 
@@ -310,6 +313,22 @@ namespace PaperWings.Demo
             txt.alignment = TextAnchor.MiddleCenter;
 
             return btn;
+        }
+
+        // Simple placeholder tone generator for celebratory sounds (no asset required)
+        private AudioClip GenerateSimpleTone(float frequency, float duration)
+        {
+            int sampleRate = 44100;
+            int samples = Mathf.FloorToInt(sampleRate * duration);
+            float[] data = new float[samples];
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (float)i / sampleRate;
+                data[i] = Mathf.Sin(2 * Mathf.PI * frequency * t) * Mathf.Exp(-4f * t);
+            }
+            AudioClip clip = AudioClip.Create("CelebrationTone", samples, 1, sampleRate, false);
+            clip.SetData(data, 0);
+            return clip;
         }
 
         private void RecordFlightProgress()
