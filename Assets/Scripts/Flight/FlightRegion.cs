@@ -36,5 +36,9 @@ namespace PaperWings.Flight
         [Header("Environment Theme (used by FlightEnvironment)")]
         public Color environmentPrimaryColor = new Color(0.6f, 0.5f, 0.4f);
         public Color environmentSecondaryColor = new Color(0.5f, 0.45f, 0.4f);
+
+        [Header("Unlock & Monetization (Phase 5+)")]
+        public bool isFree = false;
+        public string unlockProductId;   // Matches RevenueCat / IAP product identifier
     }
 }

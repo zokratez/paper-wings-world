@@ -36,6 +36,12 @@ namespace PaperWings.Progression
         private static SaveData data;
         private static string SavePath => Path.Combine(Application.persistentDataPath, "flight_progress.json");
 
+        /// <summary>
+        /// Fired whenever local progress changes (bests updated or regions unlocked).
+        /// SupabaseProgressService subscribes to push to cloud when authenticated.
+        /// </summary>
+        public static event Action OnProgressChanged;
+
         private const string GrandCanyon = "grand_canyon";
         private const string Fuji = "fuji_foothills";
         private const string Norwegian = "norwegian_coast";
@@ -84,6 +90,8 @@ namespace PaperWings.Progression
             {
                 Debug.LogError($"[FlightProgress] Failed to save progress: {e.Message}");
             }
+
+            OnProgressChanged?.Invoke();
         }
 
         /// <summary>
@@ -151,6 +159,7 @@ namespace PaperWings.Progression
                 {
                     data.unlockedRegions.Add(Fuji);
                     Debug.Log("[FlightProgress] Fuji Foothills unlocked! (500m+ in Grand Canyon)");
+                    Save(); // ensure unlock is persisted and event fires
                 }
             }
 
@@ -161,6 +170,7 @@ namespace PaperWings.Progression
                 {
                     data.unlockedRegions.Add(Norwegian);
                     Debug.Log("[FlightProgress] Norwegian Coast unlocked!");
+                    Save(); // ensure unlock is persisted and event fires
                 }
             }
 
@@ -222,6 +232,112 @@ namespace PaperWings.Progression
                 MasteryTier.Bronze => "Bronze",
                 _ => ""
             };
+        }
+
+        // ============================================================
+        // Phase 5 Cloud Sync Support
+        // ============================================================
+
+        /// <summary>
+        /// Serializable DTO for uploading / downloading progress to Supabase.
+        /// Keeps the schema simple and stable for cloud storage.
+        /// </summary>
+        [Serializable]
+        public class CloudProgressDto
+        {
+            public List<string> unlockedRegions = new List<string>();
+            public List<CloudFlightRecord> bestFlights = new List<CloudFlightRecord>();
+        }
+
+        [Serializable]
+        public class CloudFlightRecord
+        {
+            public string key;           // "planeId_regionId"
+            public float bestDistance;
+            public float bestGlideTime;
+        }
+
+        /// <summary>
+        /// Exports the current local progress into a clean DTO ready for JSON serialization to Supabase.
+        /// </summary>
+        public static CloudProgressDto ExportForCloud()
+        {
+            var dto = new CloudProgressDto
+            {
+                unlockedRegions = new List<string>(data.unlockedRegions)
+            };
+
+            foreach (var kvp in data.bestFlights)
+            {
+                dto.bestFlights.Add(new CloudFlightRecord
+                {
+                    key = kvp.Key,
+                    bestDistance = kvp.Value.bestDistance,
+                    bestGlideTime = kvp.Value.bestGlideTime
+                });
+            }
+
+            return dto;
+        }
+
+        /// <summary>
+        /// Imports progress from a cloud DTO.
+        /// Current policy (foundation): cloud data wins for bests and unlocks.
+        /// Later we can implement smarter last-write-wins or merge.
+        /// </summary>
+        public static void ImportFromCloud(CloudProgressDto dto)
+        {
+            if (dto == null) return;
+
+            bool changed = false;
+
+            // Merge unlocks (union)
+            foreach (var region in dto.unlockedRegions)
+            {
+                if (!data.unlockedRegions.Contains(region))
+                {
+                    data.unlockedRegions.Add(region);
+                    changed = true;
+                }
+            }
+
+            // For bests: take the better of local vs cloud (simple but safe)
+            foreach (var record in dto.bestFlights)
+            {
+                if (string.IsNullOrEmpty(record.key)) continue;
+
+                if (!data.bestFlights.ContainsKey(record.key))
+                {
+                    data.bestFlights[record.key] = new FlightRecord();
+                }
+
+                var local = data.bestFlights[record.key];
+
+                if (record.bestDistance > local.bestDistance)
+                {
+                    local.bestDistance = record.bestDistance;
+                    changed = true;
+                }
+                if (record.bestGlideTime > local.bestGlideTime)
+                {
+                    local.bestGlideTime = record.bestGlideTime;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+            {
+                Save(); // will fire OnProgressChanged
+                Debug.Log("[FlightProgress] Progress merged from cloud.");
+            }
+        }
+
+        /// <summary>
+        /// Convenience for SupabaseProgressService — returns JSON string of the DTO.
+        /// </summary>
+        public static string ExportForCloudAsJson()
+        {
+            return JsonUtility.ToJson(ExportForCloud(), false);
         }
 
         /// <summary>
