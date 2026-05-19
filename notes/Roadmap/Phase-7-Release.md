@@ -254,7 +254,46 @@ This is the exact repeatable process for producing a release candidate build.
 - Verify purchases, cloud sync, and Settings (including Privacy Policy button) work.
 - Check no Unity splash, correct orientation, performance is good.
 
-**Pro Tip:** Create a Unity "Release" scene build profile or a small Editor script that runs the entire helper chain in one click if you do this frequently.
+**Pro Tip:** Use the new one-click **Paper Wings / HIGH INTENSITY - Full Release Preparation** menu item (it runs the entire chain automatically).
+
+---
+
+## Release Build Verification Checklist (Must Be 100% True Before Submission)
+
+This is the final gate. Every single item below **must** be verified on real devices using a build produced after running the Full Release Preparation helper. Do not submit until all are green.
+
+### Pre-Build Preparation
+- [ ] **Full Release Preparation** helper run successfully (all 4 steps logged without errors)
+- [ ] Bundle Identifier in PlayerSettings exactly matches the App ID / package name registered in App Store Connect and Google Play Console
+- [ ] Version (e.g. 1.0.0) and Build number correct and ready for this submission
+- [ ] All store visual assets (icons, screenshots, feature graphic) finalized and captured from a release build (no dev UI visible)
+- [ ] Privacy Policy hosted at a permanent public URL and the in-app Settings button opens the live page (not the placeholder)
+
+### Build & Code Stripping
+- [ ] Build produced with **Development Build unchecked** (via the helpers or Full Release Preparation)
+- [ ] Phase 5 Dev Tools panel and all its debug buttons (Sign in Anonymously, Load/Save Cloud, etc.) are **completely absent** when the app is run on a physical device
+- [ ] No "🛠️ Phase 5 Dev Tools" text or any debug-only UI appears anywhere in the app
+- [ ] No stray Debug.Log spam or development-only behavior visible to the user
+
+### Functional & Quality Verification (on Physical Devices)
+- [ ] Cold launch succeeds with custom splash (no Unity splash) and lands on Main Hub
+- [ ] All 10 items on the **Final Testing Checklist** (see Phase-6-Testing.md) pass on at least one hero tablet (iPad Pro/M-series or Galaxy Tab S9/S10) **and** one secondary device
+- [ ] 55–60 FPS sustained in both Folding and Flight experiences on hero device across all regions
+- [ ] Full auth flow (anonymous + email sign-up/sign-in/upgrade/sign-out) works end-to-end with cloud sync
+- [ ] Real in-app purchases (via RevenueCat) work in sandbox: unlock, restore, Premium badges appear correctly, no simulation mode
+- [ ] All Settings features work: Restore Purchases, Sign Out, Privacy Policy link, Account status
+- [ ] Scene transitions are smooth with loading indicators, no black screens or stuck states
+- [ ] Touch targets (56px+), scrolling, and keyboard behavior are excellent on tablets and phones
+- [ ] 15+ minute continuous session test passes with no thermal throttling or frame drops on hero device
+
+### Store & Legal Readiness
+- [ ] Content rating questionnaire completed and appropriate for the kid-friendly / educational audience
+- [ ] Export compliance and any required declarations filled in App Store Connect / Play Console
+- [ ] All required screenshots and feature graphic uploaded to the store listings
+- [ ] Privacy Policy URL entered in both App Store Connect and Google Play Console
+- [ ] No placeholder text, "TODO", or development strings remain in any user-facing UI or store metadata
+
+**Pass criteria:** Every checkbox above must be checked after testing the actual candidate build on real hardware. Any failure blocks submission.
 
 ---
 

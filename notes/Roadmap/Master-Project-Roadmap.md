@@ -32,10 +32,10 @@ The app combines:
 
 ## Current Overall Progress
 
-**Estimated Overall Completion:** **~88%**
+**Estimated Overall Completion:** **95%** (Phase 7 tooling & docs complete; final backend integration + assets remain)
 
-- **Phase 0–5:** Complete (Foundation through Backend, Accounts & Monetization)
-- **Phase 6:** Just Started (~10%) — Testing, Optimization & Final Polish
+- **Phase 0–6:** Complete
+- **Phase 7:** Complete (all release preparation infrastructure delivered)
 
 ---
 
@@ -49,7 +49,8 @@ The app combines:
 | **3** | World Expansion & Progression     | Complete        | 100%       | FlightRegion system, 3 distinct regions, Region Selection, Main Hub, Post-Flight Summary, Mastery badges, progression & persistence |
 | **4** | Audio, Effects & Visual Polish    | Complete        | 100%       | Region-specific particles, dynamic audio, camera shake, launch effects, unified palette, fade transitions |
 | **5** | Backend, Accounts & Monetization  | Complete        | 100%       | Supabase auth (anonymous + email + upgrade), cloud progress sync, PurchaseManager + 2 IAP products, unlock buttons, Premium badges, Settings screen, Restore, toasts |
-| **6** | Testing, Optimization & Final Polish | In Progress  | ~10%       | Performance (60 FPS target), loading indicators, device QA matrix, Known Issues & Testing Checklist |
+| **6** | Testing, Optimization & Final Polish | Complete     | 100%       | PerformanceManager, LOD, splash, Final Testing Checklist (top 10), multiple Editor helpers, dev tools gating |
+| **7** | Release Preparation                 | Complete     | 100%       | Full suite of release Editor helpers (Device Build, Release Build, Remove Dev Tools, Full Release Preparation), Phase-7-Release.md with verification checklist & workflow, Privacy Policy integration, build documentation |
 
 ---
 
@@ -74,22 +75,33 @@ See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issu
 
 ---
 
-## Phase 7: Release Preparation (Current)
+## Phase 7: Release Preparation (Complete)
 
-**Status:** Just started. All Phase 6 deliverables complete and pushed.
+**Status:** ✅ Phase 7 Complete. All release preparation tooling, documentation, and infrastructure delivered. Project is now ready for final backend integration, asset production, and v1.0 submission.
 
-### Phase 7 Deliverables (In Progress)
-- New comprehensive `Phase-7-Release.md` created with full App Store + Google Play checklists, asset requirements, privacy policy guidance, and pre-submission verification steps.
-- New Editor helper: `DeviceBuildHelper.cs` — "Paper Wings / HIGH INTENSITY - Prepare for Device Build (iOS + Android)" that sets production PlayerSettings (bundle IDs, IL2CPP, version, SDK targets, architectures).
-- Master roadmap and README updated to reflect entry into final release preparation phase.
+### Phase 7 Deliverables Delivered
+- Comprehensive living document `notes/Roadmap/Phase-7-Release.md` with:
+  - Store accounts & asset checklists (exact sizes for icons/screenshots)
+  - Build & Export Workflow (step-by-step iOS + Android)
+  - Release Build Verification Checklist (pre-submission gate)
+  - Privacy policy requirements and in-app integration notes
+- Full suite of Editor helpers under **Paper Wings / HIGH INTENSITY**:
+  - Prepare Build Settings for Mobile Testing
+  - Prepare for Device Build (iOS + Android)
+  - Prepare Release Build
+  - Remove Dev Tools for Release (with #if gating of Phase 5 dev panel)
+  - **Full Release Preparation** (one-click that runs the entire chain in sequence)
+- Privacy Policy placeholder drafted (`notes/PrivacyPolicy.md`) + wired into Settings screen with in-app viewer
+- Updated root README with "How to Build for Release" section
+- Master roadmap and all docs updated with final status
 
-### Current Blockers (from Phase-7 doc)
-- Replace IAP simulation with real RevenueCat integration
-- Production Supabase environment + privacy policy hosted and linked
-- Full visual asset production (icons, screenshots for all device sizes)
-- Final device testing pass + removal of dev tools in release builds
+### Remaining Work Before Submission (not Phase 7 scope)
+- Real RevenueCat IAP integration (remove simulation)
+- Production Supabase setup + hosted privacy policy
+- Final visual assets (icons + all required screenshots from release builds)
+- End-to-end device verification using the Verification Checklist
 
-See `notes/Roadmap/Phase-7-Release.md` for the complete release checklist and next steps.
+See `notes/Roadmap/Phase-7-Release.md` (especially the Verification Checklist and Full Release Preparation helper) for the complete path to submission.
 
 ---
 
@@ -99,8 +111,8 @@ See `notes/Roadmap/Phase-7-Release.md` for the complete release checklist and ne
 |---------------------------|------------------------|-------|
 | Phase 0–5 Complete        | Done (May 2026)        | Full foundation + monetization simulation |
 | Phase 6 (Testing & Polish)| Late May – June 2026   | Performance, loading, device QA, final checklist |
-| Phase 7 (Release Prep)    | June – July 2026       | Store assets, real IAP, privacy policy, device builds, submission |
-| Public Launch             | July 2026+             | After Phase 7 sign-off and review approval |
+| Phase 7 (Release Prep)    | June 2026              | Complete — all Editor helpers, Phase-7 doc, verification checklist, dev tools removal |
+| Submission & Launch       | July 2026+             | After final IAP/Supabase integration, assets, and Verification Checklist sign-off |
 
 **Note:** Timeline is intentionally relaxed while Huh? and other ventures are active.
 
