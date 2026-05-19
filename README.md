@@ -19,15 +19,42 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 3. Select the `notes/` folder inside this project.
 4. All planning, research, design decisions, and checklists live here.
 
-## Current Status (Phase 2)
+## Current Status (Phase 2 - Complete)
 
-- All 8 MVP planes now have **low-poly rigged 3D models** with proper bone hierarchy and improved paper-like geometry.
-- All 8 planes are assigned real models by default (no procedural fallback needed).
-- Full folding tutorial system works with real 3D models.
-- Flight physics, thermals, improved camera (with free-look), and stats are implemented and playable.
-- Complete fold → launch → fly → return flow is functional and smooth.
+**Phase 2 is complete.** All major systems are functional and at a high standard:
+
+- All 8 MVP planes have **low-poly rigged 3D models** with proper bone hierarchy and improved paper-like geometry (creases, edge detail, subtle thickness).
+- All 8 planes are assigned real models by default.
+- Full folding tutorial system works with real 3D models + natural folding animations.
+- Flight physics (lift, drag, stability, thermals, wind) + kid-friendly auto-recovery.
+- Smooth third-person camera with right-side free-look.
+- Scene transitions with fade.
+- Live flight stats (altitude, distance, time + best time).
+- Complete fold → launch → fly → return flow works end-to-end.
 
 See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
+
+### How to Test the Current Build (Recommended Order)
+
+1. Open the project in **Unity 6+**.
+2. Run these menu items **in this exact order**:
+   - **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
+   - **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
+   - **Paper Wings → Assign Real Models to All PaperPlaneDefinitions**
+   - **Paper Wings → Refresh All Models in Demo**
+3. Ensure both scenes are added to **Build Settings**:
+   - `FoldingTutorialDemo`
+   - `FlightDemo`
+4. (Optional) Rebuild the scenes using the menu items if they are missing or outdated.
+5. Open `FoldingTutorialDemo.unity` and press **Play**.
+
+**Recommended test flow:**
+- Select and fully fold one of the planes with real 3D models (Classic Dart, The Ring, Nakamichi Glider, or The Bird).
+- Press **"Launch to Flight →"**.
+- Fly in the canyon environment (right side of screen = free-look camera, fly through thermals for lift).
+- Use the **"Return to Folding"** button when finished.
+
+See `Assets/Scripts/Folding/Demo/HOW_TO_TEST.md` for detailed controls and tips.
 
 ## Documentation & Notes
 

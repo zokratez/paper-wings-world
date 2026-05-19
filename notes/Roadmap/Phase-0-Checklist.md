@@ -46,22 +46,31 @@ updated: 2026-05
 - [x] FlightCharacteristics data populated on all PaperPlaneDefinition assets for future flight physics
 - [x] Checklist updated for Phase 1 completion
 
-### Phase 2 — 3D Flight Physics (In Progress)
-- [x] PaperAirplanePhysics with realistic lift, drag, torque, stability, wind + gentle auto-recovery
-- [x] Improved FlightController: swipe to steer + optional device tilt for banking
-- [x] "Launch to Flight" fully functional (transitions with correct plane)
-- [x] "Return to Folding" button in flight scene
-- [x] Beautiful Grand Canyon-style test environment (walls, mesas, fog, good lighting)
-- [x] FlightDemo.scene with proper bootstrap and environment
-- [x] All 8 planes carry flight tuning data ready for physics
-- [x] Light thermals in the canyon for rewarding gliding
-- [x] Enhanced camera with smooth follow + two-finger free look
-- [x] Subtle paper flutter visual feedback during flight
-- [x] Scene transitions with fade effect
-- [x] Basic flight stats display (altitude, distance, time + best time)
-- [x] Light thermals + natural wind currents placed for rewarding long glides
-- [x] Improved camera with smooth third-person follow + right-side free look
-- [x] Polished "Launch to Flight" and "Return to Folding" with fade transitions
+### Phase 2 — 3D Flight Physics + Real 3D Paper Models (Complete)
+
+**Status: Phase 2 is complete at a high standard.**
+
+#### Flight Systems
+- PaperAirplanePhysics with realistic lift, drag, torque, stability, wind + gentle auto-recovery
+- Improved FlightController: swipe to steer + optional device tilt for banking
+- "Launch to Flight" fully functional (transitions with correct plane)
+- "Return to Folding" button in flight scene
+- Beautiful Grand Canyon-style test environment (walls, mesas, fog, good lighting)
+- FlightDemo.scene with proper bootstrap and environment
+- All 8 planes carry flight tuning data ready for physics
+- Light thermals in the canyon for rewarding gliding
+- Enhanced camera with smooth follow + right-side free look
+- Subtle paper flutter visual feedback during flight
+- Scene transitions with fade effect
+- Basic flight stats display (altitude, distance, time + best time)
+
+#### 3D Model Pipeline
+- All 8 planes now have proper rigged low-poly prefabs with improved paper-like geometry (creases, edge detail, thickness simulation)
+- All 8 PaperPlaneDefinition assets now point to real 3D models by default
+- Added "Refresh All Models in Demo" menu item for quick iteration
+- Created `notes/Research/3D-Models.md` documenting current model quality and upgrade path
+
+**Phase 2 is ready for final testing.**
 
 ### Technical Skeleton
 - [ ] Add a proper Unity `.gitignore` (standard + Cesium/Mapbox specifics)
