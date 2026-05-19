@@ -154,3 +154,29 @@
     color: #6B7280;
     white-space: normal;
 }
+
+/* Locked region cards */
+.region-card-locked {
+    background-color: #F3F4F6;
+    border-color: #D1D5DB;
+    opacity: 0.75;
+}
+
+.region-card-locked .region-card-title,
+.region-card-locked .region-card-desc {
+    color: #9CA3AF;
+}
+
+/* Best scores in cards */
+.region-card-best {
+    font-size: 10px;
+    color: #059669;
+    margin-top: 4px;
+    -unity-font-style: bold;
+}
+
+.region-card-lock {
+    font-size: 13px;
+    color: #9CA3AF;
+    margin-top: 4px;
+}

@@ -382,3 +382,30 @@ The foundation is now solid, clean, and extensible. Adding a 4th region is now a
 - Wind, thermal multiplier, spawn height, and challenge targets remain strongly differentiated in the region assets.
 
 All changes keep the system clean, data-driven, and easy to extend (new region = one asset + generator entry + optional prop theme).
+
+## Latest Additions (Current Session)
+
+### 1. Best Scores in Region Selection Cards
+- Cards now display personal best distance and time pulled live from `FlightProgress.GetBest(planeId, regionId)`.
+- Shows "Best: XXX m / XX s" or "Best: --" when no flight recorded yet.
+- Only appears on unlocked cards for the currently folded plane.
+- Gives immediate feedback and motivation ("I can beat my best!").
+
+### 2. Nice Locked State for Regions
+- All three regions are always shown in the selection (better UX than hiding them).
+- Locked cards are greyed out (`.region-card-locked` style), with 🔒 icon, "Locked" label, and clear unlock requirement text:
+  - Fuji: "Reach 500m in Grand Canyon to unlock"
+  - Norwegian: "Reach 600m in Fuji Foothills to unlock"
+- Locked cards are non-interactive (no click handler, lower opacity).
+
+### 3. Simple "My Progress" Screen
+- Added "📊 My Progress" button in the success panel (after region selection).
+- Clicking it opens a clean full-screen overlay panel with:
+  - All 8 planes (from `planeLibrary`).
+  - For each plane: best scores across the three regions (or "No flights yet" / "🔒 Locked").
+- Professional, readable list layout with good contrast and spacing.
+- Close button returns to the success/reward view.
+- Fully dynamic, uses the same `FlightProgress` data source.
+- Accessible right after any successful fold (no need for main menu yet).
+
+This completes a very satisfying vertical slice of Phase 3 progression and feedback loops while staying lightweight and demo-friendly.

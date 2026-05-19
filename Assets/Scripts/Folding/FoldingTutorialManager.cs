@@ -297,10 +297,132 @@ namespace PaperWings.Folding
             // Show region selection (simple for foundation)
             ShowRegionSelection();
 
+            // Add "My Progress" button (simple access to full best scores)
+            AddMyProgressButton();
+
             if (audioPlayer != null)
                 audioPlayer.PlaySuccessSound();
 
             Debug.Log($"[Folding] {currentPlane.displayName} folding tutorial completed successfully.");
+        }
+
+        private void AddMyProgressButton()
+        {
+            if (successPanel == null) return;
+
+            // Avoid duplicates
+            if (successPanel.Q<Button>("my-progress-btn") != null) return;
+
+            var progressBtn = new Button { text = "📊 My Progress", name = "my-progress-btn" };
+            progressBtn.style.marginTop = 16;
+            progressBtn.style.paddingLeft = 20;
+            progressBtn.style.paddingRight = 20;
+            progressBtn.style.paddingTop = 8;
+            progressBtn.style.paddingBottom = 8;
+            progressBtn.style.fontSize = 16;
+            progressBtn.style.backgroundColor = new Color(0.2f, 0.4f, 0.6f);
+            progressBtn.style.color = Color.white;
+            progressBtn.style.borderRadius = 8;
+
+            progressBtn.clicked += ShowMyProgressScreen;
+
+            successPanel.Add(progressBtn);
+        }
+
+        private void ShowMyProgressScreen()
+        {
+            if (foldingRoot == null || currentPlane == null || planeLibrary == null) return;
+
+            // Create a simple modal-like progress panel
+            var progressPanel = new VisualElement();
+            progressPanel.name = "my-progress-panel";
+            progressPanel.style.position = Position.Absolute;
+            progressPanel.style.top = 0;
+            progressPanel.style.left = 0;
+            progressPanel.style.width = Length.Percent(100);
+            progressPanel.style.height = Length.Percent(100);
+            progressPanel.style.backgroundColor = new Color(0, 0, 0, 0.85f);
+            progressPanel.style.flexDirection = FlexDirection.Column;
+            progressPanel.style.alignItems = Align.Center;
+            progressPanel.style.justifyContent = Justify.Center;
+            progressPanel.style.padding = 20;
+
+            // Title
+            var title = new Label("My Flight Progress");
+            title.style.fontSize = 28;
+            title.style.unityFontStyleAndWeight = FontStyle.Bold;
+            title.style.color = Color.white;
+            title.style.marginBottom = 20;
+            progressPanel.Add(title);
+
+            // Content container (scrollable feel via max height)
+            var content = new VisualElement();
+            content.style.backgroundColor = new Color(1, 1, 1, 0.95f);
+            content.style.borderRadius = 12;
+            content.style.padding = 16;
+            content.style.maxHeight = 420;
+            content.style.width = Length.Percent(85);
+            content.style.flexDirection = FlexDirection.Column;
+            content.style.overflow = Overflow.Hidden;
+            progressPanel.Add(content);
+
+            // Regions for display
+            var regions = new[]
+            {
+                new { Id = "grand_canyon", Name = "Grand Canyon" },
+                new { Id = "fuji_foothills", Name = "Fuji Foothills" },
+                new { Id = "norwegian_coast", Name = "Norwegian Coast" }
+            };
+
+            foreach (var planeDef in planeLibrary.allPlanes)
+            {
+                // Plane header
+                var planeHeader = new Label(planeDef.displayName);
+                planeHeader.style.fontSize = 18;
+                planeHeader.style.unityFontStyleAndWeight = FontStyle.Bold;
+                planeHeader.style.color = new Color(0.15f, 0.25f, 0.35f);
+                planeHeader.style.marginTop = 12;
+                planeHeader.style.marginBottom = 6;
+                content.Add(planeHeader);
+
+                foreach (var region in regions)
+                {
+                    var (dist, time) = PaperWings.Progression.FlightProgress.GetBest(planeDef.planeId, region.Id);
+                    bool unlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked(region.Id);
+
+                    string text = unlocked 
+                        ? (dist > 0 || time > 0 ? $"{region.Name}: {dist:F0}m / {time:F1}s" : $"{region.Name}: No flights yet")
+                        : $"{region.Name}: 🔒 Locked";
+
+                    var line = new Label(text);
+                    line.style.fontSize = 14;
+                    line.style.color = unlocked ? new Color(0.2f, 0.3f, 0.2f) : new Color(0.5f, 0.5f, 0.5f);
+                    line.style.marginLeft = 12;
+                    content.Add(line);
+                }
+            }
+
+            // Close button
+            var closeBtn = new Button { text = "Close" };
+            closeBtn.style.marginTop = 20;
+            closeBtn.style.paddingLeft = 40;
+            closeBtn.style.paddingRight = 40;
+            closeBtn.style.paddingTop = 10;
+            closeBtn.style.paddingBottom = 10;
+            closeBtn.style.fontSize = 18;
+            closeBtn.style.backgroundColor = new Color(0.8f, 0.2f, 0.2f);
+            closeBtn.style.color = Color.white;
+            closeBtn.style.borderRadius = 8;
+
+            closeBtn.clicked += () =>
+            {
+                if (progressPanel.parent != null)
+                    progressPanel.parent.Remove(progressPanel);
+            };
+
+            progressPanel.Add(closeBtn);
+
+            foldingRoot.Add(progressPanel);
         }
 
         private void ShowRegionSelection()
@@ -341,43 +463,35 @@ namespace PaperWings.Folding
             buttonRow.style.justifyContent = Justify.Center;
             regionContainer.Add(buttonRow);
 
-            // Only show unlocked regions (progression-aware)
-            // Grand Canyon is always available as the starter region.
-            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon"))
-            {
-                CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
-                    "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f));
-            }
+            // Show all 3 regions, with locked state for progression
+            bool gcUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon");
+            bool fujiUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("fuji_foothills");
+            bool norUnlocked = PaperWings.Progression.FlightProgress.IsRegionUnlocked("norwegian_coast");
 
-            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("fuji_foothills"))
-            {
-                CreateRegionChoice(buttonRow, "Fuji Foothills", "fuji_foothills", 
-                    "Strong volcanic lift • Misty forests • Long graceful flights", "🗻", new Color(0.35f, 0.65f, 0.45f));
-            }
+            CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
+                "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f), !gcUnlocked);
 
-            if (PaperWings.Progression.FlightProgress.IsRegionUnlocked("norwegian_coast"))
-            {
-                CreateRegionChoice(buttonRow, "Norwegian Coast", "norwegian_coast", 
-                    "Powerful sea winds • Dramatic fjords • Fast distance runs", "🌊", new Color(0.35f, 0.55f, 0.75f));
-            }
+            CreateRegionChoice(buttonRow, "Fuji Foothills", "fuji_foothills", 
+                "Strong volcanic lift • Misty forests • Long graceful flights", "🗻", new Color(0.35f, 0.65f, 0.45f), !fujiUnlocked);
 
-            // If nothing is unlocked (shouldn't happen), fall back to Grand Canyon
-            if (buttonRow.childCount == 0 && PaperWings.Progression.FlightProgress.IsRegionUnlocked("grand_canyon"))
-            {
-                CreateRegionChoice(buttonRow, "Grand Canyon", "grand_canyon", 
-                    "Balanced canyons • Reliable thermals • Perfect starter", "🏜️", new Color(0.85f, 0.55f, 0.35f));
-            }
+            CreateRegionChoice(buttonRow, "Norwegian Coast", "norwegian_coast", 
+                "Powerful sea winds • Dramatic fjords • Fast distance runs", "🌊", new Color(0.35f, 0.55f, 0.75f), !norUnlocked);
         }
 
-        private void CreateRegionChoice(VisualElement container, string displayName, string regionId, string description, string iconEmoji, Color iconBg)
+        private void CreateRegionChoice(VisualElement container, string displayName, string regionId, string description, string iconEmoji, Color iconBg, bool isLocked)
         {
-            // Polished region "card" using VisualElement + labels for much better visual quality.
-            // Large touch target, clear hierarchy (icon + title + personality hint), card styling via USS.
+            // Polished region "card" using VisualElement + labels.
+            // Supports best scores (from FlightProgress) and locked state for progression.
 
             var card = new VisualElement();
             card.AddToClassList("region-card");
 
-            // Icon / thumbnail placeholder (colored rounded square with emoji for now)
+            if (isLocked)
+            {
+                card.AddToClassList("region-card-locked");
+            }
+
+            // Icon
             var icon = new Label(iconEmoji);
             icon.AddToClassList("region-card-icon");
             icon.style.backgroundColor = iconBg;
@@ -395,16 +509,57 @@ namespace PaperWings.Folding
             desc.AddToClassList("region-card-desc");
             card.Add(desc);
 
-            // Click handler on the whole card (large target)
-            card.RegisterCallback<ClickEvent>(evt =>
+            if (isLocked)
             {
-                selectedRegionForLaunch = LoadRegionById(regionId);
+                // Lock state
+                var lockLabel = new Label("🔒 Locked");
+                lockLabel.AddToClassList("region-card-lock");
+                card.Add(lockLabel);
 
-                if (launchToFlightBtn != null)
-                    launchToFlightBtn.style.display = DisplayStyle.Flex;
+                string unlockHint = regionId == "fuji_foothills" 
+                    ? "Reach 500m in Grand Canyon to unlock" 
+                    : "Reach 600m in Fuji Foothills to unlock";
+                var hint = new Label(unlockHint);
+                hint.style.fontSize = 10;
+                hint.style.color = new Color(0.6f, 0.6f, 0.6f);
+                hint.style.whiteSpace = WhiteSpace.Normal;
+                card.Add(hint);
 
-                Debug.Log($"[Region Selection] Selected: {displayName}");
-            });
+                // No click handler for locked
+            }
+            else
+            {
+                // Show best scores if we have a current plane
+                if (currentPlane != null)
+                {
+                    var (bestDist, bestTime) = PaperWings.Progression.FlightProgress.GetBest(currentPlane.planeId, regionId);
+                    if (bestDist > 0 || bestTime > 0)
+                    {
+                        string bestText = $"Best: {bestDist:F0}m / {bestTime:F1}s";
+                        var bestLabel = new Label(bestText);
+                        bestLabel.AddToClassList("region-card-best");
+                        card.Add(bestLabel);
+                    }
+                    else
+                    {
+                        var bestLabel = new Label("Best: --");
+                        bestLabel.style.fontSize = 10;
+                        bestLabel.style.color = new Color(0.6f, 0.6f, 0.6f);
+                        card.Add(bestLabel);
+                    }
+                }
+
+                // Click handler (only for unlocked)
+                card.RegisterCallback<ClickEvent>(evt =>
+                {
+                    selectedRegionForLaunch = LoadRegionById(regionId);
+
+                    if (launchToFlightBtn != null)
+                        launchToFlightBtn.style.display = DisplayStyle.Flex;
+
+                    Debug.Log($"[Region Selection] Selected: {displayName}");
+                });
+            }
 
             container.Add(card);
         }
