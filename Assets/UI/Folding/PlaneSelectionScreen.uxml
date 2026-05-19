@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+  <Style src="PlaneSelectionScreen.uss" />
+  
+  <ui:VisualElement name="root" class="screen">
+    <ui:Label text="Paper Wings World" class="title" />
+    <ui:Label text="Choose a plane to fold" class="subtitle" />
+    
+    <ui:VisualElement name="plane-grid" class="grid" />
+  </ui:VisualElement>
+</ui:UXML>

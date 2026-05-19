@@ -25,11 +25,17 @@ Full development begins after Huh? Build 44 ships and generates initial revenue.
 /docs/                  ← Additional technical docs
 ```
 
-## Getting Started (for future phases)
+## Getting Started (Phase 1 - Folding System)
 
-1. Open the root folder in Unity 6+ (Personal is free for this project).
-2. The `notes/` folder is a standalone Obsidian vault — open it separately for all planning and documentation.
-3. See `notes/Roadmap/Phase-0-Checklist.md` for current tasks.
+1. Open the folder `~/paper-wings-world/` in **Unity 6+**.
+2. Let Unity import the packages (UI Toolkit, Addressables, URP, etc.).
+3. Go to menu: **Paper Wings → Create MVP Plane Assets (v1.0 Locked 8)**  
+   → This will generate all 8 ScriptableObjects + the central library.
+4. Create a new scene and add the `FoldingTutorialManager` + UI Documents.
+5. Use the `SimplePaperPlaneGenerator` + `PaperModelOrbitController` for early 3D testing.
+6. The `notes/` folder is the Obsidian vault (highly recommended to open separately).
+
+See `Assets/Scripts/Folding/README.md` for detailed status and next steps.
 
 ## Principles (inherited from ooabisabi operating agreement)
 

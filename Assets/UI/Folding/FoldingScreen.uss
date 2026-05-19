@@ -1,0 +1,76 @@
+.folding-screen {
+    flex-direction: column;
+    height: 100%;
+    background-color: #F8FAFC;
+}
+
+.top-bar {
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: white;
+    border-bottom-width: 1px;
+    border-color: #D1D5DB;
+}
+
+.plane-title {
+    font-size: 22px;
+    -unity-font-style: bold;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.model-view {
+    flex-grow: 1;
+    background-color: #E0E7FF;
+    border-radius: 8px;
+    margin: 16px;
+}
+
+.instruction-panel {
+    padding: 16px 24px;
+    background-color: white;
+    border-top-width: 1px;
+    border-color: #D1D5DB;
+}
+
+.step-number {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 6px;
+}
+
+.instruction {
+    font-size: 20px;
+    color: #1F2937;
+    white-space: normal;
+}
+
+.controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background-color: white;
+    border-top-width: 1px;
+    border-color: #D1D5DB;
+}
+
+.control-btn {
+    font-size: 18px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    min-width: 120px;
+    height: 56px; /* Large touch target for tablets */
+}
+
+.primary {
+    background-color: #2563EB;
+    color: white;
+}
+
+.progress {
+    flex-grow: 1;
+    margin: 0 16px;
+    height: 12px;
+}

@@ -1,0 +1,30 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+  <Style src="FoldingScreen.uss" />
+  
+  <ui:VisualElement name="root" class="folding-screen">
+    
+    <!-- Top bar -->
+    <ui:VisualElement class="top-bar">
+      <ui:Button name="back-button" text="← Back" class="back-btn" />
+      <ui:Label name="plane-name" text="Plane Name" class="plane-title" />
+    </ui:VisualElement>
+
+    <!-- 3D View Area (will be filled by RenderTexture or separate camera later) -->
+    <ui:VisualElement name="model-view" class="model-view" />
+
+    <!-- Instruction Panel -->
+    <ui:VisualElement class="instruction-panel">
+      <ui:Label name="step-number" text="Step 1 / 12" class="step-number" />
+      <ui:Label name="instruction-text" text="Fold the left edge to the center line..." class="instruction" />
+    </ui:VisualElement>
+
+    <!-- Controls -->
+    <ui:VisualElement class="controls">
+      <ui:Button name="prev-button" text="Previous" class="control-btn" />
+      <ui:ProgressBar name="progress-bar" value="25" class="progress" />
+      <ui:Button name="next-button" text="Next Step" class="control-btn primary" />
+      <ui:Button name="print-button" text="Print Template" class="control-btn" />
+    </ui:VisualElement>
+
+  </ui:VisualElement>
+</ui:UXML>

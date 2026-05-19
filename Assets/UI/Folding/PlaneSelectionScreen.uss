@@ -1,0 +1,32 @@
+.plane-card {
+    background-color: #F0F4F8;
+    border-radius: 12px;
+    padding: 8px;
+    margin: 8px;
+    border-width: 2px;
+    border-color: #A0C4E8;
+}
+
+.plane-card:hover {
+    background-color: #D6EAF8;
+    border-color: #4A90D9;
+}
+
+.title {
+    font-size: 32px;
+    -unity-font-style: bold;
+    color: #1A5276;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #5D6D7E;
+    margin-bottom: 24px;
+}
+
+.grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
