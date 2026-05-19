@@ -400,7 +400,7 @@ namespace PaperWings.Folding
 
         private IEnumerator AnimateStep(string foldName, float duration)
         {
-            if (audioPlayer != null) audioPlayer.PlayFoldSound();
+            if (audioPlayer != null) audioPlayer.PlayFoldSound(Mathf.Clamp(currentStep, 1, 5));
 
             // Find the right animator (real or procedural)
             if (currentRealAnimator == null && currentPaper != null)
@@ -765,6 +765,12 @@ namespace PaperWings.Folding
             var regionToUse = selectedRegionForLaunch ?? Resources.Load<FlightRegion>("FlightRegions/grand_canyon");
 
             PaperWings.Flight.FlightSessionData.SetSession(currentPlane, regionToUse);
+
+            // Play satisfying launch sound
+            if (audioPlayer != null)
+            {
+                audioPlayer.PlayLaunchSound();
+            }
 
             Debug.Log($"[Folding] Launching {currentPlane.displayName} into {regionToUse?.displayName ?? "default"}...");
 

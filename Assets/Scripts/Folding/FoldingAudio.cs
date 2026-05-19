@@ -16,18 +16,21 @@ namespace PaperWings.Folding
         public AudioClip foldWhoosh;
         public AudioClip stepComplete;
 
-        public void PlayFoldSound()
+        public void PlayFoldSound(int intensity = 1)
         {
             if (whooshSource == null) return;
 
             if (foldWhoosh != null)
             {
-                whooshSource.PlayOneShot(foldWhoosh, 0.7f);
+                float volume = Mathf.Clamp(0.5f + (intensity * 0.15f), 0.5f, 1.0f);
+                whooshSource.PlayOneShot(foldWhoosh, volume);
             }
             else
             {
-                // Simple placeholder tone
-                AudioSource.PlayClipAtPoint(GenerateTone(800, 0.15f), transform.position, 0.6f);
+                // Varied synthesized paper fold sound based on step intensity
+                float frequency = 650f + (intensity * 120f);
+                float volume = 0.55f + (intensity * 0.12f);
+                AudioSource.PlayClipAtPoint(GenerateTone(frequency, 0.18f), transform.position, volume);
             }
         }
 
@@ -79,6 +82,23 @@ namespace PaperWings.Folding
         public void PlayBadgeUnlockSound()
         {
             AudioSource.PlayClipAtPoint(GenerateTone(950, 0.4f), transform.position, 0.85f);
+        }
+
+        /// <summary>
+        /// Satisfying launch sound when transitioning from folding success to flight.
+        /// </summary>
+        public void PlayLaunchSound()
+        {
+            if (successSource != null && stepComplete != null)
+            {
+                successSource.PlayOneShot(stepComplete, 1.0f);
+            }
+            else
+            {
+                // Big celebratory whoosh + rising tone for launch feel
+                AudioSource.PlayClipAtPoint(GenerateTone(650, 0.5f), transform.position, 0.9f);
+                AudioSource.PlayClipAtPoint(GenerateTone(1100, 0.35f), transform.position, 0.75f);
+            }
         }
     }
 }
