@@ -297,6 +297,25 @@ This is the final gate. Every single item below **must** be verified on real dev
 
 ---
 
+## Pre-Submission Validation Checklist (Final 10 Critical Checks Before Upload)
+
+This is the absolute last gate. These 10 checks must all be **true** on physical devices using the exact build produced after running the **Full Release Preparation** helper. No exceptions.
+
+1. The candidate build was produced after running **Paper Wings → HIGH INTENSITY - Full Release Preparation**.
+2. The Phase 5 Dev Tools panel and all its debug buttons are completely absent when the app runs on a real device.
+3. All 10 items from the Final Testing Checklist (Phase-6-Testing.md) pass on at least one hero tablet and one secondary physical device.
+4. Real RevenueCat sandbox purchases work end-to-end (unlock, restore, Premium badges display correctly).
+5. The Privacy Policy is live at its permanent public URL and the in-app Settings button opens the live page.
+6. Bundle Identifier and version number in the build exactly match the records in App Store Connect and Google Play Console.
+7. All screenshots and the feature graphic were captured from this release build (no development UI or watermarks visible).
+8. No placeholder text, "TODO", debug logs, or development-only strings remain anywhere in the app or store listings.
+9. Performance holds at 55–60 FPS with stable thermals during a 15+ minute session on the hero device.
+10. The final candidate build has been freshly installed and smoke-tested on the devices reviewers are expected to use.
+
+**Pass requirement:** All 10 items must be confirmed true. Any single "no" means do not upload the build.
+
+---
+
 ## 7. Submission & Review Process
 
 ### Apple

@@ -2,7 +2,7 @@
 
 Family-friendly mobile app that teaches kids and all ages how to fold real paper airplanes from around the world — then launch them into a realistic 3D flight over the actual Earth.
 
-**Current Phase**: Phase 7 — Release Preparation (Final Phase)  
+**Current Phase**: Phase 7 Complete — Ready for Real-Device Validation & Submission  
 **Target Platforms**: Tablet-first (iPad + high-end Android tablets)  
 **MVP Scope (locked)**: 8 paper airplanes + 3 starting flight regions
 
@@ -19,26 +19,40 @@ Family-friendly mobile app that teaches kids and all ages how to fold real paper
 3. Select the `notes/` folder inside this project.
 4. All planning, research, design decisions, and checklists live here.
 
-## Current Status (Phase 7 — Release Preparation)
+## Current Status (Phase 7 Complete — Ready for Submission)
 
-**Phase 7 has begun.** Phase 6 is fully complete. We are now in the final phase focused on store submission, assets, compliance, and production builds.
+**Phase 7 is complete.** All release preparation tooling, documentation, and infrastructure have been delivered. The project is at ~95% and ready for final real-device validation and store submission.
 
-**Phase 7 Deliverables Started:**
-- Comprehensive `notes/Roadmap/Phase-7-Release.md` created — full App Store + Google Play checklists, visual asset requirements, privacy policy guidance, pre-submission verification, and current blockers.
-- New Editor helper: **Paper Wings → HIGH INTENSITY - Prepare for Device Build (iOS + Android)** — configures production PlayerSettings (bundle IDs, IL2CPP, version, SDK targets, ARM64, etc.).
-- Updated roadmap and README to reflect final release preparation.
+**Phase 7 Deliverables Complete:**
+- Full suite of HIGH INTENSITY Editor helpers including the one-click **Full Release Preparation** (chains every prior release helper).
+- Comprehensive `notes/Roadmap/Phase-7-Release.md` with asset checklists, Build & Export Workflow, Release Build Verification Checklist, and the new Pre-Submission Validation Checklist (final 10 critical checks).
+- Privacy Policy integration (placeholder + in-app viewer).
+- Updated Master Roadmap and this README with clear submission guidance.
 
-**Phase 6 Foundation (Complete):**
-- Centralized `PerformanceManager`, `PaperModelLOD`, splash + loading polish, Final Testing Checklist (top 10), and mobile build prep helper.
+**Phase 6 & Earlier:** All foundation systems (folding, flight, progression, auth, monetization simulation, performance, LOD, dev tools removal) are production-ready.
 
-**Phase 5 (Backend, Accounts & Monetization) is Complete**:
-- Supabase auth (anonymous + email upgrade) + cloud progress sync.
-- PurchaseManager with 2 products (Full Content Pack $4.99, All Regions Pack $2.99).
-- Unlock buttons, "⭐ Premium" badges, Settings screen, Restore Purchases, success toasts.
+**Remaining Work (Blockers):**
+- Real RevenueCat integration (remove simulation)
+- Production Supabase + hosted live Privacy Policy
+- Final visual assets (icons + screenshots from release builds)
+- Execute the Pre-Submission Validation Checklist on physical devices
 
-**Important Current Reality:** IAP and some backend features are still in simulation mode. Real RevenueCat integration, production Supabase, privacy policy hosting, and full visual assets are required before store submission.
+## Ready for Submission
 
-See `notes/Roadmap/Phase-7-Release.md` for the complete release preparation checklist and "Final Steps to Ship" guidance.
+The release pipeline is now fully operational:
+
+**One-Click Preparation:**
+- **Paper Wings → HIGH INTENSITY - Full Release Preparation** (recommended — runs the entire chain)
+- Individual helpers also available for granular control
+
+**Final Validation (Before Upload):**
+- Use the **Pre-Submission Validation Checklist** (last 10 critical checks) in `notes/Roadmap/Phase-7-Release.md`.
+- All testing must be performed on real devices with builds produced after the Full Release Preparation helper.
+- The Verification Checklist and detailed workflow in the same document provide the complete pre-upload gate.
+
+Once the remaining blockers above are resolved and the final 10 checks pass on physical hardware, the project is ready to upload to App Store Connect and Google Play Console.
+
+See `notes/Roadmap/Phase-7-Release.md` for the living checklists and exact process.
 
 ## Current Playable Experience (Phase 4 Complete - Fully Polished)
 
