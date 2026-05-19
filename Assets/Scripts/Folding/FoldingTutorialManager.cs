@@ -1239,6 +1239,21 @@ namespace PaperWings.Folding
             };
             card.Add(restoreBtn);
 
+            // Privacy Policy (Phase 7 placeholder — links to in-app draft + hosted version required for launch)
+            var privacyBtn = new Button { text = "📜  Privacy Policy" };
+            privacyBtn.style.width = Length.Percent(100);
+            privacyBtn.style.maxWidth = 300;
+            privacyBtn.style.height = 54;
+            privacyBtn.style.backgroundColor = new Color(0.4f, 0.55f, 0.7f);
+            privacyBtn.style.color = Color.white;
+            privacyBtn.style.fontSize = 16;
+            privacyBtn.style.unityFontStyleAndWeight = FontStyle.Bold;
+            privacyBtn.style.borderRadius = 10;
+            privacyBtn.style.marginBottom = 12;
+
+            privacyBtn.clicked += () => ShowPrivacyPolicy(overlay);
+            card.Add(privacyBtn);
+
             // Sign Out
             var signOutBtn = new Button { text = "🚪  Sign Out" };
             signOutBtn.style.width = Length.Percent(100);
@@ -1281,6 +1296,92 @@ namespace PaperWings.Folding
             card.Add(closeBtn);
 
             selectionRoot.Add(overlay);
+        }
+
+        /// <summary>
+        /// Shows a simple in-app Privacy Policy viewer (Phase 7 placeholder).
+        /// The text is a working draft. Before launch, replace with a hosted URL
+        /// and use Application.OpenURL to the live privacy policy page.
+        /// </summary>
+        private void ShowPrivacyPolicy(VisualElement parentOverlay)
+        {
+            if (selectionRoot == null) return;
+
+            var policyOverlay = new VisualElement();
+            policyOverlay.style.position = Position.Absolute;
+            policyOverlay.style.top = 0;
+            policyOverlay.style.left = 0;
+            policyOverlay.style.width = Length.Percent(100);
+            policyOverlay.style.height = Length.Percent(100);
+            policyOverlay.style.backgroundColor = new Color(0.08f, 0.12f, 0.18f, 0.92f);
+            policyOverlay.style.flexDirection = FlexDirection.Column;
+            policyOverlay.style.alignItems = Align.Center;
+            policyOverlay.style.justifyContent = Justify.Center;
+            policyOverlay.style.padding = 20;
+
+            var card = new VisualElement();
+            card.style.backgroundColor = CreamBg;
+            card.style.borderRadius = 14;
+            card.style.padding = 20;
+            card.style.width = Length.Percent(92);
+            card.style.maxWidth = 460;
+            card.style.maxHeight = Length.Percent(85);
+            card.style.flexDirection = FlexDirection.Column;
+            policyOverlay.Add(card);
+
+            var title = new Label("📜  Privacy Policy");
+            title.style.fontSize = 22;
+            title.style.unityFontStyleAndWeight = FontStyle.Bold;
+            title.style.color = TitleColor;
+            title.style.marginBottom = 12;
+            card.Add(title);
+
+            // Scrollable policy text (placeholder draft)
+            var scroll = new ScrollView();
+            scroll.style.flexGrow = 1;
+            scroll.style.marginBottom = 16;
+
+            string policyText = 
+                "Paper Wings World — Privacy Policy (Placeholder)\n\n" +
+                "Effective Date: May 2026\n\n" +
+                "Paper Wings World is built by ooabisabi LLC.\n\n" +
+                "We collect:\n" +
+                "• Account data (email or anonymous ID via Supabase)\n" +
+                "• Flight progress, best scores, and unlocks (local + cloud sync)\n" +
+                "• Purchase receipts (via RevenueCat / App Store / Google Play)\n\n" +
+                "We use this data only to deliver the educational folding + flight experience, " +
+                "restore your purchases, and improve the app.\n\n" +
+                "We do not sell your data.\n\n" +
+                "You can sign out or request account deletion from Settings.\n\n" +
+                "For the full current policy, visit the hosted version that will be linked here before launch.\n\n" +
+                "Questions? Contact support@paperwingsworld.com (placeholder).";
+
+            var textLabel = new Label(policyText);
+            textLabel.style.whiteSpace = WhiteSpace.Normal;
+            textLabel.style.fontSize = 14;
+            textLabel.style.color = TitleColor;
+            textLabel.style.unityTextAlign = TextAnchor.UpperLeft;
+
+            scroll.Add(textLabel);
+            card.Add(scroll);
+
+            var closeBtn = new Button { text = "Close" };
+            closeBtn.style.paddingLeft = 36;
+            closeBtn.style.paddingRight = 36;
+            closeBtn.style.paddingTop = 9;
+            closeBtn.style.paddingBottom = 9;
+            closeBtn.style.fontSize = 15;
+            closeBtn.style.backgroundColor = TextMuted;
+            closeBtn.style.color = Color.white;
+            closeBtn.style.borderRadius = 8;
+
+            closeBtn.clicked += () =>
+            {
+                if (policyOverlay.parent != null) policyOverlay.parent.Remove(policyOverlay);
+            };
+            card.Add(closeBtn);
+
+            selectionRoot.Add(policyOverlay);
         }
 
         private void ShowRegionSelection()

@@ -33,46 +33,74 @@
 
 ---
 
-## 2. Required Visual & Brand Assets
+## 2. Required Visual & Brand Assets — Detailed Checklist
 
-### App Icons
-- **iOS:** All required sizes (1024×1024 App Store icon is mandatory). Use Asset Catalog or Unity icon slots.
-- **Android:** Adaptive icon (foreground + background) + legacy icons at multiple densities (mdpi to xxxhdpi). 512×512 Play Store icon.
-- **Source:** Provide master 1024×1024 or 2048×2048 vector/SVG for future-proofing.
+**Use this exact checklist when producing assets.** All dimensions are in pixels. Create a folder `Assets/StoreAssets/` (or external design folder) with final production files.
 
-### Screenshots (Mandatory for both stores)
-**iPhone (required for iOS):**
-- 6.7" (iPhone 14 Pro Max / 15 Pro Max / 16 Pro Max)
-- 6.5" (iPhone 11 Pro Max / XS Max)
-- 5.5" (iPhone 8 Plus)
+### App Icons (Mandatory)
+- [ ] **Master source**: 2048×2048 or vector (SVG/AI) — "paper_wings_icon_master"
+- [ ] **iOS App Store** (required): 1024×1024 — `icon_1024.png`
+- [ ] **iOS** (all slots in Unity or Asset Catalog): 180, 120, 87, 80, 58, 40, etc.
+- [ ] **Android Adaptive Icon**: 
+  - Foreground: 432×432 (safe zone 264×264)
+  - Background: 432×432
+- [ ] **Android Legacy + Play Store**: 512×512 (`icon_play.png`)
+- [ ] **Unity PlayerSettings**: Assign the correct icons for iOS and Android tabs
 
-**iPad (required for iOS tablet support):**
-- 12.9" (3rd gen+)
-- 11" (iPad Pro)
+**Tool recommendation**: Use https://appicon.co or Icon Slayer for batch generation from master.
 
-**Android (recommended sizes for tablets + phones):**
-- 7" tablet (1920×1200 or similar)
-- 10" tablet
-- Phone screenshots (various aspect ratios)
+### Screenshots — iOS (Required for App Store)
+- [ ] **6.7" iPhone** (iPhone 14/15/16 Pro Max): 1290×2796 (portrait) or landscape equivalent — at least 3–5 screens
+- [ ] **6.5" iPhone** (XS Max / 11 Pro Max): 1242×2688
+- [ ] **5.5" iPhone** (8 Plus): 1242×2208
+- [ ] **12.9" iPad** (3rd gen+): 2048×2732
+- [ ] **11" iPad Pro**: 1668×2388
 
-**Guidelines:**
-- Show real gameplay (folding steps, beautiful flight regions, post-flight summary with badges).
-- Include the Main Hub, Plane Selection, and at least one flight scene.
-- No placeholder or dev-only UI.
-- Dark / light mode variants if the app supports system theme.
+**Recommended content order**:
+1. Main Hub (welcome + big buttons)
+2. Plane Selection with Premium badges visible
+3. Folding tutorial step with real 3D model
+4. Region selection (beautiful Grand Canyon or Fuji)
+5. In-flight over one of the regions + stats
+6. Post-flight summary with badge celebration
 
-### Feature Graphic (Google Play only)
-- 1024×500 px — eye-catching banner showing the hero experience.
+### Screenshots — Android (Google Play)
+- [ ] **Phone**: 1080×1920 or 1440×2560 (at least 2–4)
+- [ ] **7" Tablet**: 1920×1200 or 1280×800 landscape/portrait
+- [ ] **10" Tablet**: 2560×1600 or similar
 
-### Promo Video (Optional but recommended)
-- 30–60 second vertical or horizontal video of folding + flight.
+**Note**: Google requires screenshots for the default language; additional languages optional.
 
-### Store Listing Assets
-- App name: "Paper Wings World"
-- Subtitle / short description (30 chars)
-- Full description (4000 chars max)
-- Keywords (App Store)
-- Category: Education or Games (Simulation / Educational)
+### Feature Graphic (Google Play — Required)
+- [ ] 1024×500 px — `feature_graphic.png`
+- Must be eye-catching, show the plane in flight over a scenic region
+
+### Promo Video (Strongly Recommended)
+- [ ] 15–60 seconds, 1080p or higher
+- Show folding → launch → beautiful flight
+- Export in formats required by each store
+
+### Store Listing Text Assets (prepare in Phase-7 doc or separate file)
+- [ ] App name: "Paper Wings World"
+- [ ] Subtitle (30 chars max): "Fold. Fly. Explore the world."
+- [ ] Full description (up to 4000 chars) — benefit-focused, mention 8 planes, 3 regions, real physics, progression
+- [ ] Keywords (App Store — 100 chars total)
+- [ ] Category: Education (primary) or Games > Simulation
+
+### Privacy Policy & Legal Links
+- [ ] Hosted live Privacy Policy at permanent URL (e.g. `https://paperwingsworld.com/privacy`)
+- [ ] "Privacy Policy" button in Settings screen (already implemented in Phase 7 — currently shows placeholder text; must point to live URL before submission)
+- [ ] Terms of Service (recommended)
+- [ ] Support email visible in policy and Settings
+
+**Guidelines for all screenshots**:
+- Use final release build (no dev UI, no "Development Build" watermark)
+- Real device frames optional but nice
+- Show actual gameplay, not mocked
+- High contrast, kid-friendly but premium feel
+- Test on light and dark device themes if supported
+
+**Current Status**: Placeholder Privacy Policy drafted in `notes/PrivacyPolicy.md` and wired into Settings screen. Real hosted version + final copy still required.
 
 ---
 
@@ -152,8 +180,9 @@
 
 New in Phase 7:
 - `Paper Wings / HIGH INTENSITY - Prepare for Device Build (iOS + Android)` — one-click configuration of production PlayerSettings, bundle IDs, version, IL2CPP, SDK targets, etc.
+- `Paper Wings / HIGH INTENSITY - Prepare Release Build` — turns Development Build OFF, disables profiler/debugging, enforces release optimizations.
 
-Run this helper immediately before every device build intended for TestFlight, internal track, or final submission.
+Run the Device Build helper first, then the Release Build helper immediately before every candidate build for TestFlight or Play track.
 
 Also continue using:
 - Scene generation and model refresh tools
@@ -196,22 +225,23 @@ Also continue using:
 
 - [ ] Real RevenueCat integration (currently simulation)
 - [ ] Production Supabase project + verified RLS + backup strategy
-- [ ] Privacy policy hosted and linked from app + store listings
+- [x] Privacy policy placeholder drafted (`notes/PrivacyPolicy.md`) + in-app viewer added to Settings screen (Phase 7)
+- [ ] Privacy policy hosted at permanent public URL and wired to live link
 - [ ] Full set of store screenshots and icons (production quality)
 - [ ] Final device testing pass on the Top 10 checklist
 - [ ] Remove / conditional-compile dev tools panel for release builds
-- [ ] Add "Privacy Policy" and support links in Settings UI
+- [ ] Final store descriptions and keywords copy
 
 ---
 
 ## 10. Next Steps After This Document
 
-1. Create and host privacy policy + legal pages.
-2. Produce all visual assets.
-3. Integrate real IAP backend (RevenueCat).
-4. Run the new Device Build helper and produce signed builds.
-5. Execute full device test matrix.
-6. Create App Store / Play Console records.
+1. Host the Privacy Policy at a permanent public URL and update the in-app button to open the live page.
+2. Produce all visual assets using the detailed checklist above.
+3. Integrate real IAP backend (RevenueCat) and remove simulation mode.
+4. Run "Prepare for Device Build" + "Prepare Release Build" helpers and produce signed release candidates.
+5. Execute full device test matrix (Top 10 checklist).
+6. Create App Store / Play Console records with final bundle ID.
 7. Submit for review.
 
 ---
