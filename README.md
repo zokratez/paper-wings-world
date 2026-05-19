@@ -73,6 +73,17 @@ You can currently experience:
 
 All features are fully playable end-to-end in the demo scenes.
 
+### Monetization Flow (Phase 5 - Complete)
+
+- **Freemium model**: First 3 planes + Grand Canyon region are free. Everything else is behind purchase.
+- **Two example products**:
+  - "Full Content Pack" ($4.99) — unlocks all 8 planes + premium regions.
+  - "All Regions Pack" ($2.99) — unlocks the two premium flight regions.
+- Purchase buttons ("Unlock for $X.XX") appear on locked cards in Plane and Region Selection.
+- **Settings screen** (from Hub) includes Account info, Restore Purchases, and Sign Out.
+- Purchase success toasts and "⭐ Premium" badges appear on unlocked content.
+- Full simulation mode for immediate testing; clean abstraction ready for real RevenueCat SDK.
+
 ### How to Test the Current Build (Recommended Order)
 
 1. Open the project in **Unity 6+**.

@@ -1,15 +1,17 @@
 ---
 type: roadmap
 title: "Phase 5 — Backend, Accounts & Monetization"
-status: in-progress
+status: complete
 updated: 2026-05
 ---
 
 # Phase 5 — Backend, Accounts & Monetization
 
+**Status: COMPLETE** ✅
+
 **Goal**: Move from local-only demo to a connected, account-based, freemium product with real monetization while keeping the core experience delightful and accessible.
 
-This phase introduces Supabase for auth and cloud persistence, and a clean monetization layer (initially local + placeholder, ready for RevenueCat).
+This phase introduces Supabase for auth and cloud persistence, and a clean monetization layer (local simulation + clean abstractions ready for real RevenueCat). All core flows (anonymous + email auth, progress sync, IAP simulation, Settings, Restore, Premium badges, multiple products) are implemented and tested in the playable demo.
 
 ---
 
@@ -114,10 +116,13 @@ create policy "Users can update own progress"
 - SupabaseAuth now exposes `OnAuthError` with friendly messages (wrong password, weak password, invalid email, etc.).
 - Plane Selection cards now respect `ContentUnlockManager.IsPlaneUnlocked()` and show an "Unlock for $4.99" button on locked items (buys the full content pack).
 - Region Selection now uses `ContentUnlockManager.IsRegionUnlocked(id)` and shows purchase buttons on locked regions.
-- New `PurchaseManager` abstraction (simulation mode) + wired into `ContentUnlockManager` for real gating. One foundation product: "full_content_pack".
+- New `PurchaseManager` abstraction (simulation mode) + wired into `ContentUnlockManager` for real gating.
+- Two foundation products: "full_content_pack" ($4.99) and "all_regions_pack" ($2.99) — multiple purchases now testable.
 - Simple **Settings screen** (⚙️ button on Hub) with Account info, Restore Purchases button, and Sign Out.
-- Purchase success confirmation toast after buying.
-- Restore Purchases wired and functional (with user feedback).
+- Purchase success confirmation toasts + "⭐ Premium" badges on content unlocked via IAP.
+- Restore Purchases fully wired and functional with user feedback.
+- Short "Monetization Flow" section added to root README.md.
+- Phase 5 marked Complete.
 
 **Not yet production-ready**:
 - Token refresh / session expiration handling

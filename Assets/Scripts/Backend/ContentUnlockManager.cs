@@ -74,7 +74,7 @@ namespace PaperWings.Backend
             if (!string.IsNullOrEmpty(region.unlockProductId) && HasProduct(region.unlockProductId))
                 return true;
 
-            if (HasFullContentAccess())
+            if (HasFullContentAccess() || HasAllRegionsAccess())
                 return true;
 
             return false;
@@ -100,7 +100,7 @@ namespace PaperWings.Backend
                     return true;
             }
 
-            if (HasFullContentAccess())
+            if (HasFullContentAccess() || HasAllRegionsAccess())
                 return true;
 
             return false;
@@ -201,6 +201,19 @@ namespace PaperWings.Backend
                 return true;
 
             return purchasedProductIds.Contains(PurchaseManager.FullContentProductId);
+        }
+
+        /// <summary>
+        /// Returns true if the user owns the All Regions pack.
+        /// </summary>
+        public static bool HasAllRegionsAccess()
+        {
+            PurchaseManager.EnsureExists();
+
+            if (PurchaseManager.Instance != null && PurchaseManager.Instance.HasAllRegionsAccess())
+                return true;
+
+            return purchasedProductIds.Contains(PurchaseManager.AllRegionsProductId);
         }
     }
 }

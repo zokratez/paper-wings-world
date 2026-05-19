@@ -31,12 +31,13 @@ namespace PaperWings.Backend
             Instance = go.AddComponent<PurchaseManager>();
         }
 
-        // Example premium product for the foundation demo.
-        // This single purchase unlocks the full remaining library (planes + premium regions).
-        public const string FullContentProductId = "full_content_pack";
+        // Example premium products for the foundation demo.
+        public const string FullContentProductId = "full_content_pack";      // Unlocks all planes + regions
+        public const string AllRegionsProductId = "all_regions_pack";        // Unlocks premium regions only
 
-        // Display price used in UI until we have a real product catalog.
+        // Display prices used in UI until we have a real product catalog.
         public const string FullContentDisplayPrice = "$4.99";
+        public const string AllRegionsDisplayPrice = "$2.99";
 
         public event Action<string> OnPurchaseCompleted;
         public event Action<string> OnPurchaseFailed;
@@ -105,6 +106,14 @@ namespace PaperWings.Backend
         public bool HasFullContentAccess()
         {
             return HasPurchased(FullContentProductId);
+        }
+
+        /// <summary>
+        /// Returns true if the user has purchased the All Regions pack.
+        /// </summary>
+        public bool HasAllRegionsAccess()
+        {
+            return HasPurchased(AllRegionsProductId);
         }
 
         /// <summary>

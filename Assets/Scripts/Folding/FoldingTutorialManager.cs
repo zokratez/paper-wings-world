@@ -779,6 +779,16 @@ namespace PaperWings.Folding
                     card.Add(free);
                 }
 
+                // Premium badge for purchased unlocks
+                if (!plane.isFree && PurchaseManager.Instance != null && PurchaseManager.Instance.HasFullContentAccess())
+                {
+                    var premium = new Label("⭐ Premium");
+                    premium.style.fontSize = 10;
+                    premium.style.color = WarmAccent;
+                    premium.style.marginTop = 2;
+                    card.Add(premium);
+                }
+
                 card.RegisterCallback<ClickEvent>(e => StartTutorial(plane));
             }
 
@@ -1348,6 +1358,17 @@ namespace PaperWings.Folding
             title.AddToClassList("region-card-title");
             card.Add(title);
 
+            // Premium badge for purchased regions
+            if (PurchaseManager.Instance != null && PurchaseManager.Instance.HasAllRegionsAccess())
+            {
+                var premium = new Label("⭐ Premium");
+                premium.style.fontSize = 10;
+                premium.style.color = WarmAccent;
+                premium.style.marginTop = 2;
+                premium.style.marginBottom = 4;
+                card.Add(premium);
+            }
+
             // Description / personality hint
             var desc = new Label(description);
             desc.AddToClassList("region-card-desc");
@@ -1361,7 +1382,7 @@ namespace PaperWings.Folding
                 card.Add(lockLabel);
 
                 // Purchase button (foundation demo uses the full content pack)
-                var unlockBtn = new Button { text = $"Unlock for {PurchaseManager.FullContentDisplayPrice}" };
+                var unlockBtn = new Button { text = $"Unlock for {PurchaseManager.AllRegionsDisplayPrice}" };
                 unlockBtn.style.fontSize = 10;
                 unlockBtn.style.backgroundColor = WarmAccent;
                 unlockBtn.style.color = Color.white;
@@ -1374,13 +1395,13 @@ namespace PaperWings.Folding
                     PurchaseManager.EnsureExists();
                     if (PurchaseManager.Instance != null)
                     {
-                        PurchaseManager.Instance.BuyProduct(PurchaseManager.FullContentProductId);
+                        PurchaseManager.Instance.BuyProduct(PurchaseManager.AllRegionsProductId);
                     }
                     else
                     {
-                        ContentUnlockManager.GrantPurchase(PurchaseManager.FullContentProductId);
+                        ContentUnlockManager.GrantPurchase(PurchaseManager.AllRegionsProductId);
                     }
-                    Debug.Log("[Region Selection] Purchase requested for full content pack");
+                    Debug.Log("[Region Selection] Purchase requested for all regions pack");
                 };
                 card.Add(unlockBtn);
 
