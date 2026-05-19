@@ -2,53 +2,65 @@
 
 Family-friendly mobile app that teaches kids and all ages how to fold real paper airplanes from around the world — then launch them into a realistic 3D flight over the actual Earth.
 
-**Status**: Phase 0 — Setup, documentation, and skeleton only.  
-Full development begins after Huh? Build 44 ships and generates initial revenue.
+**Current Phase**: Phase 2 — 3D Flight Physics (in active development)  
+**Target Platforms**: Tablet-first (iPad + high-end Android tablets)  
+**MVP Scope (locked)**: 8 paper airplanes + 3 starting flight regions
 
-**Name**: Paper Wings World (English-first)  
-**Target**: Tablet-first (iPad Pro/Air + high-end Android tablets as hero devices)  
-**MVP Scope (locked)**: Exactly 8 paper airplanes + exactly 3 flight regions for v1.0
+## How to Work on This Project
 
-## Quick Links
+### Opening in Unity
+1. Open the folder `~/paper-wings-world/` directly in **Unity 6+**.
+2. Let Unity resolve packages on first open.
+3. Useful Editor menus are under **Paper Wings → ...** in the menu bar.
 
+### Opening the Obsidian Vault (Documentation & Notes)
+1. Open **Obsidian**.
+2. Choose "Open folder as vault".
+3. Select the `notes/` folder inside this project.
+4. All planning, research, design decisions, and checklists live here.
+
+## Current Status
+- All 8 MVP planes have folding steps and distinct low-poly 3D models.
+- Full folding tutorial system is functional with real 3D rigged models.
+- Flight physics, thermals, camera, and stats are implemented and playable.
+- Complete fold → launch → fly → return flow works.
+
+See `notes/Roadmap/Phase-0-Checklist.md` for detailed task tracking.
+
+## Documentation & Notes
+
+All planning, design decisions, research, and checklists live in the **Obsidian vault** located at `notes/`.
+
+See the following key notes:
 - [Project Vision](notes/Roadmap/Vision.md)
 - [Locked Scope & Constraints](notes/Roadmap/Scope-Lock.md)
-- [Tech Decisions (incl. cheapest globe solution)](notes/Research/Tech-Decisions.md)
-- [Paper Airplane List (8 planes)](notes/Game-Features/Paper-Airplanes.md)
-- [Phase 0 Checklist](notes/Roadmap/Phase-0-Checklist.md)
+- [Paper Airplane List & Steps](notes/Game-Features/Paper-Airplanes.md)
+- [Current Phase Checklist](notes/Roadmap/Phase-0-Checklist.md)
 
 ## Folder Structure
 
 ```
-/notes/                 ← Primary Obsidian vault (research, design, roadmap)
-/Assets/                ← Unity project structure (skeleton ready)
-/docs/                  ← Additional technical docs
+paper-wings-world/
+├── notes/                 # Obsidian vault (all documentation & planning)
+├── Assets/                # Unity project
+│   ├── Scripts/
+│   ├── Prefabs/
+│   ├── Scenes/
+│   └── ...
+├── Editor/                # Custom Unity Editor tools
+└── README.md
 ```
 
-## HIGH INTENSITY MODE - Getting a Playable Demo (5 minutes)
+## Principles
 
-1. Open `~/paper-wings-world/` in **Unity 6+**.
-2. Run: **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
-3. Run: **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
-4. Run: **Paper Wings → Assign Real Models to Key PaperPlaneDefinitions**
-5. Run: **Paper Wings → HIGH INTENSITY - Create Playable Demo Scene** and **Create FlightDemo Scene** if needed
-4. Open the new scene: `Assets/Scenes/FoldingTutorialDemo.unity`
-5. Press Play.
-6. Click any plane card (Classic Dart has full working steps + animation).
+This project follows the high-quality, organized approach used across ooabisabi projects:
+- Clean, maintainable, and well-documented code
+- Data-driven architecture where possible
+- Obsidian as the single source of truth for all non-code documentation
 
-Touch controls: Drag to rotate the paper, pinch to zoom.
+---
 
-See `Assets/Scripts/Folding/Demo/HOW_TO_TEST.md` for details.
-
-**Phase 1 Complete** — All 8 planes have realistic folding + success/reward + Launch to Flight hook. Ready for Phase 2 (3D Flight Physics).
-
-**Phase 2 Started** — Realistic aerodynamics + touch flight controls + FlightDemo scene now exist. You can launch planes from the folding screen.
-
-## Principles (inherited from ooabisabi operating agreement)
-
-- Accuracy over agreement
-- Evidence-first (device-verified on real iPads)
-- Spanish later (English-first for v1.0)
+*Last updated during Phase 2 (3D Flight Physics + Real 3D Paper Models)*
 - Ship the complete thing
 
 ---
