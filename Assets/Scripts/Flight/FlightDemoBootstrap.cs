@@ -20,6 +20,10 @@ namespace PaperWings.Demo
 
         private void Start()
         {
+            // Phase 6 basic performance target (tablet-first 60 FPS)
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+
             // Build nice environment first — now region-aware for distinct visual personality
             FlightEnvironment env = null;
             if (buildCanyonEnvironment)

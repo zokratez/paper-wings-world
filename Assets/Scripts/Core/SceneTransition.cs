@@ -18,6 +18,7 @@ namespace PaperWings.Core
 
         private Canvas fadeCanvas;
         private UnityEngine.UI.Image fadeImage;
+        private UnityEngine.UI.Text loadingText; // Phase 6 simple loading indicator
 
         private void Awake()
         {
@@ -28,6 +29,15 @@ namespace PaperWings.Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Phase 6 basic mobile optimization
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+            // Use a balanced quality level suitable for tablets (index 2–3 in default URP project)
+            if (QualitySettings.GetQualityLevel() > 3)
+            {
+                QualitySettings.SetQualityLevel(3, true);
+            }
 
             CreateFadeOverlay();
         }
@@ -50,6 +60,22 @@ namespace PaperWings.Core
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
+
+            // Phase 6 simple loading indicator (visible during black fade / load)
+            var loadingGO = new GameObject("LoadingText", typeof(UnityEngine.UI.Text));
+            loadingGO.transform.SetParent(fadeCanvas.transform, false);
+            loadingText = loadingGO.GetComponent<UnityEngine.UI.Text>();
+            loadingText.text = "Loading...";
+            loadingText.fontSize = 36;
+            loadingText.color = Color.white;
+            loadingText.alignment = TextAnchor.MiddleCenter;
+            loadingText.enabled = false; // hidden by default
+
+            var loadingRect = loadingText.GetComponent<RectTransform>();
+            loadingRect.anchorMin = new Vector2(0.5f, 0.45f);
+            loadingRect.anchorMax = new Vector2(0.5f, 0.55f);
+            loadingRect.offsetMin = new Vector2(-200, -30);
+            loadingRect.offsetMax = new Vector2(200, 30);
         }
 
         public void LoadSceneWithFade(string sceneName)
@@ -69,11 +95,23 @@ namespace PaperWings.Core
                 yield return null;
             }
 
-            // Load
+            // Show simple loading indicator while the new scene loads and initializes
+            if (loadingText != null)
+            {
+                loadingText.enabled = true;
+            }
+
+            // Load (synchronous — the loading text gives visual feedback during hitch)
             SceneManager.LoadScene(sceneName);
 
-            // Small delay so new scene can initialize
-            yield return new WaitForSeconds(0.1f);
+            // Small delay so new scene can initialize (loading text remains visible)
+            yield return new WaitForSeconds(0.25f);
+
+            // Hide loading text before fade in
+            if (loadingText != null)
+            {
+                loadingText.enabled = false;
+            }
 
             // Fade in
             t = 0f;

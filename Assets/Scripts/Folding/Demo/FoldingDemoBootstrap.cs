@@ -33,6 +33,10 @@ namespace PaperWings.Demo
                 return;
             }
 
+            // Phase 6 basic performance target (tablet-first 60 FPS)
+            Application.targetFrameRate = 60;
+            QualitySettings.vSyncCount = 0;
+
             // Setup Orbit Controller on camera
             var orbit = mainCamera.gameObject.AddComponent<PaperModelOrbitController>();
             orbit.enabled = false; // Will be enabled when a plane loads
