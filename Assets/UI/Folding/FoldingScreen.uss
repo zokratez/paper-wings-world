@@ -74,3 +74,35 @@
     margin: 0 16px;
     height: 12px;
 }
+
+/* Success / Reward Screen */
+.success-panel {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    width: 70%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.success-title {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: #1A5276;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.launch-btn {
+    font-size: 20px;
+    padding: 14px 32px;
+    background-color: #27AE60;
+    color: white;
+    border-radius: 10px;
+    min-width: 220px;
+    height: 62px;
+}

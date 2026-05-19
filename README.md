@@ -29,7 +29,9 @@ Full development begins after Huh? Build 44 ships and generates initial revenue.
 
 1. Open `~/paper-wings-world/` in **Unity 6+**.
 2. Run: **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
-3. Run: **Paper Wings → HIGH INTENSITY - Create Playable Demo Scene**
+3. Run: **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
+4. Run: **Paper Wings → Assign Real Models to Key PaperPlaneDefinitions**
+5. Run: **Paper Wings → HIGH INTENSITY - Create Playable Demo Scene** and **Create FlightDemo Scene** if needed
 4. Open the new scene: `Assets/Scenes/FoldingTutorialDemo.unity`
 5. Press Play.
 6. Click any plane card (Classic Dart has full working steps + animation).
@@ -37,6 +39,10 @@ Full development begins after Huh? Build 44 ships and generates initial revenue.
 Touch controls: Drag to rotate the paper, pinch to zoom.
 
 See `Assets/Scripts/Folding/Demo/HOW_TO_TEST.md` for details.
+
+**Phase 1 Complete** — All 8 planes have realistic folding + success/reward + Launch to Flight hook. Ready for Phase 2 (3D Flight Physics).
+
+**Phase 2 Started** — Realistic aerodynamics + touch flight controls + FlightDemo scene now exist. You can launch planes from the folding screen.
 
 ## Principles (inherited from ooabisabi operating agreement)
 

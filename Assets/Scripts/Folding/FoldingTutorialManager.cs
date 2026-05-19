@@ -32,12 +32,22 @@ namespace PaperWings.Folding
         private VisualElement foldingRoot;
 
         // UI References
+        private Label planeNameLabel;
+        private Label difficultyLabel;
+        private Label descriptionLabel;
         private Label stepLabel;
         private Label instructionLabel;
         private ProgressBar progressBar;
         private Button nextBtn;
         private Button prevBtn;
         private Button printBtn;
+        private Button launchToFlightBtn;
+
+        // Success screen
+        private VisualElement successPanel;
+        private Label successTitle;
+
+        private FoldingAudio audioPlayer;
 
         private void Start()
         {
@@ -99,6 +109,12 @@ namespace PaperWings.Folding
 
             foldingRoot = foldingDocument.rootVisualElement;
 
+            // Plane info
+            planeNameLabel = foldingRoot.Q<Label>("plane-name");
+            difficultyLabel = foldingRoot.Q<Label>("plane-difficulty");
+            descriptionLabel = foldingRoot.Q<Label>("plane-description");
+
+            // Step UI
             stepLabel = foldingRoot.Q<Label>("step-number");
             instructionLabel = foldingRoot.Q<Label>("instruction-text");
             progressBar = foldingRoot.Q<ProgressBar>("progress-bar");
@@ -106,6 +122,7 @@ namespace PaperWings.Folding
             prevBtn = foldingRoot.Q<Button>("prev-button");
             printBtn = foldingRoot.Q<Button>("print-button");
 
+            // Wire buttons
             nextBtn.clicked += NextStep;
             prevBtn.clicked += PreviousStep;
             printBtn.clicked += () => Debug.Log("Printable template requested for " + plane.displayName);
@@ -113,26 +130,84 @@ namespace PaperWings.Folding
             var back = foldingRoot.Q<Button>("back-button");
             if (back != null) back.clicked += ShowSelectionScreen;
 
+            // Launch button (for Phase 2 transition)
+            launchToFlightBtn = foldingRoot.Q<Button>("launch-flight-button");
+            if (launchToFlightBtn != null)
+            {
+                launchToFlightBtn.clicked += LaunchToFlight;
+                launchToFlightBtn.style.display = DisplayStyle.None; // Hidden until complete
+            }
+
+            // Success panel
+            successPanel = foldingRoot.Q<VisualElement>("success-panel");
+            successTitle = foldingRoot.Q<Label>("success-title");
+            if (successPanel != null) successPanel.style.display = DisplayStyle.None;
+
+            // Audio (optional - safe if missing)
+            audioPlayer = GetComponent<FoldingAudio>();
+
             LoadPaperModel();
+            PopulatePlaneInfo();
             UpdateUI();
+        }
+
+        private void PopulatePlaneInfo()
+        {
+            if (planeNameLabel != null) planeNameLabel.text = currentPlane.displayName;
+            if (difficultyLabel != null) difficultyLabel.text = currentPlane.difficulty.ToString();
+            if (descriptionLabel != null) descriptionLabel.text = currentPlane.shortDescription;
         }
 
         private void LoadPaperModel()
         {
-            if (currentPaper != null) Destroy(currentPaper.gameObject);
+            // Clean up previous model
+            foreach (Transform child in modelParent)
+            {
+                if (child.name.Contains("Model")) Destroy(child.gameObject);
+            }
+            currentPaper = null;
+            currentRealAnimator = null;
+            currentProcedural = null;
 
-            var go = new GameObject(currentPlane.displayName + " Model");
-            go.transform.SetParent(modelParent);
-            go.transform.localPosition = Vector3.zero;
+            GameObject modelInstance;
 
-            currentPaper = go.AddComponent<ProceduralPaperPlane>();
-            currentPaper.Initialize();
+            if (currentPlane.paperModelPrefab != null)
+            {
+                modelInstance = Instantiate(currentPlane.paperModelPrefab, modelParent);
+                modelInstance.name = currentPlane.displayName + " Model";
+
+                currentRealAnimator = modelInstance.GetComponent<PaperPlaneAnimator>();
+                if (currentRealAnimator == null)
+                    currentRealAnimator = modelInstance.AddComponent<PaperPlaneAnimator>();
+
+                currentRealAnimator.Initialize();
+            }
+            else
+            {
+                modelInstance = new GameObject(currentPlane.displayName + " Model");
+                modelInstance.transform.SetParent(modelParent);
+                modelInstance.transform.localPosition = Vector3.zero;
+
+                currentProcedural = modelInstance.AddComponent<ProceduralPaperPlane>();
+                currentProcedural.Initialize(currentPlane.planeId);
+            }
 
             if (orbitController != null)
             {
-                orbitController.target = currentPaper.transform;
-                orbitController.ResetView();
+                orbitController.target = modelInstance.transform;
+                orbitController.ResetView(GetPreferredCameraDistance(currentPlane.planeId));
             }
+        }
+
+        private float GetPreferredCameraDistance(string planeId)
+        {
+            // Give each plane type a sensible starting zoom
+            return planeId switch
+            {
+                "the_ring" => 2.2f,
+                "nakamichi_glider" or "stealth_glider" or "the_bird" => 3.4f,
+                _ => 2.8f
+            };
         }
 
         private void UpdateUI()
@@ -152,16 +227,42 @@ namespace PaperWings.Folding
             }
         }
 
+        private PaperPlaneAnimator currentRealAnimator;
+        private ProceduralPaperPlane currentProcedural;
+
         private IEnumerator AnimateStep(string foldName, float duration)
         {
+            if (audioPlayer != null) audioPlayer.PlayFoldSound();
+
+            // Find the right animator (real or procedural)
+            if (currentRealAnimator == null && currentPaper != null)
+            {
+                // Try to get from the spawned model
+                currentRealAnimator = modelParent.GetComponentInChildren<PaperPlaneAnimator>();
+                currentProcedural = modelParent.GetComponentInChildren<ProceduralPaperPlane>();
+            }
+
             float t = 0;
             while (t < 1)
             {
                 t += Time.deltaTime / duration;
-                currentPaper.AnimateFold(foldName, Mathf.Clamp01(t));
+                float eased = Mathf.Clamp01(t);
+
+                if (currentRealAnimator != null)
+                    currentRealAnimator.AnimateFold(foldName, eased);
+                else if (currentProcedural != null)
+                    currentProcedural.AnimateFold(foldName, eased);
+
                 yield return null;
             }
-            currentPaper.AnimateFold(foldName, 1f);
+
+            // Final pose
+            if (currentRealAnimator != null)
+                currentRealAnimator.AnimateFold(foldName, 1f);
+            else if (currentProcedural != null)
+                currentProcedural.AnimateFold(foldName, 1f);
+
+            if (audioPlayer != null) audioPlayer.PlaySuccessSound();
         }
 
         private void NextStep()
@@ -169,11 +270,51 @@ namespace PaperWings.Folding
             if (currentStep < currentPlane.steps.Count - 1)
             {
                 currentStep++;
-                UpdateUI();
+                StartCoroutine(SmoothStepTransition());
             }
             else
             {
-                Debug.Log("Tutorial Complete! Ready for flight mode.");
+                // Plane fully folded — show success reward
+                ShowSuccessScreen();
+            }
+        }
+
+        private void ShowSuccessScreen()
+        {
+            if (successPanel != null)
+            {
+                successPanel.style.display = DisplayStyle.Flex;
+                if (successTitle != null)
+                    successTitle.text = $"Great job!\n{currentPlane.displayName} complete!";
+            }
+
+            if (launchToFlightBtn != null)
+                launchToFlightBtn.style.display = DisplayStyle.Flex;
+
+            if (audioPlayer != null)
+                audioPlayer.PlaySuccessSound();
+
+            Debug.Log($"[Folding] {currentPlane.displayName} folding tutorial completed successfully.");
+        }
+
+        private void LaunchToFlight()
+        {
+            if (currentPlane == null) return;
+
+            Debug.Log($"[Folding] Launching {currentPlane.displayName} into Flight Scene...");
+
+            PaperWings.Flight.SelectedPlaneHolder.SetPlane(currentPlane);
+
+            // Use smooth fade transition
+            var transition = FindObjectOfType<PaperWings.Core.SceneTransition>();
+            if (transition != null)
+            {
+                transition.LoadSceneWithFade("FlightDemo");
+            }
+            else
+            {
+                // Fallback if transition object not present
+                UnityEngine.SceneManagement.SceneManager.LoadScene("FlightDemo");
             }
         }
 
@@ -182,8 +323,15 @@ namespace PaperWings.Folding
             if (currentStep > 0)
             {
                 currentStep--;
-                UpdateUI();
+                StartCoroutine(SmoothStepTransition());
             }
+        }
+
+        private IEnumerator SmoothStepTransition()
+        {
+            // Small breathing room between steps for better feel
+            yield return new WaitForSeconds(0.12f);
+            UpdateUI();
         }
     }
 }

@@ -1,28 +1,55 @@
-# How to Test the Folding System Right Now (Early Phase 1)
+# How to Test the Full Experience (Folding + Real 3D Models + Flight) — Updated for Tomorrow
 
-## Step-by-step (takes ~3 minutes)
+## Prerequisites
+- Unity 6+
+- Both scenes added to Build Settings:
+  - `FoldingTutorialDemo`
+  - `FlightDemo`
+
+## Step-by-step (5–7 minutes)
 
 1. Open the project in Unity 6.
-2. Run the menu item:
-   **Paper Wings → Create MVP Plane Assets (v1.0 Locked 8)**
-3. This creates 8 `PaperPlaneDefinition` assets + `PaperPlaneLibrary.asset`.
-4. Create a new empty scene called `FoldingTutorialDemo`.
-5. Create an empty GameObject called "Folding System".
-6. Add these components:
-   - `FoldingTutorialManager`
-   - `FoldingDemoSetup`
-7. Create two UIDocuments:
-   - One using `PlaneSelectionScreen.uxml`
-   - One using `FoldingScreen.uxml`
-8. Assign them to the `FoldingTutorialManager`.
-9. Create a simple 3D plane using the `SimplePaperPlaneGenerator` (or just a Cube for now).
-10. Add the `PaperModelOrbitController` to your main camera and point it at the paper model.
 
-You should now be able to see the selection grid (populated from the 8 assets) and click a plane to enter the folding view with working touch orbit.
+2. Generate all plane data + real 3D models:
+   - **Paper Wings → HIGH INTENSITY - Generate All 8 MVP Planes + Demo Data**
+   - **Paper Wings → Generate Low-Poly Rigged Paper Planes (All 8)**
+   - **Paper Wings → Assign Real Models to Key PaperPlaneDefinitions**  
+     (This assigns the new 3D prefabs to Classic Dart, The Ring, Nakamichi Glider, and The Bird)
 
-## Touch Controls (already implemented)
+3. (Re)create the demo scenes if needed:
+   - **Paper Wings → HIGH INTENSITY - Create Playable Demo Scene**
+   - **Paper Wings → HIGH INTENSITY - Create FlightDemo Scene**
 
-- 1 finger drag → Orbit the paper model
-- 2 finger pinch → Zoom in/out
+4. Open `FoldingTutorialDemo.unity` and press **Play**.
 
-This is the foundation. Real folding steps + animations come next once you approve the current state.
+5. In the plane selection grid, choose one of the planes with real models (recommended order):
+   - Classic Dart
+   - The Ring
+   - Nakamichi Glider
+   - The Bird
+
+6. Fold the plane completely. You should now see the proper low-poly 3D model with natural folding animation.
+
+7. On the success screen, press **"Launch to Flight →"**.
+
+You will load into the FlightDemo scene flying the real 3D model with correct physics, thermals, flutter, stats, and the improved camera (including right-side free-look).
+
+## Controls
+
+**Folding:**
+- Tap to advance steps (animations play automatically)
+- Touch orbit on the 3D model
+
+**Flight:**
+- Swipe anywhere → Steer (pitch + roll)
+- Drag on the **right half of the screen** → Free-look camera
+- Fly through green thermal zones for extra lift
+
+**General:**
+- "Return to Folding" button in flight scene
+
+## Notes
+- The other 4 planes still use the procedural fallback (you can assign their prefabs manually if desired).
+- All models use the same bone names, so animations and future real art swaps will work seamlessly.
+
+Test the full loop (fold → launch → fly → return) and let me know how the new 3D models feel!
