@@ -74,13 +74,33 @@ See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issu
 
 ---
 
+## Phase 7: Release Preparation (Current)
+
+**Status:** Just started. All Phase 6 deliverables complete and pushed.
+
+### Phase 7 Deliverables (In Progress)
+- New comprehensive `Phase-7-Release.md` created with full App Store + Google Play checklists, asset requirements, privacy policy guidance, and pre-submission verification steps.
+- New Editor helper: `DeviceBuildHelper.cs` — "Paper Wings / HIGH INTENSITY - Prepare for Device Build (iOS + Android)" that sets production PlayerSettings (bundle IDs, IL2CPP, version, SDK targets, architectures).
+- Master roadmap and README updated to reflect entry into final release preparation phase.
+
+### Current Blockers (from Phase-7 doc)
+- Replace IAP simulation with real RevenueCat integration
+- Production Supabase environment + privacy policy hosted and linked
+- Full visual asset production (icons, screenshots for all device sizes)
+- Final device testing pass + removal of dev tools in release builds
+
+See `notes/Roadmap/Phase-7-Release.md` for the complete release checklist and next steps.
+
+---
+
 ## High-Level Timeline Estimate
 
 | Milestone                  | Estimated Timeline     | Notes |
 |---------------------------|------------------------|-------|
 | Phase 0–5 Complete        | Done (May 2026)        | Full foundation + monetization simulation |
 | Phase 6 (Testing & Polish)| Late May – June 2026   | Performance, loading, device QA, final checklist |
-| Beta + Store Submission   | July 2026              | After Phase 6 sign-off |
+| Phase 7 (Release Prep)    | June – July 2026       | Store assets, real IAP, privacy policy, device builds, submission |
+| Public Launch             | July 2026+             | After Phase 7 sign-off and review approval |
 
 **Note:** Timeline is intentionally relaxed while Huh? and other ventures are active.
 
@@ -124,4 +144,4 @@ See `notes/Roadmap/Phase-6-Testing.md` for the detailed checklist and known issu
 
 *This is the single source of truth for the overall project roadmap. Individual phase documents contain the detailed task lists.*
 
-**Last major update:** May 2026 (Post-Hub + Badges + Phase 4 kickoff)
+**Last major update:** May 2026 (Phase 7 Release Preparation kickoff — Phase-7 doc + DeviceBuildHelper)

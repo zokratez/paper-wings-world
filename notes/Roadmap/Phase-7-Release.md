@@ -1,0 +1,221 @@
+# Phase 7: Release Preparation
+
+**Goal:** Take the polished, tested build from Phase 6 through all store submission requirements, asset production, legal/compliance, and final pre-flight checks so the app can ship to the App Store and Google Play.
+
+**Current State (end of Phase 6):**  
+- Fully playable end-to-end experience with folding, flight, progression, accounts (Supabase), and freemium gating (simulation mode).  
+- Performance centralized, LOD, splash, transitions, and device testing checklist complete.  
+- Editor tooling for scenes and mobile settings in place.
+
+**Phase 7 will turn a high-quality internal build into a shippable consumer product.**
+
+---
+
+## 1. Store Accounts & App Records (Prerequisites)
+
+### Apple App Store Connect
+- [ ] Apple Developer Program membership ($99/year) active
+- [ ] Create App ID + Bundle Identifier in developer portal (must exactly match Unity PlayerSettings)
+- [ ] Create new app record in App Store Connect
+  - Primary language: English (United States)
+  - Secondary: Spanish (if localized later)
+- [ ] Agree to all contracts, tax forms, and banking setup (critical for IAP payouts)
+- [ ] Add test users for TestFlight (internal + external)
+
+### Google Play Console
+- [ ] Google Play Console developer account ($25 one-time)
+- [ ] Create new app
+- [ ] Set up merchant account for IAP (if offering paid content)
+- [ ] Complete content rating questionnaire (important for kid-friendly app)
+- [ ] Prepare for 64-bit compliance and target API level
+
+**Critical:** Bundle identifier must be identical across Unity, Apple, and Google (e.g. `com.ooabisabi.paperwingsworld`).
+
+---
+
+## 2. Required Visual & Brand Assets
+
+### App Icons
+- **iOS:** All required sizes (1024×1024 App Store icon is mandatory). Use Asset Catalog or Unity icon slots.
+- **Android:** Adaptive icon (foreground + background) + legacy icons at multiple densities (mdpi to xxxhdpi). 512×512 Play Store icon.
+- **Source:** Provide master 1024×1024 or 2048×2048 vector/SVG for future-proofing.
+
+### Screenshots (Mandatory for both stores)
+**iPhone (required for iOS):**
+- 6.7" (iPhone 14 Pro Max / 15 Pro Max / 16 Pro Max)
+- 6.5" (iPhone 11 Pro Max / XS Max)
+- 5.5" (iPhone 8 Plus)
+
+**iPad (required for iOS tablet support):**
+- 12.9" (3rd gen+)
+- 11" (iPad Pro)
+
+**Android (recommended sizes for tablets + phones):**
+- 7" tablet (1920×1200 or similar)
+- 10" tablet
+- Phone screenshots (various aspect ratios)
+
+**Guidelines:**
+- Show real gameplay (folding steps, beautiful flight regions, post-flight summary with badges).
+- Include the Main Hub, Plane Selection, and at least one flight scene.
+- No placeholder or dev-only UI.
+- Dark / light mode variants if the app supports system theme.
+
+### Feature Graphic (Google Play only)
+- 1024×500 px — eye-catching banner showing the hero experience.
+
+### Promo Video (Optional but recommended)
+- 30–60 second vertical or horizontal video of folding + flight.
+
+### Store Listing Assets
+- App name: "Paper Wings World"
+- Subtitle / short description (30 chars)
+- Full description (4000 chars max)
+- Keywords (App Store)
+- Category: Education or Games (Simulation / Educational)
+
+---
+
+## 3. Store Listing Copy (English Primary)
+
+### Required Text
+- **Title:** Paper Wings World
+- **Subtitle:** Fold real paper airplanes. Fly them around the world.
+- **Description:** Write compelling, benefit-focused copy highlighting:
+  - Educational folding tutorials with real 3D models
+  - Realistic physics and beautiful global regions
+  - Progression, personal bests, and mastery badges
+  - Free core experience + optional premium unlocks
+- **What's New** (for v1.0): "First public release"
+
+**Localization note:** English is the initial language. Spanish support can be added later (aligns with other ooabisabi projects).
+
+### Privacy & Data
+- Privacy Policy URL (must be publicly hosted and linked in both stores)
+- Data types collected (account, progress, purchase history)
+- Children's privacy considerations (COPPA — app is kid-friendly)
+
+---
+
+## 4. Privacy Policy & Legal Requirements
+
+**Mandatory for both stores** (especially because of accounts + IAP):
+
+- Host a clear Privacy Policy (recommended location: `https://paperwingsworld.com/privacy` or via GitHub pages / Notion / dedicated page).
+- The policy must cover:
+  - What data is collected (Supabase user IDs, email if provided, flight progress, purchase receipts)
+  - How data is used and shared (no selling of personal data)
+  - Third parties (Supabase, Apple/Google payment processors, future analytics)
+  - User rights (delete account, data export)
+  - Children's data handling
+
+**Recommended additional pages:**
+- Terms of Service
+- Support / Contact email
+
+**App Store specific:** Include a link in the app (Settings screen already has account section — add a "Privacy Policy" button that opens the URL).
+
+**Google Play:** Provide the policy URL during app creation.
+
+---
+
+## 5. Technical & Build Requirements Before Submission
+
+### Unity PlayerSettings (use the new Editor helper)
+- Correct Bundle Identifier for iOS and Android
+- Version and Build numbers (semantic: 1.0.0 / 1)
+- Company Name: ooabisabi LLC (or your legal entity)
+- Product Name: Paper Wings World
+- IL2CPP scripting backend (release performance)
+- Target iOS version: 15.0+
+- Android minSdk: 24, targetSdk: latest (34+)
+- Architectures: ARM64 for both platforms
+- Icons and splash configured (custom splash already implemented)
+
+### Backend & Monetization (Critical Blockers for Real Launch)
+- **Replace simulation mode** in `PurchaseManager` with real RevenueCat SDK + App Store / Play billing.
+- Switch Supabase to production project (new keys, RLS verified, backups enabled).
+- Remove or gate all dev-only UI (dev tools panel) for release builds (use conditional compilation or build flags).
+- Add crash reporting (Sentry or Unity Cloud Diagnostics) and analytics (PostHog / Plausible or Firebase).
+- Verify all webhooks (Stripe/RevenueCat if used) and deep link handling.
+
+### Testing Gates
+- Pass the entire **Final Testing Checklist** (see Phase-6-Testing.md) on hero devices + at least one low/mid device.
+- Internal TestFlight + Google Play Internal test track for 1+ week.
+- At least one full end-to-end purchase flow with real sandbox payments.
+- Account deletion / data export flow tested.
+- Offline behavior + cloud sync edge cases.
+
+---
+
+## 6. Editor Tooling for Release
+
+New in Phase 7:
+- `Paper Wings / HIGH INTENSITY - Prepare for Device Build (iOS + Android)` — one-click configuration of production PlayerSettings, bundle IDs, version, IL2CPP, SDK targets, etc.
+
+Run this helper immediately before every device build intended for TestFlight, internal track, or final submission.
+
+Also continue using:
+- Scene generation and model refresh tools
+- Previous mobile testing helper
+
+---
+
+## 7. Submission & Review Process
+
+### Apple
+- Upload via Xcode or Transporter
+- Complete App Review information (age rating, content descriptions, export compliance)
+- Submit for review (expect 1–7 days; longer for first app)
+
+### Google
+- Upload AAB via Play Console
+- Content rating, ads declaration (none), target audience (include "Designed for Families" if qualifying)
+- Submit for review (usually faster)
+
+**Common rejection reasons to pre-empt:**
+- Missing privacy policy link
+- Inaccurate content rating
+- IAP not properly integrated or described
+- Placeholder text or dev UI visible
+- Performance or crash issues on review devices
+
+---
+
+## 8. Post-Launch & Iteration Plan
+
+- Monitor crash reports and support emails in first 48 hours
+- Prepare v1.0.1 hotfix pipeline
+- Plan first content update (new plane or region) using existing data-driven system
+- Collect user feedback for future localization and feature prioritization
+- Consider "Designed for Families" or teacher resources later
+
+---
+
+## 9. Current Blockers & Open Items (Update as Resolved)
+
+- [ ] Real RevenueCat integration (currently simulation)
+- [ ] Production Supabase project + verified RLS + backup strategy
+- [ ] Privacy policy hosted and linked from app + store listings
+- [ ] Full set of store screenshots and icons (production quality)
+- [ ] Final device testing pass on the Top 10 checklist
+- [ ] Remove / conditional-compile dev tools panel for release builds
+- [ ] Add "Privacy Policy" and support links in Settings UI
+
+---
+
+## 10. Next Steps After This Document
+
+1. Create and host privacy policy + legal pages.
+2. Produce all visual assets.
+3. Integrate real IAP backend (RevenueCat).
+4. Run the new Device Build helper and produce signed builds.
+5. Execute full device test matrix.
+6. Create App Store / Play Console records.
+7. Submit for review.
+
+---
+
+*This document is the living single source of truth for all release preparation work.*
+
+**Phase 7 will get Paper Wings World from "excellent internal demo" to "shipped on the App Store and Google Play."**
