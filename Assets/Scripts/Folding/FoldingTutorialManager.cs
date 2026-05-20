@@ -5,6 +5,8 @@ using PaperWings.Folding;
 using PaperWings.Demo;
 using PaperWings.Backend;
 using PaperWings.Progression;
+using PaperWings.Flight;
+using PaperWings.Core;
 
 namespace PaperWings.Folding
 {

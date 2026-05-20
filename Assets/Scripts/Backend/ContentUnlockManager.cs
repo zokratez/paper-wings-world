@@ -1,8 +1,10 @@
+using PaperWings.Folding;
+using PaperWings.Backend;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
 using PaperWings.Flight;
-using PaperWings.Folding.Data;
+using PaperWings.Progression;
 
 namespace PaperWings.Backend
 {
