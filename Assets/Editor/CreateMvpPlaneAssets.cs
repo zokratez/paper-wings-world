@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using PaperWings.Folding;
+using PaperWings.Core;
 using System.Collections.Generic;
 
 namespace PaperWings.EditorTools
